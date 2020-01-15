@@ -1,7 +1,8 @@
 package com.example.marvellisimo
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
@@ -11,7 +12,9 @@ import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 
+
 class CharacterSerieResultListActivity : AppCompatActivity() {
+    private lateinit var b: Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,17 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
+
+        adapter.setOnItemClickListener { item, view ->
+            val selectedItem = item as SearchResultItem
+            val intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+
+            b = Bundle()
+            b.putSerializable("item", selectedItem.serie)
+            intent.putExtras(b)
+
+            startActivity(intent)
+        }
         recyclerView_search_result.adapter = adapter
 
 
