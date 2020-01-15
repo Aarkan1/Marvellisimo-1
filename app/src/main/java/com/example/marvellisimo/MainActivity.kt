@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val TAG = "MainActivity"
+private const val TAG = "RegisterActivity"
 
 class MainActivity : AppCompatActivity() {
 
