@@ -9,26 +9,45 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.R
+import com.google.android.gms.dynamic.IFragmentWrapper
 import kotlinx.android.synthetic.main.activity_search.*
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
-    val history = arrayListOf("Spiderman", "Antman", "Aquaman", "Batman", "Superman")
+//    val history = arrayListOf(
+//        "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman",
+//        "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman",
+//        "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman",
+//        "Aquaman", "Batman", "Superman"
+//    )
+
+    val history = arrayListOf<String>()
     lateinit var historyAdapter: HistoryViewAdapter
+    lateinit var viewModel: SearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d(TAG, "Getting viewModel")
+        viewModel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
+
         Log.d(TAG, "onCreate: starts")
         setContentView(R.layout.activity_search)
 
         Log.d(TAG, "onCreate: binding viewAdapter")
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
-        this.historyAdapter = HistoryViewAdapter(history, this)
+        this.historyAdapter = HistoryViewAdapter(viewModel.history.value!!, this)
         historyRecyclerView.adapter = historyAdapter
+        viewModel.history.observe(this, Observer<ArrayList<String>> {
+            historyAdapter.setItems(it)
+            historyAdapter.notifyDataSetChanged()
+        })
 
         Log.d(TAG, "onCreate: setting toolbar")
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -48,8 +67,11 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         searchView.setSearchableInfo(searchableInfo)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                Log.d(TAG, "searchView: submitted")
+            override fun onQueryTextSubmit(s: String?): Boolean {
+                Log.d(TAG, "searchView: submitted - $s")
+                if (s == null) return false
+
+                if (!history.contains(s)) viewModel.addToHistory(s)
                 finish()
                 return true
             }
@@ -61,6 +83,8 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         })
 
         searchView.isIconified = false
+
+        searchView.queryHint = "characters or series"
 
         Log.d(TAG, "onCreateOptionsMenu: ends")
         return true
@@ -81,6 +105,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     }
 
     override fun itemClicked(item: String) {
-
+        Log.d(TAG, "itemClicked - $item")
+        finish()
     }
 }

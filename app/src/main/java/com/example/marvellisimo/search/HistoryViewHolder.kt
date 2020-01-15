@@ -18,7 +18,7 @@ class HistoryViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     }
 }
 
-class HistoryViewAdapter(private val items: ArrayList<String>, private val listener: HistoryListActionListener) :
+class HistoryViewAdapter(private var items: ArrayList<String>, private val listener: HistoryListActionListener) :
     RecyclerView.Adapter<HistoryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         val view = LayoutInflater
@@ -31,6 +31,10 @@ class HistoryViewAdapter(private val items: ArrayList<String>, private val liste
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         holder.setItem(items[position], listener)
+    }
+
+    fun setItems(items: ArrayList<String>) {
+        this.items = items
     }
 
 }
