@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val TAG = "RegisterActivity"
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,18 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         // launching coroutine
         Log.d(TAG, "about to start coroutine")
-        CoroutineScope(Default).launch {
-            repeat(100) {
-                // this could be api call instead
-                val value = getHelloWorld()
-                Log.d(TAG, value)
-            }
-
-            // if we want perform some change on UI we can just call
-            // CoroutineScope(Main).launch{
-            //  ...and change UI here
-            // }
-        }.start()
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
