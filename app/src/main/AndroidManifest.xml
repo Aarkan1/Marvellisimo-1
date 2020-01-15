@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".CharacterSerieDetailsActivity"></activity>
-        <activity android:name=".CharacterSerieResultListActivity">
+        <activity android:name=".ui.searchResult.CharacterSerieResultListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

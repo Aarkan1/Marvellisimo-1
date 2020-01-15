@@ -1,10 +1,13 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.ui.searchResult
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.CharacterSerieDetailsActivity
+import com.example.marvellisimo.R
+import com.example.marvellisimo.ui.entities.Serie
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -25,9 +28,36 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
         val adapter = GroupAdapter<GroupieViewHolder>()
 
-        adapter.add(SearchResultItem(Serie("1234", "Breaking Bad", "drama", "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmE2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg" )))
-        adapter.add(SearchResultItem(Serie("3452345", "Lucifer", "Morningstar has decided he's had enough of being the dutiful servant in Hell and decides to spend some time on Earth to better understand humanity", "https://cdn.cdon.com/media-dynamic/images/product/movie/dvd/image782/luciferseason3nordic-45009151-front-3.JPG" )))
-        adapter.add(SearchResultItem(Serie("123243534", "Game Of Thrones", "drama", "https://cdn.cdon.com/media-dynamic/images/product/music/album/image3/game_of_thrones_season_8_mus-47834514-frntl.jpg" )))
+        adapter.add(
+            SearchResultItem(
+                Serie(
+                    "1234",
+                    "Breaking Bad",
+                    "drama",
+                    "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmE2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
+                )
+            )
+        )
+        adapter.add(
+            SearchResultItem(
+                Serie(
+                    "3452345",
+                    "Lucifer",
+                    "Morningstar has decided he's had enough of being the dutiful servant in Hell and decides to spend some time on Earth to better understand humanity",
+                    "https://cdn.cdon.com/media-dynamic/images/product/movie/dvd/image782/luciferseason3nordic-45009151-front-3.JPG"
+                )
+            )
+        )
+        adapter.add(
+            SearchResultItem(
+                Serie(
+                    "123243534",
+                    "Game Of Thrones",
+                    "drama",
+                    "https://cdn.cdon.com/media-dynamic/images/product/music/album/image3/game_of_thrones_season_8_mus-47834514-frntl.jpg"
+                )
+            )
+        )
 
 
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
