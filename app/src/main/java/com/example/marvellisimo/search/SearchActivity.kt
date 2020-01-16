@@ -1,6 +1,7 @@
 package com.example.marvellisimo.search
 
 import android.app.SearchManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -64,11 +65,13 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "onCreateOptionsMenu: starts")
 
         menuInflater.inflate(R.menu.search, menu)
-
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
+
+        Log.d(TAG, searchableInfo.toString())
         searchView.setSearchableInfo(searchableInfo)
+
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String?): Boolean {
