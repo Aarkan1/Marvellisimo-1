@@ -14,8 +14,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.CharacterSerieResultListActivity
 import com.example.marvellisimo.R
+import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -69,7 +69,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         val searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
 
-        Log.d(TAG, searchableInfo.toString())
+//        Log.d(TAG, searchableInfo.toString())
         searchView.setSearchableInfo(searchableInfo)
 
 
