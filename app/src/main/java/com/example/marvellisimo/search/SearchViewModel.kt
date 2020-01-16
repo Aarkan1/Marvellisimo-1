@@ -9,8 +9,18 @@ private const val TAG = "SearchViewModel"
 class SearchViewModel : ViewModel() {
     val history = MutableLiveData<ArrayList<String>>().apply { value = ArrayList() }
 
-    fun addToHistory(item: String) {
-        Log.d(TAG, "addToHistory - $item")
+    fun loadHistory(phrase: String = "") {
+        Log.d(TAG, "loadHistory: starts")
+        history.value = arrayListOf(
+            "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman",
+            "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman",
+            "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman",
+            "Aquaman", "Batman", "Superman"
+        )
+    }
+
+    fun updateHistory(item: String) {
+        Log.d(TAG, "updateHistory - $item")
         val newList = ArrayList(history.value!!)
         newList.add(item)
         history.value = newList

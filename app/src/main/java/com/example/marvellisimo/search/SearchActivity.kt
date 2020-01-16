@@ -6,54 +6,55 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.R
-import com.google.android.gms.dynamic.IFragmentWrapper
 import kotlinx.android.synthetic.main.activity_search.*
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
-//    val history = arrayListOf(
-//        "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman",
-//        "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman",
-//        "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman",
-//        "Aquaman", "Batman", "Superman"
-//    )
-
     val history = arrayListOf<String>()
     lateinit var historyAdapter: HistoryViewAdapter
     lateinit var viewModel: SearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_search)
 
         Log.d(TAG, "Getting viewModel")
         viewModel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
 
-        Log.d(TAG, "onCreate: starts")
-        setContentView(R.layout.activity_search)
-
-        Log.d(TAG, "onCreate: binding viewAdapter")
-        historyRecyclerView.layoutManager = LinearLayoutManager(this)
-        this.historyAdapter = HistoryViewAdapter(viewModel.history.value!!, this)
-        historyRecyclerView.adapter = historyAdapter
-        viewModel.history.observe(this, Observer<ArrayList<String>> {
-            historyAdapter.setItems(it)
-            historyAdapter.notifyDataSetChanged()
-        })
+        createViewAdapter()
 
         Log.d(TAG, "onCreate: setting toolbar")
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        viewModel.loadHistory()
+
         Log.d(TAG, "onCreate: ends")
+    }
+
+    private fun createViewAdapter() {
+        Log.d(TAG, "createViewAdapter: starts")
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        this.historyAdapter = HistoryViewAdapter(viewModel.history.value!!, this)
+        historyRecyclerView.adapter = historyAdapter
+
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+        historyRecyclerView.addItemDecoration(dividerItemDecoration)
+
+        viewModel.history.observe(this, Observer<ArrayList<String>> {
+            historyAdapter.setItems(it)
+            historyAdapter.notifyDataSetChanged()
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -71,20 +72,22 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
                 Log.d(TAG, "searchView: submitted - $s")
                 if (s == null) return false
 
-                if (!history.contains(s)) viewModel.addToHistory(s)
+                if (!history.contains(s)) viewModel.updateHistory(s)
                 finish()
                 return true
             }
 
-            override fun onQueryTextChange(p0: String?): Boolean {
+            override fun onQueryTextChange(s: String?): Boolean {
                 Log.d(TAG, "searchView: text changed")
+                if (s == null) return true
+                viewModel.loadHistory(s)
                 return true
             }
         })
 
         searchView.isIconified = false
 
-        searchView.queryHint = "characters or series"
+        searchView.queryHint = "Characters or series"
 
         Log.d(TAG, "onCreateOptionsMenu: ends")
         return true
@@ -106,6 +109,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
     override fun itemClicked(item: String) {
         Log.d(TAG, "itemClicked - $item")
+
         finish()
     }
 }
