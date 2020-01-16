@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.marvellisimo.ui.entities.Serie
+import com.example.marvellisimo.ui.entities.CharacterEntity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_character_serie_details.*
 
@@ -17,7 +17,7 @@ class CharacterSerieDetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character_serie_details)
 
         var selectedResultItem = intent.getSerializableExtra("item")
-        selectedResultItem = selectedResultItem as Serie
+        selectedResultItem = selectedResultItem as CharacterEntity
 
         supportActionBar!!.title = selectedResultItem.name
 

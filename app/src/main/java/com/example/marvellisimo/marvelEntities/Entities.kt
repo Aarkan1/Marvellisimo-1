@@ -1,6 +1,4 @@
-package com.example.marvellisimo.character
-
-import retrofit2.http.Url
+package com.example.marvellisimo.marvelEntities
 
 data class CharacterDataWrapper(
     // val copyright: String, // optional): The copyright notice for the returned result.,
@@ -58,16 +56,16 @@ data class SeriesDataContainer (
 
 data class Series (
     val id: Int, //(int, optional): The unique ID of the series resource.,
-    val title: Int, // (string, optional): The canonical title of the series.,
-    val description: String // (string, optional): A description of the series.,
+    val title: String, // (string, optional): The canonical title of the series.,
+    val description: String, // (string, optional): A description of the series.,
     /*resourceURI (string, optional): The canonical URL identifier for this resource.,
     urls (Array[Url], optional): A set of public web site URLs for the resource.,
     startYear (int, optional): The first year of publication for the series.,
     endYear (int, optional): The last year of publication for the series (conventionally, 2099 for ongoing series) .,
     rating (string, optional): The age-appropriateness rating for the series.,
-    modified (Date, optional): The date the resource was most recently modified.,
-    thumbnail (Image, optional): The representative image for this series.,
-    comics (ComicList, optional): A resource list containing comics in this series.,
+    modified (Date, optional): The date the resource was most recently modified.,*/
+    val thumbnail: Image //The representative image for this series.,
+    /*comics (ComicList, optional): A resource list containing comics in this series.,
     stories (StoryList, optional): A resource list containing stories which occur in comics in this series.,
     events (EventList, optional): A resource list containing events which take place in comics in this series.,
     characters (CharacterList, optional): A resource list containing characters which appear in comics in this series.,
