@@ -2,6 +2,7 @@ package com.example.marvellisimo.search
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,14 +13,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.CharacterSerieResultListActivity
 import com.example.marvellisimo.R
 import kotlinx.android.synthetic.main.activity_search.*
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), HistoryListActionListener {
-
-    val history = arrayListOf<String>()
     lateinit var historyAdapter: HistoryViewAdapter
     lateinit var viewModel: SearchViewModel
 
@@ -71,9 +71,9 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
             override fun onQueryTextSubmit(s: String?): Boolean {
                 Log.d(TAG, "searchView: submitted - $s")
                 if (s == null) return false
+                viewModel.updateHistory(s)
 
-                if (!history.contains(s)) viewModel.updateHistory(s)
-                finish()
+                switchToCharacterSerieList(s)
                 return true
             }
 
@@ -109,7 +109,13 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
     override fun itemClicked(item: String) {
         Log.d(TAG, "itemClicked - $item")
+        switchToCharacterSerieList(item)
+    }
 
-        finish()
+    private fun switchToCharacterSerieList(search: String) {
+        Log.d(TAG, "switchToCharacterSerieList: starts")
+        startActivity(
+            Intent(this, CharacterSerieResultListActivity::class.java).putExtra("search", search)
+        )
     }
 }
