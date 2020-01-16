@@ -1,28 +1,38 @@
 package com.example.marvellisimo.search
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.marvellisimo.search.realm.HistoryItem
+import io.realm.Realm
+import io.realm.Sort
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 
 private const val TAG = "SearchViewModel"
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(application: Application) : AndroidViewModel(application) {
     val history = MutableLiveData<ArrayList<String>>().apply { value = ArrayList() }
+
+    init {
+        Realm.init(getApplication<Application>().applicationContext)
+    }
 
     fun loadHistory(phrase: String = "") {
         Log.d(TAG, "loadHistory: starts")
-        history.value = arrayListOf(
-            "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman",
-            "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman", "Aquaman",
-            "Batman", "Superman", "Spiderman", "Antman", "Aquaman", "Batman", "Superman", "Spiderman", "Antman",
-            "Aquaman", "Batman", "Superman"
-        )
+
+        Realm.getDefaultInstance().executeTransaction {
+            val result = it.where(HistoryItem::class.java).sort("updated", Sort.DESCENDING).findAll()
+                .toArray().map { (it as HistoryItem).phrase }
+
+            CoroutineScope(Main).launch { history.value = ArrayList(result) }
+        }
     }
 
-    fun updateHistory(item: String) {
-        Log.d(TAG, "updateHistory - $item")
-        val newList = ArrayList(history.value!!)
-        newList.add(item)
-        history.value = newList
+    fun updateHistory(item: String) = Realm.getDefaultInstance().executeTransaction {
+        it.insertOrUpdate(HistoryItem(item, System.currentTimeMillis()))
     }
 }

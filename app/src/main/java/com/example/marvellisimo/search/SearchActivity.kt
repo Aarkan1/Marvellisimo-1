@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.CharacterSerieResultListActivity
 import com.example.marvellisimo.R
 import kotlinx.android.synthetic.main.activity_search.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 
 private const val TAG = "SearchActivity"
 
@@ -37,7 +40,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.loadHistory()
+        CoroutineScope(IO).launch { withContext(IO) { viewModel.loadHistory() } }
 
         Log.d(TAG, "onCreate: ends")
     }
@@ -71,6 +74,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
             override fun onQueryTextSubmit(s: String?): Boolean {
                 Log.d(TAG, "searchView: submitted - $s")
                 if (s == null) return false
+
                 viewModel.updateHistory(s)
 
                 switchToCharacterSerieList(s)
@@ -109,6 +113,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
     override fun itemClicked(item: String) {
         Log.d(TAG, "itemClicked - $item")
+        CoroutineScope(Main).launch { viewModel.updateHistory(item) }
         switchToCharacterSerieList(item)
     }
 
