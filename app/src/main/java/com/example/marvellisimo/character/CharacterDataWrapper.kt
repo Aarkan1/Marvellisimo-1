@@ -24,7 +24,7 @@ data class Character(
     //val modified: Date, //, optional): The date the resource was most recently modified.,
     //val resourceURI: string, //, optional): The canonical URL identifier for this resource.,
     //val urls: Array, //[Url], optional): A set of public web site URLs for the resource.,
-    //val thumbnail: Image, //, optional): The representative image for this character.,
+    val thumbnail: Image, //, optional): The representative image for this character.,
     /*val comics: ComicList, //, optional): A resource list containing comics which feature this character.,
     val stories: StoryList, //, optional): A resource list of stories in which this character appears.,
     val events: EventList, //, optional): A resource list of events in which this character appears.,
@@ -74,4 +74,9 @@ data class Series (
     creators (CreatorList, optional): A resource list of creators whose work appears in comics in this series.,
     next (SeriesSummary, optional): A summary representation of the series which follows this series.,
     previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
+)
+
+data class Image (
+    val path: String, // The directory path of to the image.,
+    val extension: String // The file extension for the image.
 )
