@@ -2,16 +2,20 @@ package com.example.marvellisimo.ui.searchResult
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.CharacterSerieDetailsActivity
+import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.R
 import com.example.marvellisimo.ui.entities.Serie
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 
@@ -24,6 +28,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character_serie_result_list)
 
         supportActionBar!!.title = "hejjj"
+
+        getAllCharacters()
 
 
         val adapter = GroupAdapter<GroupieViewHolder>()
@@ -77,6 +83,18 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
 
 
+    }
+
+    private fun getAllCharacters() {
+       MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { result, err ->
+                if (err?.message != null) Log.d("__", "Error getAllSeries " + err.message)
+                else {
+                    Log.d("___", "I got a getAllSeries $result")
+                }
+            }
     }
 }
 
