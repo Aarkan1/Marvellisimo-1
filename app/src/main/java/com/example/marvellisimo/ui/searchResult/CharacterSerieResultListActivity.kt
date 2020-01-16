@@ -32,57 +32,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         getAllCharacters()
 
 
-        val adapter = GroupAdapter<GroupieViewHolder>()
-
-        adapter.add(
-            SearchResultItem(
-                Serie(
-                    "1234",
-                    "Breaking Bad",
-                    "drama",
-                    "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmE2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
-                )
-            )
-        )
-        adapter.add(
-            SearchResultItem(
-                Serie(
-                    "3452345",
-                    "Lucifer",
-                    "Morningstar has decided he's had enough of being the dutiful servant in Hell and decides to spend some time on Earth to better understand humanity",
-                    "https://cdn.cdon.com/media-dynamic/images/product/movie/dvd/image782/luciferseason3nordic-45009151-front-3.JPG"
-                )
-            )
-        )
-        adapter.add(
-            SearchResultItem(
-                Serie(
-                    "123243534",
-                    "Game Of Thrones",
-                    "drama",
-                    "https://cdn.cdon.com/media-dynamic/images/product/music/album/image3/game_of_thrones_season_8_mus-47834514-frntl.jpg"
-                )
-            )
-        )
-
-
-        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
-        recyclerView_search_result.addItemDecoration(dividerItemDecoration)
-
-
-        adapter.setOnItemClickListener { item, view ->
-            val selectedItem = item as SearchResultItem
-            val intent = Intent(this, CharacterSerieDetailsActivity::class.java)
-
-            b = Bundle()
-            b.putSerializable("item", selectedItem.serie)
-            intent.putExtras(b)
-
-            startActivity(intent)
-        }
-        recyclerView_search_result.adapter = adapter
-
-
     }
 
     private fun getAllCharacters() {
@@ -93,6 +42,71 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
                 if (err?.message != null) Log.d("__", "Error getAllSeries " + err.message)
                 else {
                     Log.d("___", "I got a getAllSeries $result")
+
+                    val adapter = GroupAdapter<GroupieViewHolder>()
+
+                    for ( character in result.data.results){
+                        //Log.d("____", character.thumbnail.toString())
+                        adapter.add(
+                            SearchResultItem(
+                                Serie(
+                                    character.id.toString(),
+                                    character.name,
+                                    character.description,
+                                    "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmE2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
+                                )
+                            )
+                        )
+                    }
+
+                    adapter.add(
+                        SearchResultItem(
+                            Serie(
+                                "1234",
+                                "Breaking Bad",
+                                "drama",
+                                "https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmE2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
+                            )
+                        )
+                    )
+                    adapter.add(
+                        SearchResultItem(
+                            Serie(
+                                "3452345",
+                                "Lucifer",
+                                "Morningstar has decided he's had enough of being the dutiful servant in Hell and decides to spend some time on Earth to better understand humanity",
+                                "https://cdn.cdon.com/media-dynamic/images/product/movie/dvd/image782/luciferseason3nordic-45009151-front-3.JPG"
+                            )
+                        )
+                    )
+                    adapter.add(
+                        SearchResultItem(
+                            Serie(
+                                "123243534",
+                                "Game Of Thrones",
+                                "drama",
+                                "https://cdn.cdon.com/media-dynamic/images/product/music/album/image3/game_of_thrones_season_8_mus-47834514-frntl.jpg"
+                            )
+                        )
+                    )
+
+
+                    val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+                    recyclerView_search_result.addItemDecoration(dividerItemDecoration)
+
+
+                    adapter.setOnItemClickListener { item, view ->
+                        val selectedItem = item as SearchResultItem
+                        val intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+
+                        b = Bundle()
+                        b.putSerializable("item", selectedItem.serie)
+                        intent.putExtras(b)
+
+                        startActivity(intent)
+                    }
+                    recyclerView_search_result.adapter = adapter
+
                 }
             }
     }
