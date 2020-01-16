@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.ui.entities
 
 import java.io.Serializable
 
