@@ -17,15 +17,14 @@ private const val TAG = "SearchViewModel"
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
     val history = MutableLiveData<ArrayList<String>>().apply { value = ArrayList() }
 
-    init {
-        Realm.init(getApplication<Application>().applicationContext)
-    }
-
     fun loadHistory(phrase: String = "") {
         Log.d(TAG, "loadHistory: starts")
 
         Realm.getDefaultInstance().executeTransaction {
-            val result = it.where(HistoryItem::class.java).sort("updated", Sort.DESCENDING).findAll()
+            val result = it.where(HistoryItem::class.java).like("phrase", "$phrase*")
+                .sort("updated", Sort.DESCENDING)
+                .limit(50)
+                .findAll()
                 .toArray().map { (it as HistoryItem).phrase }
 
             CoroutineScope(Main).launch { history.value = ArrayList(result) }
