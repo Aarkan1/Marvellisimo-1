@@ -37,14 +37,14 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
-        //val searchString =intent.getStringExtra("search")
-        val searchString = "spider"
+        val searchString =intent.getStringExtra("search")
+        //val searchString = "spider"
         val searchType =intent.getStringExtra("type") ?: "characters"
         //val searchType = "characters"
 
         supportActionBar!!.title = searchString
 
-        if (searchType == "series") getAllSeries() else getAllCharacters()
+        if (searchType == "series") getAllSeries(searchString) else getAllCharacters(searchString)
 
         resultListListener()
     }
@@ -68,10 +68,10 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
     }
 
-    private fun getAllSeries() {
+    private fun getAllSeries(searchString: String?) {
         CoroutineScope(IO).launch {
             try {
-                val series = MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = "Spider-Man")
+                val series = MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = searchString)
                 Log.d(TAG, "Getting series")
                 CoroutineScope(Main).launch {
                     addSeriesToResultList(series.data.results)
@@ -82,10 +82,10 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAllCharacters() {
+    private fun getAllCharacters(searchString: String?) {
         CoroutineScope(IO).launch {
             try {
-                val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
+                val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
                 Log.d(TAG, "Getting characters")
                 CoroutineScope(Main).launch {
                     addCharactersToResultList(characters.data.results)
@@ -119,14 +119,24 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addCharactersToResultList(characters: Array<Character>) {
         adapter.clear()
         for (character in characters) {
+            var des = character.description
+            des = if(des.length > 200)
+                des.substring(0,140) + "..."
+            else "No description found"
+
+            var name = character.name
+            if (name.length > 25)
+                name = character.name.substring(0, 25) + "..."
+
+            Log.d(TAG, "antal bokstäver: ${des}")
             val imagePath = character.thumbnail.path
                 .replace("http:", "https:") + "." + character.thumbnail.extension
             adapter.add(
                 CharacterSearchResultItem(
                     CharacterEntity(
                         character.id.toString(),
-                        character.name,
-                        character.description,
+                        name,
+                        des,
                         imagePath
                     )
                 )
