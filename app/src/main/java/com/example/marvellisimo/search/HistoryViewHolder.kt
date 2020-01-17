@@ -1,20 +1,26 @@
 package com.example.marvellisimo.search
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marvellisimo.R
 import kotlinx.android.synthetic.main.history_item_fragment.view.*
 
+private val TAG = "HistoryViewHolder"
+
 interface HistoryListActionListener {
     fun itemClicked(item: String)
+    fun iconClicked(item: String)
 }
 
 class HistoryViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     fun setItem(item: String, listener: HistoryListActionListener) {
         view.searchValue.text = item
-        view.setOnClickListener { listener.itemClicked(item) }
+
+        view.searchValue.setOnClickListener { listener.itemClicked(item) }
+        view.arrow_up_button.setOnClickListener { listener.iconClicked(item) }
     }
 }
 
