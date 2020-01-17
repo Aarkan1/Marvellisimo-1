@@ -14,7 +14,6 @@
             app:layout_constraintStart_toStartOf="@+id/historyRecyclerView"
             app:layout_constraintEnd_toEndOf="@+id/historyRecyclerView"/>
 
-
     <androidx.recyclerview.widget.RecyclerView
             android:layout_marginTop="?attr/actionBarSize"
             android:layout_width="match_parent"
