@@ -21,7 +21,9 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         Log.d(TAG, "loadHistory: starts")
 
         Realm.getDefaultInstance().executeTransaction {
-            val result = it.where(HistoryItem::class.java).like("phrase", "$phrase*")
+            val result = it.where(HistoryItem::class.java)
+                .notEqualTo("phrase", phrase)
+                .like("phrase", "$phrase*")
                 .sort("updated", Sort.DESCENDING)
                 .limit(50)
                 .findAll()

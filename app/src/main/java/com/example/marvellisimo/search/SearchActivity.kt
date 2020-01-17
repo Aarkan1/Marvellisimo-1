@@ -27,8 +27,11 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     lateinit var historyAdapter: HistoryViewAdapter
     lateinit var viewModel: SearchViewModel
 
+    lateinit var searchView: SearchView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
@@ -66,8 +69,13 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
         menuInflater.inflate(R.menu.search, menu)
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
+        searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
+
+
+        searchManager.searchablesInGlobalSearch[0].voiceSearchEnabled
+        Log.d(TAG, "globalSearch ${searchManager.searchablesInGlobalSearch.size}")
+        Log.d(TAG, "searchable: ${searchableInfo ?: null}")
 
 //        Log.d(TAG, searchableInfo.toString())
         searchView.setSearchableInfo(searchableInfo)
@@ -93,7 +101,6 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         })
 
         searchView.isIconified = false
-
         searchView.queryHint = "Characters or series"
 
         Log.d(TAG, "onCreateOptionsMenu: ends")
@@ -118,6 +125,11 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "itemClicked - $item")
         CoroutineScope(Main).launch { viewModel.updateHistory(item) }
         switchToCharacterSerieList(item)
+    }
+
+    override fun iconClicked(item: String) {
+        Log.d(TAG, "iconClicked: starts")
+        searchView.setQuery(item, false)
     }
 
     private fun switchToCharacterSerieList(search: String) {
