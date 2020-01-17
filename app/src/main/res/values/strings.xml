@@ -13,4 +13,12 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="back_to_regrister">Back to regrister</string>
+    <string name="username">Username</string>
+    <string name="regrister">Regrister</string>
+    <string name="go_to_login">Go to login</string>
+    <string name="toolbar_search">Search</string>
 </resources>

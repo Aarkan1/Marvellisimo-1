@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import android.view.MenuItem
+import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
@@ -26,7 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,18 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         // launching coroutine
         Log.d(TAG, "about to start coroutine")
-        CoroutineScope(Default).launch {
-            repeat(100) {
-                // this could be api call instead
-                val value = getHelloWorld()
-                Log.d(TAG, value)
-            }
-
-            // if we want perform some change on UI we can just call
-            // CoroutineScope(Main).launch{
-            //  ...and change UI here
-            // }
-        }.start()
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
@@ -71,6 +60,20 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected: starts")
+
+        val value = when (item.itemId) {
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+        Log.d(TAG, "onOptionsItemSelected: ends")
+        return value
     }
 
     override fun onSupportNavigateUp(): Boolean {
