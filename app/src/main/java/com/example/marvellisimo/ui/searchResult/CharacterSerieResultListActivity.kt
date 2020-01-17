@@ -28,16 +28,18 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+private const val TAG = "CharacterSerieResultListActivity"
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var b: Bundle
-    private lateinit var adapter : GroupAdapter<GroupieViewHolder>
+    private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private var seriesList = ArrayList<SeriesSearchResultItem>()
     private var charactersList = ArrayList<CharacterSearchResultItem>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_character_serie_result_list)
         adapter = GroupAdapter()
 
@@ -47,7 +49,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         supportActionBar!!.title = "hejjj"
 
         getAllCharacters()
-        getAllSeries()
+//        getAllSeries()
 /*
         CoroutineScope(IO).launch {
             // val chars = getAllCharacters.await()
@@ -56,20 +58,20 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             }
         }*/
 
-        Log.d("___", "Here is the end ${charactersList.size}")
-        Log.d("___", "Here is the end ${seriesList.size}")
+        Log.d(TAG, "Here is the end ${charactersList.size}")
+        Log.d(TAG, "Here is the end ${seriesList.size}")
 
-        charactersList.forEach {
-            Log.d("___", "Here is the loop ${charactersList.size}")
-
-            adapter.add(it)
-        }
-
-        seriesList.forEach {
-            Log.d("___", "Here is the loop ${charactersList.size}")
-
-            adapter.add(it)
-        }
+//        charactersList.forEach {
+//            Log.d(TAG, "Here is the loop ${charactersList.size}")
+//
+//            adapter.add(it)
+//        }
+//
+//        seriesList.forEach {
+//            Log.d(TAG, "Here is the loop ${charactersList.size}")
+//
+//            adapter.add(it)
+//        }
 
         recyclerView_search_result.adapter = adapter
 
@@ -79,13 +81,12 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun resultListListener() {
         lateinit var intent: Intent
         adapter.setOnItemClickListener { item, view ->
-            if (item is CharacterSearchResultItem){
+            if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterSerieDetailsActivity::class.java)
                 b = Bundle()
                 b.putSerializable("item", item.character)
                 intent.putExtras(b)
-            }
-            else if (item is SeriesSearchResultItem){
+            } else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, CharacterSerieDetailsActivity::class.java)
                 b = Bundle()
                 b.putSerializable("item", item.serie)
@@ -98,18 +99,18 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun getAllSeries() {
-        MarvelRetrofit.marvelService.getAllSeries()
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result, err ->
-                if (err?.message != null) Log.d("__", "Error getAllSeries " + err.message)
-                else {
-                    Log.d("__", "I got a getAllSeries $result")
-
-                    addSeriesToResultList(result.data.results)
-
-                }
-            }
+//        MarvelRetrofit.marvelService.getAllSeries()
+//            .subscribeOn(Schedulers.newThread())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe { result, err ->
+//                if (err?.message != null) Log.d(TAG, "Error getAllSeries " + err.message)
+//                else {
+//                    Log.d(TAG, "I got a getAllSeries $result")
+//
+//                    addSeriesToResultList(result.data.results)
+//
+//                }
+//            }
     }
 
     @SuppressLint("CheckResult")
@@ -120,13 +121,20 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             try {
                 characters = MarvelRetrofit.marvelService.getAllCharacters()
 
-                Log.d("__", "Error getAllCharacters ")
+                Log.d(TAG, "Getting characters")
 
                 CoroutineScope(Main).launch {
                     addCharactersToResultList(characters.data.results)
+
+                    charactersList.forEach {
+                        Log.d(TAG, "Here is the loop ${charactersList.size}")
+
+                        adapter.add(it)
+                    }
+
                 }
-            }catch (e: Exception){
-                Log.d("__", "Error getAllCharacters ")
+            } catch (e: Exception) {
+                Log.d(TAG, "Error getAllCharacters ")
             }
         }
 
@@ -137,9 +145,9 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { result, err ->
                 if (err?.message != null)
-                    Log.d("__", "Error getAllCharacters " + err.message)
+                    Log.d(TAG, "Error getAllCharacters " + err.message)
                 else {
-                    Log.d("__", "I got a getAllCharacters $result")
+                    Log.d(TAG, "I got a getAllCharacters $result")
 
                     addCharactersToResultList(result.data.results)
 
@@ -148,27 +156,28 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun addSeriesToResultList(series: Array<Series>) {
-        for ( serie in series){
+        for (serie in series) {
             val imagePath = serie.thumbnail.path
                 .replace("http:", "https:") + "." + serie.thumbnail.extension
 
             seriesList.add(
                 SeriesSearchResultItem(
                     SerieEntity(
-                    serie.id.toString(),
-                    serie.title,
-                    "dddd",
-                    imagePath)
+                        serie.id.toString(),
+                        serie.title,
+                        "dddd",
+                        imagePath
+                    )
                 )
             )
         }
     }
 
     private fun addCharactersToResultList(characters: Array<Character>) {
-        for ( character in characters){
+        for (character in characters) {
             val imagePath = character.thumbnail.path
                 .replace("http:", "https:") + "." + character.thumbnail.extension
-            Log.d("___", charactersList.size.toString())
+            Log.d(TAG, charactersList.size.toString())
             charactersList.add(
                 CharacterSearchResultItem(
                     CharacterEntity(

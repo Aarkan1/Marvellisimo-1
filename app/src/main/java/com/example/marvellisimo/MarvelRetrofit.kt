@@ -1,6 +1,7 @@
 package com.example.marvellisimo
 
 import com.example.marvellisimo.services.MarvelService
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -17,8 +18,8 @@ object MarvelRetrofit {
 
     val marvelService: MarvelService = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(getOkHttpClient())
         .build()
         .create(MarvelService::class.java)
@@ -28,7 +29,7 @@ object MarvelRetrofit {
         logging.level = if (LOG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
 
         val builder = OkHttpClient.Builder()
-            .addInterceptor{ chain ->
+            .addInterceptor { chain ->
                 val original = chain.request()
                 val originalHttpUrl = original.url()
                 val timestamp = System.currentTimeMillis().toString()
@@ -36,7 +37,7 @@ object MarvelRetrofit {
 
                 val url = originalHttpUrl.newBuilder()
                     .addQueryParameter("apikey", PUBLIC_KEY)
-                    .addQueryParameter("ts",timestamp)
+                    .addQueryParameter("ts", timestamp)
                     .addQueryParameter("hash", hash)
                     .build()
 

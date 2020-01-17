@@ -135,7 +135,9 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     private fun switchToCharacterSerieList(search: String) {
         Log.d(TAG, "switchToCharacterSerieList: starts")
         startActivity(
-            Intent(this, CharacterSerieResultListActivity::class.java).putExtra("search", search)
+            Intent(this, CharacterSerieResultListActivity::class.java)
+                .putExtra("type", "character/serie")
+                .putExtra("search", search)
         )
     }
 }

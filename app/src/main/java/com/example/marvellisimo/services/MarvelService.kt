@@ -19,13 +19,13 @@ interface MarvelService {
 
 
     @GET("series")
-    fun getAllSeries(
+    suspend fun getAllSeries(
         @Query("titleStartsWith") titleStartsWith: String? = null,
         @Query("title") byExactTitle: String? = null,
         @Query("startYear") startYear: Int? = null,
         @Query("orderBy") orderBy: String? = null,
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null
-    ): Single<SeriesDataWrapper>
+    ): SeriesDataWrapper
 
 }
