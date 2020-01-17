@@ -10,14 +10,15 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+
         <activity android:name=".CharacterSerieDetailsActivity"></activity>
         <activity android:name=".ui.searchResult.CharacterSerieResultListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".MainActivity"/>
         </activity>
-        <activity android:name=".RegristerActivity"></activity>
-        <activity android:name=".LoginActivity" />
+        <activity android:windowSoftInputMode="stateVisible|adjustResize" android:name=".RegristerActivity"></activity>
+        <activity android:windowSoftInputMode="stateVisible|adjustResize" android:name=".LoginActivity"/>
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"

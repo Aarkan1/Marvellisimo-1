@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         // launching coroutine
         Log.d(TAG, "about to start coroutine")
 
+
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
             startActivity(Intent(this, CharacterSerieResultListActivity::class.java))
@@ -54,6 +55,13 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
+        //Login
+        val intent = Intent(this,LoginActivity::class.java)
+        startActivity(intent)
+
+        //Loguot
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

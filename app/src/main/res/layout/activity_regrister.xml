@@ -10,45 +10,49 @@
     <EditText
         android:id="@+id/editText_regrister_username"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="75dp"
         android:background="@drawable/rounded_edittext_regrister_login"
         android:ems="10"
         android:hint="@string/username"
         android:inputType="textPersonName"
+        android:paddingStart="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="Autofill" />
+        tools:ignore="Autofill,RtlSymmetry" />
 
     <EditText
         android:id="@+id/editText_regrister_email"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_edittext_regrister_login"
         android:ems="10"
         android:hint="@string/email"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
+        android:paddingStart="10dp"
         app:layout_constraintEnd_toEndOf="@+id/editText_regrister_username"
         app:layout_constraintStart_toStartOf="@+id/editText_regrister_username"
         app:layout_constraintTop_toBottomOf="@+id/editText_regrister_username"
-        tools:ignore="Autofill,TextFields" />
+        tools:ignore="Autofill,RtlSymmetry,TextFields" />
 
     <EditText
         android:id="@+id/editText_regrister_password"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_edittext_regrister_login"
         android:ems="10"
         android:hint="@string/password"
         android:inputType="textPassword"
+        android:paddingStart="10dp"
         app:layout_constraintEnd_toEndOf="@+id/editText_regrister_email"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/editText_regrister_email"
         app:layout_constraintTop_toBottomOf="@+id/editText_regrister_email"
-        tools:ignore="Autofill" />
+        tools:ignore="Autofill,RtlSymmetry" />
 
     <Button
         android:id="@+id/btn_regrister"
@@ -75,5 +79,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_regrister" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

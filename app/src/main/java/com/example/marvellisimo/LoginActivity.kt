@@ -1,5 +1,6 @@
 package com.example.marvellisimo
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +20,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         textView_login.setOnClickListener {
-            finish()
+            val intent = Intent(this,RegristerActivity::class.java)
+            startActivity(intent)
         }
     }
 
