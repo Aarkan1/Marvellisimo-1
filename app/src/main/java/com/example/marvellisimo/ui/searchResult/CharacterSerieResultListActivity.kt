@@ -1,6 +1,5 @@
 package com.example.marvellisimo.ui.searchResult
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -12,11 +11,8 @@ import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.CharacterDataWrapper
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.ui.entities.CharacterEntity
 import com.example.marvellisimo.ui.entities.SerieEntity
@@ -25,7 +21,6 @@ import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultIte
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 private const val TAG = "CharacterSerieResultListActivity"
@@ -33,47 +28,23 @@ private const val TAG = "CharacterSerieResultListActivity"
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var b: Bundle
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
-    private var seriesList = ArrayList<SeriesSearchResultItem>()
-    private var charactersList = ArrayList<CharacterSearchResultItem>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_character_serie_result_list)
         adapter = GroupAdapter()
 
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
-        supportActionBar!!.title = "hejjj"
+        //val searchString =intent.getStringExtra("search")
+        val searchString = "spider"
+        val searchType =intent.getStringExtra("type") ?: "characters"
+        //val searchType = "characters"
 
-        getAllCharacters()
-//        getAllSeries()
-/*
-        CoroutineScope(IO).launch {
-            // val chars = getAllCharacters.await()
-            CoroutineScope(Main).launch {
-                // change UI
-            }
-        }*/
+        supportActionBar!!.title = searchString
 
-        Log.d(TAG, "Here is the end ${charactersList.size}")
-        Log.d(TAG, "Here is the end ${seriesList.size}")
-
-//        charactersList.forEach {
-//            Log.d(TAG, "Here is the loop ${charactersList.size}")
-//
-//            adapter.add(it)
-//        }
-//
-//        seriesList.forEach {
-//            Log.d(TAG, "Here is the loop ${charactersList.size}")
-//
-//            adapter.add(it)
-//        }
-
-        recyclerView_search_result.adapter = adapter
+        if (searchType == "series") getAllSeries() else getAllCharacters()
 
         resultListListener()
     }
@@ -97,50 +68,75 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
     }
 
-    @SuppressLint("CheckResult")
     private fun getAllSeries() {
-//        MarvelRetrofit.marvelService.getAllSeries()
-//            .subscribeOn(Schedulers.newThread())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe { result, err ->
-//                if (err?.message != null) Log.d(TAG, "Error getAllSeries " + err.message)
-//                else {
-//                    Log.d(TAG, "I got a getAllSeries $result")
-//
-//                    addSeriesToResultList(result.data.results)
-//
-//                }
-//            }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun getAllCharacters() {
-        var characters: CharacterDataWrapper
-
         CoroutineScope(IO).launch {
             try {
-                characters = MarvelRetrofit.marvelService.getAllCharacters()
+                val series = MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = "Spider-Man")
+                Log.d(TAG, "Getting series")
+                CoroutineScope(Main).launch {
+                    addSeriesToResultList(series.data.results)
+                }
+            } catch (e: Exception) {
+                Log.d(TAG, "Error getAllSeries ")
+            }
+        }
+    }
 
+    private fun getAllCharacters() {
+        CoroutineScope(IO).launch {
+            try {
+                val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
                 Log.d(TAG, "Getting characters")
-
                 CoroutineScope(Main).launch {
                     addCharactersToResultList(characters.data.results)
-
-                    charactersList.forEach {
-                        Log.d(TAG, "Here is the loop ${charactersList.size}")
-
-                        adapter.add(it)
-                    }
-
                 }
             } catch (e: Exception) {
                 Log.d(TAG, "Error getAllCharacters ")
             }
         }
+    }
 
-/*       MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
+    private fun addSeriesToResultList(series: Array<Series>) {
+        adapter.clear()
+        for (serie in series) {
+            val imagePath = serie.thumbnail.path
+                .replace("http:", "https:") + "." + serie.thumbnail.extension
+
+            adapter.add(
+                SeriesSearchResultItem(
+                    SerieEntity(
+                        serie.id.toString(),
+                        serie.title,
+                        "dddd",
+                        imagePath
+                    )
+                )
+            )
+        }
+        recyclerView_search_result.adapter = adapter
+    }
+
+    private fun addCharactersToResultList(characters: Array<Character>) {
+        adapter.clear()
+        for (character in characters) {
+            val imagePath = character.thumbnail.path
+                .replace("http:", "https:") + "." + character.thumbnail.extension
+            adapter.add(
+                CharacterSearchResultItem(
+                    CharacterEntity(
+                        character.id.toString(),
+                        character.name,
+                        character.description,
+                        imagePath
+                    )
+                )
+            )
+        }
+        recyclerView_search_result.adapter = adapter
+    }
 
 
+    /*       MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { result, err ->
@@ -153,42 +149,5 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
                 }
             }*/
-    }
-
-    private fun addSeriesToResultList(series: Array<Series>) {
-        for (serie in series) {
-            val imagePath = serie.thumbnail.path
-                .replace("http:", "https:") + "." + serie.thumbnail.extension
-
-            seriesList.add(
-                SeriesSearchResultItem(
-                    SerieEntity(
-                        serie.id.toString(),
-                        serie.title,
-                        "dddd",
-                        imagePath
-                    )
-                )
-            )
-        }
-    }
-
-    private fun addCharactersToResultList(characters: Array<Character>) {
-        for (character in characters) {
-            val imagePath = character.thumbnail.path
-                .replace("http:", "https:") + "." + character.thumbnail.extension
-            Log.d(TAG, charactersList.size.toString())
-            charactersList.add(
-                CharacterSearchResultItem(
-                    CharacterEntity(
-                        character.id.toString(),
-                        character.name,
-                        character.description,
-                        imagePath
-                    )
-                )
-            )
-        }
-    }
 
 }
