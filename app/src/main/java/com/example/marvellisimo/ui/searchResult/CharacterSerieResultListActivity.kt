@@ -10,18 +10,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.CharacterSerieDetailsActivity
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.R
-import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.xwray.groupie.Item
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
-import kotlinx.android.synthetic.main.search_result_item.view.*
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.ui.entities.CharacterEntity
 import com.example.marvellisimo.ui.entities.SerieEntity
+import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
+import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
 
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
@@ -40,7 +39,27 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
         getAllCharacters()
         getAllSeries()
+        resultListListener()
     }
+
+    private fun resultListListener() {
+        lateinit var intent: Intent
+        adapter.setOnItemClickListener { item, view ->
+            if (item is CharacterSearchResultItem){
+                intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+                b = Bundle()
+                b.putSerializable("item", item.character)
+                intent.putExtras(b)
+            }
+            else if (item is SeriesSearchResultItem){
+                intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+                b = Bundle()
+                b.putSerializable("item", item.serie)
+                intent.putExtras(b)
+            }
+            startActivity(intent)
+        }
+        recyclerView_search_result.adapter = adapter    }
 
     @SuppressLint("CheckResult")
     private fun getAllSeries() {
@@ -83,22 +102,10 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
                     SerieEntity(
                         serie.id.toString(),
                         serie.title,
-                        "ddddd",
+                        "dddd",
                         imagePath))
             )
         }
-
-        adapter.setOnItemClickListener { item, view ->
-            val selectedItem = item as SeriesSearchResultItem
-            val intent = Intent(this, CharacterSerieDetailsActivity::class.java)
-
-            b = Bundle()
-            b.putSerializable("item", selectedItem.serie)
-            intent.putExtras(b)
-
-            startActivity(intent)
-        }
-        recyclerView_search_result.adapter = adapter
     }
 
     private fun addCharactersToResultList(characters: Array<Character>) {
@@ -115,47 +122,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
                 )
             )
         }
-
-        adapter.setOnItemClickListener { item, view ->
-            val selectedItem = item as CharacterSearchResultItem
-            val intent = Intent(this, CharacterSerieDetailsActivity::class.java)
-
-            b = Bundle()
-            b.putSerializable("item", selectedItem.character)
-            intent.putExtras(b)
-
-            startActivity(intent)
-        }
-        recyclerView_search_result.adapter = adapter
-    }
-
-}
-
-class CharacterSearchResultItem (val character: CharacterEntity): Item<GroupieViewHolder>() {
-    override fun getLayout(): Int {
-        return R.layout.search_result_item
-    }
-
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.search_result_item_description_textView.text = character.description
-        viewHolder.itemView.search_result_item_name_textView.text = character.name
-        Picasso.get().load(character.uri).into(viewHolder.itemView.search_result_item_imageView)
-
-    }
-
-}
-
-
-class SeriesSearchResultItem (val serie: SerieEntity): Item<GroupieViewHolder>() {
-    override fun getLayout(): Int {
-        return R.layout.search_result_item
-    }
-
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.search_result_item_description_textView.text = serie.description
-        viewHolder.itemView.search_result_item_name_textView.text = serie.name
-        Picasso.get().load(serie.uri).into(viewHolder.itemView.search_result_item_imageView)
-
     }
 
 }
