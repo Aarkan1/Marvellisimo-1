@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
+import android.widget.Toast
 import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -57,22 +58,41 @@ class MainActivity : AppCompatActivity() {
         nav_view.setupWithNavController(navController)
 
         //Login
-        val intent = Intent(this,LoginActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this,LoginActivity::class.java)
+//        startActivity(intent)
 
         //Loguot
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+
+/*
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
+
+ */
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected: starts")
 
+        when (item.itemId){
+            R.id.action_logout ->{
+                Toast.makeText(getApplicationContext(), "Logout",
+                    Toast.LENGTH_LONG).show()
+                //TODO
+                //Logout
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+
+        //KOd där inan
+        /*
         val value = when (item.itemId) {
             R.id.action_search -> {
                 startActivity(Intent(this, SearchActivity::class.java))
@@ -82,7 +102,9 @@ class MainActivity : AppCompatActivity() {
         }
         Log.d(TAG, "onOptionsItemSelected: ends")
         return value
+         */
     }
+
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
