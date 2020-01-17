@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+              android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
     <TextView
-            android:layout_width="match_parent"
+            android:layout_width="348dp"
             android:textSize="16sp"
             android:textStyle="bold"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:paddingStart="12dp"
-            android:layout_height="wrap_content" android:id="@+id/searchValue"/>
+            android:drawableStart="@drawable/ic_search_24px"
+            android:drawablePadding="8dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchValue"/>
+    <ImageButton
+            style="?android:buttonBarButtonStyle"
+            android:src="@drawable/ic_arrow_upward_24px"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent" android:id="@+id/arrow_up_button"/>
 </LinearLayout>
