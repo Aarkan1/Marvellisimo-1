@@ -29,7 +29,7 @@
         android:background="@drawable/rounded_edittext_regrister_login"
         android:ems="10"
         android:hint="@string/email"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="@+id/editText_regrister_username"
         app:layout_constraintStart_toStartOf="@+id/editText_regrister_username"
         app:layout_constraintTop_toBottomOf="@+id/editText_regrister_username"
