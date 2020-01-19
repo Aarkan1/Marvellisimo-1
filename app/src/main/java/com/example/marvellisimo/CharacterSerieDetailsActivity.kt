@@ -6,7 +6,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.marvellisimo.ui.entities.Serie
+import com.example.marvellisimo.ui.entities.CharacterEntity
+import com.example.marvellisimo.ui.entities.SerieEntity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_character_serie_details.*
 
@@ -17,16 +18,23 @@ class CharacterSerieDetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_character_serie_details)
 
         var selectedResultItem = intent.getSerializableExtra("item")
-        selectedResultItem = selectedResultItem as Serie
+        if (selectedResultItem is CharacterEntity) {
+            supportActionBar!!.title = selectedResultItem.name
 
-        supportActionBar!!.title = selectedResultItem.name
+            selected_item_description_textView.text = selectedResultItem.description
+            selected_item_name_textView.text = selectedResultItem.name
+            Picasso.get().load(selectedResultItem.uri).into(selected_item_imageView)
 
-        selected_item_description_textView.text = selectedResultItem.description
-        selected_item_name_textView.text = selectedResultItem.name
-        Picasso.get().load(selectedResultItem.uri).into(selected_item_imageView)
+            Log.d("onRecieve", selectedResultItem.name)
+            Log.d("onRecieve", selectedResultItem.description)
+        }
+        else if(selectedResultItem is SerieEntity){
+            supportActionBar!!.title = selectedResultItem.title
 
-        Log.d("onRecieve", selectedResultItem.name)
-        Log.d("onRecieve", selectedResultItem.description)
+            selected_item_description_textView.text = selectedResultItem.description
+            selected_item_name_textView.text = selectedResultItem.title
+            Picasso.get().load(selectedResultItem.uri).into(selected_item_imageView)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

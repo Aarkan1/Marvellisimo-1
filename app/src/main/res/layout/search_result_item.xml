@@ -9,9 +9,11 @@
         android:id="@+id/search_result_item_imageView"
         android:layout_width="107dp"
         android:layout_height="115dp"
+        android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/textView2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
@@ -21,7 +23,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
+        android:layout_marginStart="6dp"
         android:text="Name:"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -32,7 +34,7 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
+        android:layout_marginStart="6dp"
         android:text="Description:"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -40,36 +42,28 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <TextView
-        android:id="@+id/search_result_item_description_textView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="4dp"
-        android:maxWidth="40dp"
-        android:text="TextView"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="@+id/search_result_item_imageView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/search_result_item_imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <RelativeLayout
-        android:layout_width="3dp"
-        android:layout_height="2dp"
-        android:layout_marginStart="184dp"
-        android:layout_marginTop="104dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/search_result_item_name_textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:textSize="12sp"
+        android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toTopOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/search_result_item_description_textView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="TextView"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/search_result_item_imageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

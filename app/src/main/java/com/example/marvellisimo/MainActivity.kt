@@ -16,8 +16,10 @@ import android.view.Menu
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import com.mongodb.stitch.android.core.Stitch
+import android.view.MenuItem
+import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
 
 private const val TAG = "MainActivity"
@@ -25,7 +27,6 @@ private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,20 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected: starts")
+
+        val value = when (item.itemId) {
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+        Log.d(TAG, "onOptionsItemSelected: ends")
+        return value
     }
 
     override fun onSupportNavigateUp(): Boolean {

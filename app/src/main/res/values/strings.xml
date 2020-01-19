@@ -20,4 +20,5 @@
     <string name="username">Username</string>
     <string name="regrister">Regrister</string>
     <string name="go_to_login">Go to login</string>
+    <string name="toolbar_search">Search</string>
 </resources>
