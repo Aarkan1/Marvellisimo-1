@@ -13,12 +13,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
+import com.example.marvellisimo.models.User
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import com.mongodb.stitch.android.core.Stitch
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 
@@ -33,14 +33,26 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+//        DB.client.auth.logout()
+
+        if(!DB.client.auth.isLoggedIn) {
+            val intent = Intent(this, LoginActivity::class.java)
+            // reset activity stack/history
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
         // launching coroutine
         Log.d(TAG, "about to start coroutine")
         CoroutineScope(Default).launch {
-            repeat(100) {
-                // this could be api call instead
-                val value = getHelloWorld()
-                Log.d(TAG, value)
+            if(DB.client.auth.isLoggedIn) {
+                DB.findLoggedInUser()
             }
+
+//            repeat(100) {
+//                // this could be api call instead
+//                val value = getHelloWorld()
+//                Log.d(TAG, value)
+//            }
 
             // if we want perform some change on UI we can just call
             // CoroutineScope(Main).launch{
