@@ -35,8 +35,32 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+//        DB.client.auth.logout()
+
+        if(!DB.client.auth.isLoggedIn) {
+            val intent = Intent(this, LoginActivity::class.java)
+            // reset activity stack/history
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
         // launching coroutine
         Log.d(TAG, "about to start coroutine")
+        CoroutineScope(Default).launch {
+            if(DB.client.auth.isLoggedIn) {
+                DB.findLoggedInUser()
+            }
+
+//            repeat(100) {
+//                // this could be api call instead
+//                val value = getHelloWorld()
+//                Log.d(TAG, value)
+//            }
+
+            // if we want perform some change on UI we can just call
+            // CoroutineScope(Main).launch{
+            //  ...and change UI here
+            // }
+        }.start()
 
 
         val fab: FloatingActionButton = findViewById(R.id.fab)

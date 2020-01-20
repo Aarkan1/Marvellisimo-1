@@ -5,7 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.mongodb.stitch.android.core.Stitch
+import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
+import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
 import kotlinx.android.synthetic.main.activity_regrister.*
+import org.bson.Document
+import org.bson.types.ObjectId
 
 private const val TAG = "RegristerActivity"
 
@@ -16,7 +22,7 @@ class RegristerActivity : AppCompatActivity() {
         setContentView(R.layout.activity_regrister)
 
         btn_regrister.setOnClickListener {
-            preformRegrister()
+            preformRegister()
         }
 
         textView_regrister.setOnClickListener {
@@ -25,10 +31,42 @@ class RegristerActivity : AppCompatActivity() {
         }
     }
 
-    private fun preformRegrister() {
+    private fun preformRegister() {
         val username = editText_regrister_username.text.toString()
         val email = editText_regrister_email.text.toString()
         val password = editText_regrister_password.text.toString()
+
+        val emailPassClient = Stitch.getDefaultAppClient().auth.getProviderClient(
+            UserPasswordAuthProviderClient.factory
+        )
+
+        emailPassClient.registerWithEmail(email, password)
+            .addOnSuccessListener {
+                val credential = UserPasswordCredential(email, password)
+                // auto login after sign up
+                // because mongoDB Stitch requires confirmation + sign in to get a _id
+                DB.client.auth.loginWithCredential(credential)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("stitch", "Successfully registered user: ${task.result!!.id}")
+
+                            val userDoc = Document()
+                            userDoc["_id"] = ObjectId(task.result!!.id)
+                            userDoc["uid"] = task.result!!.id
+                            userDoc["username"] = username
+                            userDoc["email"] = email
+                            userDoc["avatar"] = ""
+
+                            DB.coll.insertOne(userDoc)
+                        } else {
+                            Log.e("stitch", "Error registering new user:", task.exception)
+                        }
+                    }
+
+            }
+            .addOnFailureListener {
+                Log.e("stitch", "Failed autologin: ${it.message}")
+            }
 
         Log.d(TAG, "Username is: $username")
         Log.d(TAG, "Email is: $email")
