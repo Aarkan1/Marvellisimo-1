@@ -33,9 +33,6 @@ data class Character(
 )
 
 
-
-
-
 data class SeriesDataWrapper(
     val code: Int, //The HTTP status code of the returned result.,
     val status: String, // (string, optional): A string description of the call status.,
@@ -44,9 +41,9 @@ data class SeriesDataWrapper(
     //attributionHTML (string, optional): An HTML representation of the attribution notice for this result. Please display either this notice or the contents of the attributionText field on all screens which contain data from the Marvel Comics API.,
     val data: SeriesDataContainer // The results returned by the call.,
     //etag (string, optional): A digest value of the content returned by the call.
-    )
+)
 
-data class SeriesDataContainer (
+data class SeriesDataContainer(
     //offset (int, optional): The requested offset (number of skipped results) of the call.,
     //limit (int, optional): The requested result limit.,
     val total: Int, //(int, optional): The total number of resources available given the current filter set.,
@@ -54,7 +51,7 @@ data class SeriesDataContainer (
     val results: Array<Series> // The list of series returned by the call
 )
 
-data class Series (
+data class Series(
     val id: Int, //(int, optional): The unique ID of the series resource.,
     val title: String, // (string, optional): The canonical title of the series.,
     val description: String, // (string, optional): A description of the series.,
@@ -74,7 +71,7 @@ data class Series (
     previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
 )
 
-data class Image (
+data class Image(
     val path: String, // The directory path of to the image.,
     val extension: String // The file extension for the image.
 )

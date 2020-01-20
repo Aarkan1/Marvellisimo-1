@@ -3,13 +3,11 @@ package com.example.marvellisimo
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
-import kotlinx.android.synthetic.main.activity_regrister.*
+import kotlinx.android.synthetic.main.activity_register.*
 import org.bson.Document
 import org.bson.types.ObjectId
 
@@ -19,7 +17,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_regrister)
+        setContentView(R.layout.activity_register)
 
         btn_regrister.setOnClickListener {
             preformRegister()
