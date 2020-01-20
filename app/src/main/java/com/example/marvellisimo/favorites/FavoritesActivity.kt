@@ -59,7 +59,7 @@ class FavoritesActivity : AppCompatActivity() {
 
         val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
 
-        if (viewModel.searchType == SearchType.CHARACTERS) {
+        if (viewModel.searchType.value == SearchType.CHARACTERS) {
             switch.setText(R.string.switch_search_options_characters)
             switch.isChecked = false
         } else {

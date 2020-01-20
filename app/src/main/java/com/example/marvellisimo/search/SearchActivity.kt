@@ -142,7 +142,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         val width: Int = size.x
         val height: Int = size.y
 
-        Log.d(TAG,"about to inflate popupView")
+        Log.d(TAG, "about to inflate popupView")
         val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popupView = inflater.inflate(R.layout.search_options_fragment, null)
 
@@ -187,6 +187,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
     private fun switchToCharacterSerieList(search: String) {
         Log.d(TAG, "switchToCharacterSerieList: starts")
+        Log.d(TAG, "search is $search")
         startActivity(
             Intent(this, CharacterSerieResultListActivity::class.java)
                 .putExtra("type", if (viewModel.searchType == SearchType.CHARACTERS) "characters" else "series")

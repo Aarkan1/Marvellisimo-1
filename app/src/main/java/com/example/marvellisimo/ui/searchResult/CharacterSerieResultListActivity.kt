@@ -35,8 +35,10 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
-        val searchString =intent.getStringExtra("search")
-        val searchType =intent.getStringExtra("type")
+        val searchString = intent.getStringExtra("search")
+        val searchType = intent.getStringExtra("type")
+
+        Log.d(TAG, "searchString: $searchString")
 
         supportActionBar!!.title = searchString
 
@@ -51,8 +53,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
                 intent.putExtra("item", item.character)
-            }
-            else if (item is SeriesSearchResultItem) {
+            } else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)
                 intent.putExtra("item", item.serie)
             }
@@ -106,6 +107,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun addCharactersToResultList(characters: Array<Character>) {
+        Log.d(TAG, "addCharacterToResultList: ${characters.size}")
+
         adapter.clear()
         for (character in characters) {
             character.thumbnail.path = character.thumbnail.path
