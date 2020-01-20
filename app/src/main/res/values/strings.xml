@@ -29,4 +29,5 @@
     <string name="switch_search_options_series">Series</string>
     <string name="textview_search_options_search_for">Search For</string>
     <string name="imageview_close_button_description">exit</string>
+    <string name="logout">Logout</string>
 </resources>
