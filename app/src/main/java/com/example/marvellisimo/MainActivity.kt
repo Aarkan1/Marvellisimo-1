@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-//        DB.client.auth.logout()
 
         if(!DB.client.auth.isLoggedIn) {
             val intent = Intent(this, LoginActivity::class.java)
@@ -81,11 +80,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
 
-        //Login
-//        val intent = Intent(this,LoginActivity::class.java)
-//        startActivity(intent)
-
-        //Loguot
 
     }
 
@@ -106,12 +100,10 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId){
             R.id.action_logout ->{
-                Toast.makeText(getApplicationContext(), "Logout",
-                    Toast.LENGTH_LONG).show()
-                //TODO
-                //Logout
+                DB.client.auth.logout()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
-
         }
         return super.onOptionsItemSelected(item)
 
@@ -128,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         return value
          */
     }
+
 
 
     override fun onSupportNavigateUp(): Boolean {
