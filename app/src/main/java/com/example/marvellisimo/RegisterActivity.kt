@@ -13,9 +13,9 @@ import kotlinx.android.synthetic.main.activity_regrister.*
 import org.bson.Document
 import org.bson.types.ObjectId
 
-private const val TAG = "RegristerActivity"
+private const val TAG = "RegisterActivity"
 
-class RegristerActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

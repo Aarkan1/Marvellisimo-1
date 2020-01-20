@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
+import com.example.marvellisimo.favorites.FavoritesActivity
 import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -52,8 +53,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -61,22 +60,18 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.d(TAG, "onOptionsItemSelected: starts")
-
-        return when (item.itemId) {
-            R.id.action_logout -> {
-                DB.client.auth.logout()
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            R.id.action_search -> {
-                startActivity(Intent(this, SearchActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.action_logout -> {
+            DB.client.auth.logout()
+            startActivity(Intent(this, LoginActivity::class.java)); true
         }
+        R.id.action_search -> {
+            startActivity(Intent(this, SearchActivity::class.java)); true
+        }
+        R.id.action_favorites -> {
+            startActivity(Intent(this, FavoritesActivity::class.java)); true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
