@@ -14,8 +14,14 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "SearchViewModel"
 
+enum class SearchType {
+    CHARACTERS, SERIES
+}
+
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
     val history = MutableLiveData<ArrayList<String>>().apply { value = ArrayList() }
+
+    var searchType = SearchType.CHARACTERS
 
     fun loadHistory(phrase: String = "") {
         Log.d(TAG, "loadHistory: starts")

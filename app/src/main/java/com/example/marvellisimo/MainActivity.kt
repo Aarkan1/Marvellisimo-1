@@ -17,10 +17,6 @@ import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
 import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 
@@ -34,17 +30,19 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // launching coroutine
-        Log.d(TAG, "about to start coroutine")
+
+        if (!DB.client.auth.isLoggedIn) {
+            val intent = Intent(this, LoginActivity::class.java)
+            // reset activity stack/history
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
             startActivity(Intent(this, CharacterSerieResultListActivity::class.java))
-            //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-              //  .setAction("Action", null).show()
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-//        val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -54,35 +52,35 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d(TAG, "onOptionsItemSelected: starts")
 
-        val value = when (item.itemId) {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                DB.client.auth.logout()
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                true
+            }
             R.id.action_search -> {
                 startActivity(Intent(this, SearchActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-        Log.d(TAG, "onOptionsItemSelected: ends")
-        return value
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    suspend fun getHelloWorld(): String {
-        delay(1000)
-        return "Hello World"
     }
 }

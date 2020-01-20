@@ -36,9 +36,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
         val searchString =intent.getStringExtra("search")
-        //val searchString = "spider"
-        //val searchType =intent.getStringExtra("type") ?: "series"
-        val searchType = "character"
+        val searchType =intent.getStringExtra("type")
 
         supportActionBar!!.title = searchString
 
