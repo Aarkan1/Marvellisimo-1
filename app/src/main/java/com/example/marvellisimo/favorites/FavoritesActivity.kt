@@ -11,11 +11,13 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.models.SearchType
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
+import kotlinx.android.synthetic.main.search_result_item.view.*
 
 private const val TAG = "Favorites"
 
@@ -51,6 +53,8 @@ class FavoritesActivity : AppCompatActivity() {
             if (it == SearchType.CHARACTERS) recycler_view_favorites.adapter = charactersAdapter
             else recycler_view_favorites.adapter = seriesAdapter
         })
+
+        viewModel.fetchFavorites()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,23 +84,39 @@ class FavoritesActivity : AppCompatActivity() {
     }
 }
 
-class CharacterItem(character: Character) : Item<GroupieViewHolder>() {
+class CharacterItem(private val character: Character) : Item<GroupieViewHolder>() {
+
+    init {
+        character.thumbnail.path = character.thumbnail.path
+            .replace("http:", "https:") + "." + character.thumbnail.extension
+    }
+
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView
+        viewHolder.itemView.search_result_item_description_textView.text = character.description
+        viewHolder.itemView.search_result_item_name_textView.text = character.name
+        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
-class SeriesItem(series: Series) : Item<GroupieViewHolder>() {
+class SeriesItem(private val series: Series) : Item<GroupieViewHolder>() {
+
+    init {
+        series.thumbnail.path = series.thumbnail.path
+            .replace("http:", "https:") + "." + series.thumbnail.extension
+    }
+
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-
+        viewHolder.itemView.search_result_item_description_textView.text = series.description
+        viewHolder.itemView.search_result_item_name_textView.text = series.title
+        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
     }
 
 }
