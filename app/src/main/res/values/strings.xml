@@ -24,4 +24,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="textview_search_options">Search Options</string>
+    <string name="switch_search_options_characters">Characters</string>
+    <string name="switch_search_options_series">Series</string>
+    <string name="textview_search_options_search_for">Search For</string>
+    <string name="imageview_close_button_description">exit</string>
 </resources>

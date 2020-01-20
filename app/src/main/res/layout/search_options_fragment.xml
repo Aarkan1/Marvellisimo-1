@@ -11,33 +11,35 @@
             android:layout_height="25dp" app:srcCompat="@drawable/ic_highlight_off_24px"
             android:id="@+id/imageview_close_button"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="16dp" android:layout_marginEnd="16dp"/>
+            android:layout_marginTop="16dp" android:layout_marginEnd="16dp"
+            android:contentDescription="@string/imageview_close_button_description"/>
     <TextView
-            android:text="Search Options"
+            android:text="@string/textview_search_options"
             android:textSize="22sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView5"
+            android:id="@+id/textview_search_options"
             android:background="@android:color/white"
             app:layout_constraintTop_toBottomOf="@+id/imageview_close_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
     <Switch
-            android:text="Characters"
+            android:text="@string/switch_search_options_characters"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:id="@+id/switch1" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" android:layout_marginTop="32dp"
+            android:id="@+id/switch_search_options" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_search_options" android:layout_marginTop="32dp"
             android:layout_marginEnd="32dp"/>
     <TextView
-            android:text="Search For"
+            android:text="@string/textview_search_options_search_for"
             android:background="@android:color/white"
             android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView6"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_search_options"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="32dp" android:layout_marginStart="32dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
