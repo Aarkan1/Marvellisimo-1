@@ -2,7 +2,6 @@ package com.example.marvellisimo.marvelEntities
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import java.io.Serializable
 
 data class CharacterDataWrapper(
     // val copyright: String, // optional): The copyright notice for the returned result.,
