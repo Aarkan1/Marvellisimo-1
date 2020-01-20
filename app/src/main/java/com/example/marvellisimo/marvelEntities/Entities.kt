@@ -1,5 +1,9 @@
 package com.example.marvellisimo.marvelEntities
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
+
 data class CharacterDataWrapper(
     // val copyright: String, // optional): The copyright notice for the returned result.,
     // val attributionText: String, // optional): The attribution notice for this result. Please display either this notice or the contents of the attributionHTML field on all screens which contain data from the Marvel Comics API.,
@@ -18,6 +22,7 @@ data class CharacterDataContainer(
     val results: Array<Character> //, optional): The list of characters returned by the call.
 )
 
+@Parcelize
 data class Character(
     //val modified: Date, //, optional): The date the resource was most recently modified.,
     //val resourceURI: string, //, optional): The canonical URL identifier for this resource.,
@@ -25,12 +30,26 @@ data class Character(
     val thumbnail: Image, //, optional): The representative image for this character.,
     /*val comics: ComicList, //, optional): A resource list containing comics which feature this character.,
     val stories: StoryList, //, optional): A resource list of stories in which this character appears.,
-    val events: EventList, //, optional): A resource list of events in which this character appears.,
-    val series: SeriesList, //, optional): A resource list of series in which this character appears.*/
+    val events: EventList, //, optional): A resource list of events in which this character appears.,*/
+    val series: SeriesList, //, optional): A resource list of series in which this character appears.
     val id: Int, //, optional): The unique ID of the character resource.,
     val name: String, //, optional): The name of the character.,
     val description: String //, optional): A short bio or description of the character.,
-)
+): Parcelable
+
+@Parcelize
+data class SeriesList (
+    //available (int, optional): The number of total available series in this list. Will always be greater than or equal to the "returned" value.,
+    //returned (int, optional): The number of series returned in this collection (up to 20).,
+    //collectionURI (string, optional): The path to the full list of series in this collection.,
+    val items: Array<SeriesSummary> //, optional): The list of returned series in this collection.
+): Parcelable
+
+@Parcelize
+data class SeriesSummary (
+    //resourceURI (string, optional): The path to the individual series resource.,
+    val name: String // (string, optional): The canonical name of the series.
+): Parcelable
 
 
 
@@ -73,8 +92,8 @@ data class Series (
     //next (SeriesSummary, optional): A summary representation of the series which follows this series.,
     //previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
 )
-
+@Parcelize
 data class Image (
-    val path: String, // The directory path of to the image.,
+    var path: String, // The directory path of to the image.,
     val extension: String // The file extension for the image.
-)
+): Parcelable

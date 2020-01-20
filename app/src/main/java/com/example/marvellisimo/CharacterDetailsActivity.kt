@@ -2,31 +2,44 @@ package com.example.marvellisimo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.marvellisimo.ui.entities.CharacterEntity
+import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.ui.entities.SerieEntity
+import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
 import com.squareup.picasso.Picasso
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
-import kotlinx.android.synthetic.main.activity_serie_details.*
-import kotlinx.android.synthetic.main.activity_serie_details.selected_item_imageView
 
 class CharacterDetailsActivity : AppCompatActivity() {
+    private lateinit var adapter: GroupAdapter<GroupieViewHolder>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_details)
 
-        val selectedCharacter = intent.getSerializableExtra("item")
-        if (selectedCharacter is CharacterEntity) {
+        adapter = GroupAdapter()
+
+        val selectedCharacter = intent.getParcelableExtra<Character>("item")
+
+        if (selectedCharacter is Character) {
 
             supportActionBar!!.title = selectedCharacter.name
 
+
+            for (serie in selectedCharacter.series.items){
+                adapter.add(CharacterDetailSeriesListItem(serie))
+
+            }
+
             selected_character_description_textView.text = selectedCharacter.description
             selected_character_name_textView.text = selectedCharacter.name
-            Picasso.get().load(selectedCharacter.uri).into(selected_character_imageView)
+            Picasso.get().load(selectedCharacter.thumbnail.path).into(selected_character_imageView)
         }
+        character_detail_serie_list_recyclerView.adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

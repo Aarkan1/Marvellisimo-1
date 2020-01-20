@@ -15,7 +15,6 @@ import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.ui.entities.CharacterEntity
 import com.example.marvellisimo.ui.entities.SerieEntity
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
@@ -27,7 +26,6 @@ import kotlinx.coroutines.launch
 private const val TAG = "CharacterSerieResultListActivity"
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
-    private lateinit var b: Bundle
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +39,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val searchString =intent.getStringExtra("search")
         //val searchString = "spider"
         //val searchType =intent.getStringExtra("type") ?: "series"
-        val searchType = "characters"
+        val searchType = "character"
 
         supportActionBar!!.title = searchString
 
@@ -55,14 +53,11 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         adapter.setOnItemClickListener { item, view ->
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
-                b = Bundle()
-                b.putSerializable("item", item.character)
-                intent.putExtras(b)
-            } else if (item is SeriesSearchResultItem) {
+                intent.putExtra("item", item.character)
+            }
+            else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)
-                b = Bundle()
-                b.putSerializable("item", item.serie)
-                intent.putExtras(b)
+                intent.putExtra("item", item.serie)
             }
             startActivity(intent)
         }
@@ -126,15 +121,18 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addCharactersToResultList(characters: Array<Character>) {
         adapter.clear()
         for (character in characters) {
-            val imagePath = character.thumbnail.path
+            character.thumbnail.path = character.thumbnail.path
                 .replace("http:", "https:") + "." + character.thumbnail.extension
+
+            val serieList = character.series
             adapter.add(
                 CharacterSearchResultItem(
-                    CharacterEntity(
-                        character.id.toString(),
+                    Character(
+                        character.thumbnail,
+                        serieList,
+                        character.id,
                         character.name,
-                        character.description,
-                        imagePath
+                        character.description
                     )
                 )
             )

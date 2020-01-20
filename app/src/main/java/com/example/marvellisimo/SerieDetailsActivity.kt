@@ -2,11 +2,9 @@ package com.example.marvellisimo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.marvellisimo.ui.entities.CharacterEntity
 import com.example.marvellisimo.ui.entities.SerieEntity
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -17,7 +15,7 @@ class SerieDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serie_details)
 
-        val selectedSerie = intent.getSerializableExtra("item")
+        val selectedSerie = intent.getParcelableExtra<SerieEntity>("item")
         if(selectedSerie is SerieEntity){
             val rating = if (selectedSerie.rating.isEmpty()) "Rating not found "
             else selectedSerie.rating
