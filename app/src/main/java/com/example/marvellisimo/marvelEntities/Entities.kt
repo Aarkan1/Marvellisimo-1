@@ -72,10 +72,11 @@ data class SeriesDataContainer (
     val results: Array<Series> // The list of series returned by the call
 )
 
+@Parcelize
 data class Series (
     val id: Int, //(int, optional): The unique ID of the series resource.,
     val title: String, // (string, optional): The canonical title of the series.,
-    val description: String, // (string, optional): A description of the series.,
+    var description: String, // (string, optional): A description of the series.,
     //resourceURI (string, optional): The canonical URL identifier for this resource.,
     //urls (Array[Url], optional): A set of public web site URLs for the resource.,
     val startYear: Int, // (int, optional): The first year of publication for the series.,
@@ -90,7 +91,8 @@ data class Series (
     //creators (CreatorList, optional): A resource list of creators whose work appears in comics in this series.,
     //next (SeriesSummary, optional): A summary representation of the series which follows this series.,
     //previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
-)
+): Parcelable
+
 @Parcelize
 data class Image (
     var path: String, // The directory path of to the image.,

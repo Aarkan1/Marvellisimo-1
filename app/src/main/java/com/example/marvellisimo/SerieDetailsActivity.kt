@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.example.marvellisimo.ui.entities.SerieEntity
+import com.example.marvellisimo.marvelEntities.Series
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
 
@@ -15,8 +15,8 @@ class SerieDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serie_details)
 
-        val selectedSerie = intent.getParcelableExtra<SerieEntity>("item")
-        if(selectedSerie is SerieEntity){
+        val selectedSerie = intent.getParcelableExtra<Series>("item")
+        if(selectedSerie is Series){
             val rating = if (selectedSerie.rating.isEmpty()) "Rating not found "
             else selectedSerie.rating
 
@@ -29,7 +29,7 @@ class SerieDetailsActivity : AppCompatActivity() {
 
             selected_item_description_textView.text = selectedSerie.description
             selected_item_name_textView.text = selectedSerie.title
-            Picasso.get().load(selectedSerie.uri).into(selected_item_imageView)
+            Picasso.get().load(selectedSerie.thumbnail.path).into(selected_item_imageView)
         }
     }
 

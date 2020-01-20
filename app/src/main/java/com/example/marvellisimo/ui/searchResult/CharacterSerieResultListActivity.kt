@@ -15,7 +15,6 @@ import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.ui.entities.SerieEntity
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
 import kotlinx.coroutines.CoroutineScope
@@ -95,24 +94,14 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addSeriesToResultList(series: Array<Series>) {
         adapter.clear()
         for (serie in series) {
-            val imagePath = serie.thumbnail.path
+            serie.thumbnail.path = serie.thumbnail.path
                 .replace("http:", "https:") + "." + serie.thumbnail.extension
 
-            val des: String = if (serie.description == null) "Description not found"
+            serie.description = if (serie.description == null) "Description not found"
             else serie.description
 
             adapter.add(
-                SeriesSearchResultItem(
-                    SerieEntity(
-                        serie.id.toString(),
-                        serie.title,
-                        des,
-                        imagePath,
-                        serie.endYear,
-                        serie.startYear,
-                        serie.rating
-                    )
-                )
+                SeriesSearchResultItem(serie)
             )
         }
         recyclerView_search_result.adapter = adapter
@@ -124,17 +113,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             character.thumbnail.path = character.thumbnail.path
                 .replace("http:", "https:") + "." + character.thumbnail.extension
 
-            val serieList = character.series
             adapter.add(
-                CharacterSearchResultItem(
-                    Character(
-                        character.thumbnail,
-                        serieList,
-                        character.id,
-                        character.name,
-                        character.description
-                    )
-                )
+                CharacterSearchResultItem(character)
             )
         }
         recyclerView_search_result.adapter = adapter

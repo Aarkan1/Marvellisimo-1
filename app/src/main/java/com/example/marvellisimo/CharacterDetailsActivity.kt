@@ -9,13 +9,11 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.ui.entities.SerieEntity
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
-import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
@@ -43,7 +41,10 @@ class CharacterDetailsActivity : AppCompatActivity() {
             }
             character_detail_serie_list_recyclerView.adapter = adapter
 
-            selected_character_description_textView.text = selectedCharacter.description
+            var des = selectedCharacter.description
+            if (des.isEmpty()) des = "No description found"
+
+            selected_character_description_textView.text = des
             selected_character_name_textView.text = selectedCharacter.name
             Picasso.get().load(selectedCharacter.thumbnail.path).into(selected_character_imageView)
         }
