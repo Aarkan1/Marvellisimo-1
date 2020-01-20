@@ -14,6 +14,7 @@ class MarvellisimoApplication : Application() {
         val config = RealmConfiguration.Builder()
             .name("marvellisimo.realm")
             .schemaVersion(0)
+            .deleteRealmIfMigrationNeeded()
             .build()
         Realm.setDefaultConfiguration(config)
 
