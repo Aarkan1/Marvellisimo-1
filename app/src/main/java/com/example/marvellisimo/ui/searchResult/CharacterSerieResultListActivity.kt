@@ -6,7 +6,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.CharacterSerieDetailsActivity
+import com.example.marvellisimo.CharacterDetailsActivity
+import com.example.marvellisimo.SerieDetailsActivity
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
@@ -39,8 +40,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
         val searchString =intent.getStringExtra("search")
         //val searchString = "spider"
-        val searchType =intent.getStringExtra("type") ?: "characters"
-        //val searchType = "characters"
+        //val searchType =intent.getStringExtra("type") ?: "series"
+        val searchType = "characters"
 
         supportActionBar!!.title = searchString
 
@@ -53,12 +54,12 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         lateinit var intent: Intent
         adapter.setOnItemClickListener { item, view ->
             if (item is CharacterSearchResultItem) {
-                intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+                intent = Intent(this, CharacterDetailsActivity::class.java)
                 b = Bundle()
                 b.putSerializable("item", item.character)
                 intent.putExtras(b)
             } else if (item is SeriesSearchResultItem) {
-                intent = Intent(this, CharacterSerieDetailsActivity::class.java)
+                intent = Intent(this, SerieDetailsActivity::class.java)
                 b = Bundle()
                 b.putSerializable("item", item.serie)
                 intent.putExtras(b)
@@ -102,13 +103,19 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             val imagePath = serie.thumbnail.path
                 .replace("http:", "https:") + "." + serie.thumbnail.extension
 
+            val des: String = if (serie.description == null) "Description not found"
+            else serie.description
+
             adapter.add(
                 SeriesSearchResultItem(
                     SerieEntity(
                         serie.id.toString(),
                         serie.title,
-                        "dddd",
-                        imagePath
+                        des,
+                        imagePath,
+                        serie.endYear,
+                        serie.startYear,
+                        serie.rating
                     )
                 )
             )
@@ -119,24 +126,14 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addCharactersToResultList(characters: Array<Character>) {
         adapter.clear()
         for (character in characters) {
-            var des = character.description
-            des = if(des.length > 200)
-                des.substring(0,140) + "..."
-            else "No description found"
-
-            var name = character.name
-            if (name.length > 25)
-                name = character.name.substring(0, 25) + "..."
-
-            Log.d(TAG, "antal bokstäver: ${des}")
             val imagePath = character.thumbnail.path
                 .replace("http:", "https:") + "." + character.thumbnail.extension
             adapter.add(
                 CharacterSearchResultItem(
                     CharacterEntity(
                         character.id.toString(),
-                        name,
-                        des,
+                        character.name,
+                        character.description,
                         imagePath
                     )
                 )

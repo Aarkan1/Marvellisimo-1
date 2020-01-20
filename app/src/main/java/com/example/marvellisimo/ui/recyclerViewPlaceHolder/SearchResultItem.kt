@@ -15,8 +15,17 @@ class CharacterSearchResultItem (val character: CharacterEntity): Item<GroupieVi
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.search_result_item_description_textView.text = character.description
-        viewHolder.itemView.search_result_item_name_textView.text = character.name
+        var des = character.description
+        des = if(des.length > 200)
+            des.substring(0,130) + "..."
+        else "No description found"
+
+        var name = character.name
+        if (name.length > 25)
+            name = character.name.substring(0, 25) + "..."
+
+        viewHolder.itemView.search_result_item_description_textView.text = des
+        viewHolder.itemView.search_result_item_name_textView.text = name
         Picasso.get().load(character.uri).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
@@ -28,8 +37,20 @@ class SeriesSearchResultItem (val serie: SerieEntity): Item<GroupieViewHolder>()
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.search_result_item_description_textView.text = serie.description
-        viewHolder.itemView.search_result_item_name_textView.text = serie.title
+
+        var des = serie.description
+        if(des.length > 200) des = des.substring(0,140) + "..."
+
+        else if (des.length <= 0)
+            des = "No description found"
+
+
+        var title = serie.title
+        if (title.length > 25)
+            title = serie.title.substring(0, 25) + "..."
+
+        viewHolder.itemView.search_result_item_description_textView.text = des
+        viewHolder.itemView.search_result_item_name_textView.text = title
         Picasso.get().load(serie.uri).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
