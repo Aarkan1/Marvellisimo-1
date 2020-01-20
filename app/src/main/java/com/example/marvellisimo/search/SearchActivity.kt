@@ -1,15 +1,16 @@
 package com.example.marvellisimo.search
 
 import android.app.SearchManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
@@ -19,11 +20,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.R
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
-import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.activity_search.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.search_options_fragment.*
+import kotlinx.android.synthetic.main.search_options_fragment.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 private const val TAG = "SearchActivity"
 
@@ -129,11 +134,26 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     }
 
     private fun showSearchOptionsPopup() {
-        val popupWindow = PopupWindow()
-        popupWindow.width = 400
-        popupWindow.height = 180
-        popupWindow.showAtLocation(recyclerView_search_result, Gravity.CENTER_HORIZONTAL, 25, 25)
-        popupWindow.update()
+        searchView.clearFocus()
+
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        val width: Int = size.x
+        val height: Int = size.y
+
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.search_options_fragment, null)
+
+        val focusable = true
+
+        val popupWindow = PopupWindow(popupView, width - 250, height - 550, focusable)
+
+        popupWindow.showAtLocation(searchView, Gravity.CENTER, 0, 0)
+
+        popupView.imageview_close_button.setOnClickListener {
+            popupWindow.dismiss()
+        }
     }
 
     override fun itemClicked(item: String) {
