@@ -21,4 +21,7 @@
     <string name="regrister">Regrister</string>
     <string name="go_to_login">Go to login</string>
     <string name="toolbar_search">Search</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

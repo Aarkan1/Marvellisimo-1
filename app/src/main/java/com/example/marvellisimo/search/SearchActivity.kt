@@ -6,8 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.PopupWindow
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.R
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -28,6 +32,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     lateinit var viewModel: SearchViewModel
 
     lateinit var searchView: SearchView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -72,14 +77,12 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
 
-
         searchManager.searchablesInGlobalSearch[0].voiceSearchEnabled
         Log.d(TAG, "globalSearch ${searchManager.searchablesInGlobalSearch.size}")
         Log.d(TAG, "searchable: ${searchableInfo ?: null}")
 
 //        Log.d(TAG, searchableInfo.toString())
         searchView.setSearchableInfo(searchableInfo)
-
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String?): Boolean {
@@ -115,10 +118,22 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
                 finish()
                 true
             }
+            R.id.action_switch -> {
+                showSearchOptionsPopup()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
         Log.d(TAG, "onOptionsItemSelected: starts")
         return value
+    }
+
+    private fun showSearchOptionsPopup() {
+        val popupWindow = PopupWindow()
+        popupWindow.width = 400
+        popupWindow.height = 180
+        popupWindow.showAtLocation(recyclerView_search_result, Gravity.CENTER_HORIZONTAL, 25, 25)
+        popupWindow.update()
     }
 
     override fun itemClicked(item: String) {
