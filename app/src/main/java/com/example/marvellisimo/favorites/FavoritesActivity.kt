@@ -1,5 +1,6 @@
 package com.example.marvellisimo.favorites
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,12 +8,13 @@ import android.view.Menu
 import android.widget.Switch
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.example.marvellisimo.CharacterDetailsActivity
 import com.example.marvellisimo.R
+import com.example.marvellisimo.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.models.SearchType
 import com.squareup.picasso.Picasso
-import com.xwray.groupie.Group
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -21,7 +23,7 @@ import kotlinx.android.synthetic.main.search_result_item.view.*
 
 private const val TAG = "Favorites"
 
-class FavoritesActivity : AppCompatActivity() {
+class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, SeriesItemActionListener {
 
     lateinit var viewModel: FavoritesViewModel
 
@@ -41,12 +43,12 @@ class FavoritesActivity : AppCompatActivity() {
 
         viewModel.favoriteCharacters.observe(this, Observer<Array<Character>> {
             charactersAdapter.clear()
-            it.forEach { charactersAdapter.add(CharacterItem(it)) }
+            it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
         viewModel.favoriteSeries.observe(this, Observer<Array<Series>> {
             seriesAdapter.clear()
-            it.forEach { seriesAdapter.add(SeriesItem(it)) }
+            it.forEach { seriesAdapter.add(SeriesItem(it, this)) }
         })
 
         viewModel.searchType.observe(this, Observer<SearchType> {
@@ -82,9 +84,31 @@ class FavoritesActivity : AppCompatActivity() {
         }
         return true
     }
+
+    override fun onCharacterClick(character: Character) {
+        val intent = Intent(this, CharacterDetailsActivity::class.java)
+        intent.putExtra("item", character)
+        startActivity(intent)
+    }
+
+    override fun onSeriesClick(series: Series) {
+        val intent = Intent(this, SerieDetailsActivity::class.java)
+        intent.putExtra("item", series)
+        startActivity(intent)
+    }
 }
 
-class CharacterItem(private val character: Character) : Item<GroupieViewHolder>() {
+interface CharacterItemActionListener {
+    fun onCharacterClick(character: Character)
+}
+
+interface SeriesItemActionListener {
+    fun onSeriesClick(series: Series)
+}
+
+class CharacterItem(
+    private val character: Character, private val characterItemActionListener: CharacterItemActionListener
+) : Item<GroupieViewHolder>() {
 
     init {
         character.thumbnail.path = character.thumbnail.path
@@ -96,13 +120,16 @@ class CharacterItem(private val character: Character) : Item<GroupieViewHolder>(
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.setOnClickListener { characterItemActionListener.onCharacterClick(character) }
+
         viewHolder.itemView.search_result_item_description_textView.text = character.description
         viewHolder.itemView.search_result_item_name_textView.text = character.name
         Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
-class SeriesItem(private val series: Series) : Item<GroupieViewHolder>() {
+class SeriesItem(private val series: Series, private val seriesItemActionListener: SeriesItemActionListener) :
+    Item<GroupieViewHolder>() {
 
     init {
         series.thumbnail.path = series.thumbnail.path
@@ -114,9 +141,10 @@ class SeriesItem(private val series: Series) : Item<GroupieViewHolder>() {
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
+
         viewHolder.itemView.search_result_item_description_textView.text = series.description
         viewHolder.itemView.search_result_item_name_textView.text = series.title
         Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
     }
-
 }
