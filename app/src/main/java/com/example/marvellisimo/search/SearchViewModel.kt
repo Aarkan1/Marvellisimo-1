@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.marvellisimo.models.SearchType
 import com.example.marvellisimo.search.realm.HistoryItem
 import io.realm.Realm
 import io.realm.Sort
@@ -13,10 +14,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 private const val TAG = "SearchViewModel"
-
-enum class SearchType {
-    CHARACTERS, SERIES
-}
 
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
     val history = MutableLiveData<ArrayList<String>>().apply { value = ArrayList() }
