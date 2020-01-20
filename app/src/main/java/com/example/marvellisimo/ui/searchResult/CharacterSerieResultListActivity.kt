@@ -1,8 +1,10 @@
 package com.example.marvellisimo.ui.searchResult
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,23 +28,37 @@ private const val TAG = "CharacterSerieResultListActivity"
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
-        adapter = GroupAdapter()
 
+        adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
         val searchString =intent.getStringExtra("search")
         val searchType =intent.getStringExtra("type")
 
+        createProgressDialog()
+
         supportActionBar!!.title = searchString
 
         if (searchType == "series") getAllSeries(searchString) else getAllCharacters(searchString)
 
         resultListListener()
+    }
+
+    private fun createProgressDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = "Loading..."
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
     }
 
     private fun resultListListener() {
@@ -95,14 +111,12 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             serie.thumbnail.path = serie.thumbnail.path
                 .replace("http:", "https:") + "." + serie.thumbnail.extension
 
-            serie.description = if (serie.description == null) "Description not found"
-            else serie.description
-
             adapter.add(
                 SeriesSearchResultItem(serie)
             )
         }
         recyclerView_search_result.adapter = adapter
+        dialog.dismiss()
     }
 
     private fun addCharactersToResultList(characters: Array<Character>) {
@@ -116,6 +130,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             )
         }
         recyclerView_search_result.adapter = adapter
+        dialog.dismiss()
     }
 
 
