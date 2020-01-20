@@ -48,8 +48,7 @@ class RegristerActivity : AppCompatActivity() {
                 DB.client.auth.loginWithCredential(credential)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Log.d("stitch", "Successfully registered user: ${task.result!!.id}")
-
+                            //Log.d("stitch", "Successfully registered user: ${task.result!!.id}")
                             val userDoc = Document()
                             userDoc["_id"] = ObjectId(task.result!!.id)
                             userDoc["uid"] = task.result!!.id
@@ -58,23 +57,19 @@ class RegristerActivity : AppCompatActivity() {
                             userDoc["avatar"] = ""
 
                             DB.coll.insertOne(userDoc)
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
                         } else {
-                            Log.e("stitch", "Error registering new user:", task.exception)
+                            Toast.makeText(this, "Error registering new user:", Toast.LENGTH_SHORT).show()
                         }
                     }
-
             }
             .addOnFailureListener {
-                Log.e("stitch", "Failed autologin: ${it.message}")
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
             }
-
-        Log.d(TAG, "Username is: $username")
-        Log.d(TAG, "Email is: $email")
-        Log.d(TAG, "Password is: $password")
 
         if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
             Toast.makeText(this, "Enter username email, or password", Toast.LENGTH_SHORT).show()
-            return
         }
     }
 }

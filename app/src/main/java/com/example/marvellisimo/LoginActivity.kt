@@ -36,20 +36,17 @@ class LoginActivity : AppCompatActivity() {
         val credential = UserPasswordCredential(email, password)
         DB.client.auth.loginWithCredential(credential)
             .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.d("stitch", "Successfully logged in as user " + it.result?.id)
+                if(!it.isSuccessful)return@addOnCompleteListener
+                 // Log.d("stitch", "Successfully logged in as user " + it.result?.id)
 
-                    val intent = Intent(this, MainActivity::class.java)
-                    // reset activity stack/history
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                } else {
-                    Log.e("stitch", "Error logging in with email/password auth:", it.exception)
-                }
+                val intent = Intent(this, MainActivity::class.java)
+                // reset activity stack/history
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
             }
-
-        Log.d(TAG,"Email is: $email")
-        Log.d(TAG,"Password is: $password")
+            .addOnFailureListener {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+            }
 
         if (email.isEmpty() || password.isEmpty()){
             Toast.makeText(this,"Enter email or password", Toast.LENGTH_SHORT).show()
