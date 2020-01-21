@@ -1,12 +1,14 @@
 package com.example.marvellisimo.marvelEntities
 
 import android.os.Parcelable
+import com.example.marvellisimo.utilities.SeriesSummaryRealmListParceler
 import io.realm.RealmList
+import io.realm.RealmModel
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import kotlinx.android.parcel.IgnoredOnParcel
+import io.realm.annotations.RealmClass
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.RawValue
+import kotlinx.android.parcel.WriteWith
 
 open class CharacterDataWrapper(
     @PrimaryKey
@@ -28,6 +30,7 @@ open class CharacterDataContainer(
     var results: RealmList<Character>? = RealmList() //, optional): The list of characters returned by the call.
 ): RealmObject()
 
+@RealmClass
 @Parcelize
 open class Character(
     //val modified: Date, //, optional): The date the resource was most recently modified.,
@@ -42,33 +45,23 @@ open class Character(
     var id: Int? = null, //, optional): The unique ID of the character resource.,
     var name: String? = null, //, optional): The name of the character.,
     var description: String? = null //, optional): A short bio or description of the character.,
-): Parcelable, RealmObject()
+): Parcelable, RealmModel
 
+@RealmClass
 @Parcelize
-open class SeriesList(
+open class SeriesList(var items: @WriteWith<SeriesSummaryRealmListParceler> RealmList<SeriesSummary> = RealmList()):
+    Parcelable, RealmModel
 
-    var items: Array<SeriesSummary>? = null
     //, optional): The list of returned series in this collection.//available (int, optional): The number of total available series in this list. Will always be greater than or equal to the "returned" value.,
     //returned (int, optional): The number of series returned in this collection (up to 20).,
     //collectionURI (string, optional): The path to the full list of series in this collection.,
-): Parcelable, RealmObject()
 
-//@Parcelize
-//open class SeriesList: Parcelable, RealmObject() {
-//    @IgnoredOnParcel
-//    var items: RealmList<SeriesSummary>? = RealmList()
-//    //, optional): The list of returned series in this collection.//available (int, optional): The number of total available series in this list. Will always be greater than or equal to the "returned" value.,
-//    //returned (int, optional): The number of series returned in this collection (up to 20).,
-//    //collectionURI (string, optional): The path to the full list of series in this collection.,
-//}
-
+@RealmClass
 @Parcelize
 open class SeriesSummary (
     //resourceURI (string, optional): The path to the individual series resource.,
     var name: String? = null // (string, optional): The canonical name of the series.
-): Parcelable, RealmObject()
-
-
+): Parcelable, RealmModel
 
 
 
@@ -82,7 +75,7 @@ open class SeriesDataWrapper(
     //attributionHTML (string, optional): An HTML representation of the attribution notice for this result. Please display either this notice or the contents of the attributionText field on all screens which contain data from the Marvel Comics API.,
     var data: SeriesDataContainer? = null // The results returned by the call.,
     //etag (string, optional): A digest value of the content returned by the call.
-    ): RealmObject()
+    ): RealmModel
 
 open class SeriesDataContainer (
     //offset (int, optional): The requested offset (number of skipped results) of the call.,
@@ -92,6 +85,7 @@ open class SeriesDataContainer (
     var results: RealmList<Series>? = RealmList() // The list of series returned by the call
 ): RealmObject()
 
+@RealmClass
 @Parcelize
 open class Series (
     @PrimaryKey
@@ -112,10 +106,11 @@ open class Series (
     //creators (CreatorList, optional): A resource list of creators whose work appears in comics in this series.,
     //next (SeriesSummary, optional): A summary representation of the series which follows this series.,
     //previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
-): Parcelable, RealmObject()
+): Parcelable, RealmModel
 
+@RealmClass
 @Parcelize
 open class Image (
     var path: String? = null, // The directory path of to the image.,
     var extension: String? = null // The file extension for the image.
-): Parcelable, RealmObject()
+): Parcelable, RealmModel
