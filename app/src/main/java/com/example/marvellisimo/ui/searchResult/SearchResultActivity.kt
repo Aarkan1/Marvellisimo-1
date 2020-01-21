@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.CharacterDetailsActivity
@@ -23,25 +25,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "CharacterSerieResultListActivity"
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
+    private lateinit var viewModel: SearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
+        viewModel = ViewModelProviders.of(this).get(SearchResultViewModel::class.java)
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
-        val searchString =intent.getStringExtra("search")
-        val searchType =intent.getStringExtra("type")
-
-
+        val searchString =intent.getStringExtra("search") ?: ""
+        val searchType =intent.getStringExtra("type") ?: "characters"
 
         createProgressDialog()
 
@@ -50,6 +53,14 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         if (searchType == "series") getAllSeries(searchString) else getAllCharacters(searchString)
 
         resultListListener()
+    }
+
+    private fun getAllCharacters(searchString: String) {
+        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllCharacters(searchString) } }
+
+        viewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
+            addCharactersToResultList(it)
+        })
     }
 
     private fun createProgressDialog() {
@@ -93,19 +104,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         }
     }
 
-    private fun getAllCharacters(searchString: String?) {
-        CoroutineScope(IO).launch {
-            try {
-                val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
-                Log.d(TAG, "Getting characters")
-                CoroutineScope(Main).launch {
-                    addCharactersToResultList(characters.data.results)
-                }
-            } catch (e: Exception) {
-                Log.d(TAG, "Error getAllCharacters ")
-            }
-        }
-    }
+
 
     private fun addSeriesToResultList(series: Array<Series>) {
         adapter.clear()
@@ -123,7 +122,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         dialog.dismiss()
     }
 
-    private fun addCharactersToResultList(characters: Array<Character>) {
+    private fun addCharactersToResultList(characters: ArrayList<Character>) {
         adapter.clear()
         for (character in characters) {
             character.thumbnail.path = character.thumbnail.path
@@ -134,7 +133,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             )
         }
         recyclerView_search_result.adapter = adapter
-        dialog.dismiss()
     }
 
 
