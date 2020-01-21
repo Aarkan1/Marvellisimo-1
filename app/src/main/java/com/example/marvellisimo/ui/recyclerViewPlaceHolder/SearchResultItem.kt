@@ -18,17 +18,17 @@ class CharacterSearchResultItem (val character: Character): Item<GroupieViewHold
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         var des = character.description
-        if (des.length > 200) des = des.substring(0, 140) + "..."
-        else if (des.length <= 0)
+        if (des!!.length > 200) des = des.substring(0, 140) + "..."
+        else if (des.isEmpty())
             des = "No description found"
 
         var name = character.name
-        if (name.length > 25)
-            name = character.name.substring(0, 25) + "..."
+        if (name!!.length > 25)
+            name = character.name!!.substring(0, 25) + "..."
 
         viewHolder.itemView.search_result_item_description_textView.text = des
         viewHolder.itemView.search_result_item_name_textView.text = name
-        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        Picasso.get().load(character.thumbnail!!.path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
@@ -41,18 +41,18 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 
         var des = serie.description
-        if (des.length > 200) des = des.substring(0, 140) + "..."
-        else if (des.length <= 0)
+        if (des!!.length > 200) des = des.substring(0, 140) + "..."
+        else if (des.isEmpty())
             des = "No description found"
 
 
         var title = serie.title
-        if (title.length > 25)
-            title = serie.title.substring(0, 25) + "..."
+        if (title!!.length > 25)
+            title = serie.title!!.substring(0, 25) + "..."
 
         viewHolder.itemView.search_result_item_description_textView.text = des
         viewHolder.itemView.search_result_item_name_textView.text = title
-        Picasso.get().load(serie.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        Picasso.get().load(serie.thumbnail!!.path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 

@@ -19,6 +19,7 @@ import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
+import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -63,7 +64,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
     private fun resultListListener() {
         lateinit var intent: Intent
-        adapter.setOnItemClickListener { item, view ->
+        adapter.setOnItemClickListener { item, _ ->
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
                 intent.putExtra("item", item.character)
@@ -79,12 +80,16 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
     private fun getAllSeries(searchString: String?) {
         CoroutineScope(IO).launch {
+            // TODO: Read from realm first
             try {
                 val series = MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = searchString)
+                series.searchString = searchString
+
                 Log.d(TAG, "Getting series")
                 CoroutineScope(Main).launch {
-                    addSeriesToResultList(series.data.results)
+                    addSeriesToResultList(series.data!!.results)
                 }
+                // TODO: Save to realm
             } catch (e: Exception) {
                 Log.d(TAG, "Error getAllSeries ")
             }
@@ -93,23 +98,29 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
     private fun getAllCharacters(searchString: String?) {
         CoroutineScope(IO).launch {
+            // TODO: Read from realm first
             try {
                 val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
-                Log.d(TAG, "Getting characters")
+                characters.searchString = searchString
+                Log.d(TAG, "Getting characters $characters")
+//                characters.data.results.forEach {
+//                    Log.d(TAG, it.toString())
+//                }
                 CoroutineScope(Main).launch {
-                    addCharactersToResultList(characters.data.results)
+                    addCharactersToResultList(characters.data!!.results)
                 }
+                // TODO: Save to realm
             } catch (e: Exception) {
                 Log.d(TAG, "Error getAllCharacters ")
             }
         }
     }
 
-    private fun addSeriesToResultList(series: Array<Series>) {
+    private fun addSeriesToResultList(series: RealmList<Series>?) {
         adapter.clear()
-        for (serie in series) {
-            serie.thumbnail.path = serie.thumbnail.path
-                .replace("http:", "https:") + "." + serie.thumbnail.extension
+        for (serie in series!!) {
+            serie.thumbnail!!.path = (serie.thumbnail!!.path
+                ?.replace("http:", "https:") ?: serie.thumbnail!!.path) + "." + serie.thumbnail!!.extension
 
             adapter.add(
                 SeriesSearchResultItem(serie)
@@ -119,11 +130,11 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         dialog.dismiss()
     }
 
-    private fun addCharactersToResultList(characters: Array<Character>) {
+    private fun addCharactersToResultList(characters: RealmList<Character>?) {
         adapter.clear()
-        for (character in characters) {
-            character.thumbnail.path = character.thumbnail.path
-                .replace("http:", "https:") + "." + character.thumbnail.extension
+        for (character in characters!!) {
+            character.thumbnail!!.path = (character.thumbnail!!.path
+                ?.replace("http:", "https:") ?: character.thumbnail!!.path) + "." + character.thumbnail!!.extension
 
             adapter.add(
                 CharacterSearchResultItem(character)

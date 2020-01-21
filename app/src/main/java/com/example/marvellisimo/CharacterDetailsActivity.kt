@@ -34,7 +34,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
             supportActionBar!!.title = selectedCharacter.name
 
 
-            for (serie in selectedCharacter.series.items){
+            for (serie in selectedCharacter.series!!.items!!){
                 Log.d("___", "name of the serie: ${serie.name}")
                 adapter.add(CharacterDetailSeriesListItem(serie))
 
@@ -42,11 +42,11 @@ class CharacterDetailsActivity : AppCompatActivity() {
             character_detail_serie_list_recyclerView.adapter = adapter
 
             var des = selectedCharacter.description
-            if (des.isEmpty()) des = "No description found"
+            if (des!!.isEmpty()) des = "No description found"
 
             selected_character_description_textView.text = des
             selected_character_name_textView.text = selectedCharacter.name
-            Picasso.get().load(selectedCharacter.thumbnail.path).into(selected_character_imageView)
+            Picasso.get().load(selectedCharacter.thumbnail!!.path).into(selected_character_imageView)
         }
 
     }
