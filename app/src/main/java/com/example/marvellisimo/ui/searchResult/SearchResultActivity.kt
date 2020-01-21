@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.CharacterDetailsActivity
 import com.example.marvellisimo.SerieDetailsActivity
-import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -23,11 +22,9 @@ import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResult
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-private const val TAG = "CharacterSerieResultListActivity"
+import kotlin.math.log
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
@@ -53,6 +50,14 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         if (searchType == "series") getAllSeries(searchString) else getAllCharacters(searchString)
 
         resultListListener()
+    }
+
+    private fun getAllSeries(searchString: String) {
+        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllSeries(searchString) } }
+
+        viewModel.allSeries.observe(this, Observer<ArrayList<Series>> {
+            addSeriesToResultList(it)
+        })
     }
 
     private fun getAllCharacters(searchString: String) {
@@ -90,23 +95,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
     }
 
-    private fun getAllSeries(searchString: String?) {
-        CoroutineScope(IO).launch {
-            try {
-                val series = MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = searchString)
-                Log.d(TAG, "Getting series")
-                CoroutineScope(Main).launch {
-                    addSeriesToResultList(series.data.results)
-                }
-            } catch (e: Exception) {
-                Log.d(TAG, "Error getAllSeries ")
-            }
-        }
-    }
-
-
-
-    private fun addSeriesToResultList(series: Array<Series>) {
+    private fun addSeriesToResultList(series: ArrayList<Series>) {
         adapter.clear()
         for (serie in series) {
             serie.thumbnail.path = serie.thumbnail.path
@@ -133,6 +122,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             )
         }
         recyclerView_search_result.adapter = adapter
+        dialog.dismiss()
     }
 
 
