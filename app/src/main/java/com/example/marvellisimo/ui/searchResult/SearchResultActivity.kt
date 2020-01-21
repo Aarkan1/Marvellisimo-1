@@ -21,7 +21,9 @@ import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.log
@@ -61,10 +63,11 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun getAllCharacters(searchString: String) {
-        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllCharacters(searchString) } }
+        viewModel.getAllCharacters(searchString)
 
         viewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
             addCharactersToResultList(it)
+            Log.d(TAG, "size allCharacters beeeeefore: ${it.size}")
         })
     }
 
@@ -84,11 +87,11 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         adapter.setOnItemClickListener { item, view ->
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
-                intent.putExtra("item", item.character)
+                //intent.putExtra("item", item.character)
             }
             else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)
-                intent.putExtra("item", item.serie)
+               // intent.putExtra("item", item.serie)
             }
             startActivity(intent)
         }
@@ -114,9 +117,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addCharactersToResultList(characters: ArrayList<Character>) {
         adapter.clear()
         for (character in characters) {
-            character.thumbnail.path = character.thumbnail.path
-                .replace("http:", "https:") + "." + character.thumbnail.extension
-
             adapter.add(
                 CharacterSearchResultItem(character)
             )

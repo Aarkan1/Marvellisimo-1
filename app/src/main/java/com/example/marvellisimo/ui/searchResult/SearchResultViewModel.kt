@@ -6,31 +6,90 @@ import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
+import io.realm.Realm
+import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
-const val TAG = "CharacterSerieResultListActivity"
+
+const val TAG = "CharacterSerieResultListActivityy"
 
 class SearchResultViewModel : ViewModel() {
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
     var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
+    private var cache = false
 
     fun getAllCharacters(searchString: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
-                Log.d(TAG, "Getting characters")
-                CoroutineScope(Dispatchers.Main).launch {
-                    val result = characters.data.results
-                    allCharacters.value = arrayListOf(*result)
+            getAllCharactersFromRealm(searchString)
 
+            if (cache) {
+                try {
+                    val characters =
+                        MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
+                    Log.d(TAG, "Getting characters")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = characters.data.results
+                        result.forEach {
+                            it.thumbnail!!.path = it.thumbnail!!.path
+                                .replace("http:", "https:") + "." + it.thumbnail!!.extension
+                        }
+                        allCharacters.value = arrayListOf(*result)
+
+                        saveToRealm(searchString, result)
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, "Error getAllCharacters ")
                 }
-            } catch (e: Exception) {
-                Log.d(TAG, "Error getAllCharacters ")
             }
         }
     }
+
+    private fun getAllCharactersFromRealm(searchString: String) {
+
+        Realm.getDefaultInstance().executeTransaction {
+            val results = it.where(CharacterRealm::class.java)
+                .equalTo("id", searchString)
+                .findAll()
+                .toArray().map { (it as CharacterRealm) }
+
+            if (results.isEmpty()) {
+                cache = true
+            } else {
+                Log.d(TAG, "size: ${results.size}")
+                Log.d(TAG, "size allCharacters before: ${allCharacters.value!!.size}")
+
+                val characters = results[0].characterList.map { Character().apply {
+                    name = it.name
+                    description = it.description
+                    thumbnail = it.thumbnail
+                    series = it.series
+                    id = it.id
+                } }
+
+                CoroutineScope(Main).launch{
+                    allCharacters.value = arrayListOf( *characters.toTypedArray())
+                }
+                    Log.d(TAG, "size allCharacters after: ${allCharacters.value!!.size}")
+
+                    cache = false
+                }
+
+        }
+
+    }
+
+    private fun saveToRealm(searchString: String, result: Array<Character>) {
+        val list = RealmList<Character>()
+        list.addAll(result)
+
+        Realm.getDefaultInstance().executeTransaction {
+            it.insertOrUpdate(CharacterRealm(searchString,list))
+        }
+    }
+
 
     fun getAllSeries(searchString: String?) {
         CoroutineScope(Dispatchers.IO).launch {

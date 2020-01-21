@@ -1,5 +1,6 @@
 package com.example.marvellisimo.ui.recyclerViewPlaceHolder
 
+import android.util.Log
 import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
@@ -9,6 +10,10 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.character_detail_series_list.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 
 
 class CharacterSearchResultItem (val character: Character): Item<GroupieViewHolder>() {
@@ -17,18 +22,29 @@ class CharacterSearchResultItem (val character: Character): Item<GroupieViewHold
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        var des = character.description
-        if (des.length > 200) des = des.substring(0, 140) + "..."
-        else if (des.length <= 0)
-            des = "No description found"
+        CoroutineScope(IO).launch {
+            val str1 = character.thumbnail!!.path
 
-        var name = character.name
-        if (name.length > 25)
+            var des = character.description
+            if (des.length > 200) des = des.substring(0, 140) + "..."
+            else if (des.length <= 0)
+                des = "No description found"
+
+            var name = character.name
+            if (name.length > 25)
             name = character.name.substring(0, 25) + "..."
 
-        viewHolder.itemView.search_result_item_description_textView.text = des
-        viewHolder.itemView.search_result_item_name_textView.text = name
-        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+            CoroutineScope(Main).launch {
+
+                Log.d("Hej", character.name)
+                viewHolder.itemView.search_result_item_description_textView.text = des
+                viewHolder.itemView.search_result_item_name_textView.text = name
+
+                val path = str1
+                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
+
+            }
+        }
     }
 }
 

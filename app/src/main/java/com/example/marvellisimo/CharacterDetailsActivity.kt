@@ -27,14 +27,14 @@ class CharacterDetailsActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         character_detail_serie_list_recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val selectedCharacter = intent.getParcelableExtra<Character>("item")
+       /* val selectedCharacter = intent.getParcelableExtra<Character>("item")
 
         if (selectedCharacter is Character) {
 
             supportActionBar!!.title = selectedCharacter.name
 
 
-            for (serie in selectedCharacter.series.items){
+            for (serie in selectedCharacter.series!!.items){
                 Log.d("___", "name of the serie: ${serie.name}")
                 adapter.add(CharacterDetailSeriesListItem(serie))
 
@@ -46,8 +46,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
             selected_character_description_textView.text = des
             selected_character_name_textView.text = selectedCharacter.name
-            Picasso.get().load(selectedCharacter.thumbnail.path).into(selected_character_imageView)
-        }
+            Picasso.get().load(selectedCharacter.thumbnail!!.path).into(selected_character_imageView)*/
+
 
     }
 
