@@ -16,6 +16,7 @@ import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
 import com.example.marvellisimo.search.SearchActivity
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
@@ -30,12 +31,16 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        DB.initRealm()
 
         if (!DB.client.auth.isLoggedIn) {
             val intent = Intent(this, LoginActivity::class.java)
             // reset activity stack/history
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+        } else {
+            DB.findAndUpdateLoggedInUser()
+
         }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
@@ -52,8 +57,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -67,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_logout -> {
                 DB.client.auth.logout()
+                DB.user = null
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 true
@@ -82,5 +86,12 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // close realm instances on activity or fragment closing
+        // to prevent memory leaks
+        Realm.getDefaultInstance().close()
     }
 }
