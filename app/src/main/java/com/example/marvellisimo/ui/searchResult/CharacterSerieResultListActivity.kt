@@ -41,6 +41,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val searchString =intent.getStringExtra("search")
         val searchType =intent.getStringExtra("type")
 
+
+
         createProgressDialog()
 
         supportActionBar!!.title = searchString
@@ -110,6 +112,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         for (serie in series) {
             serie.thumbnail.path = serie.thumbnail.path
                 .replace("http:", "https:") + "." + serie.thumbnail.extension
+
+            if (serie.description == null) serie.description = "No description found"
 
             adapter.add(
                 SeriesSearchResultItem(serie)

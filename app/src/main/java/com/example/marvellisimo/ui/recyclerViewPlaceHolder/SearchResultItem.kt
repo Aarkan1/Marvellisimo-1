@@ -42,9 +42,6 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
 
         var des = serie.description
         if (des.length > 200) des = des.substring(0, 140) + "..."
-        else if (des.length <= 0)
-            des = "No description found"
-
 
         var title = serie.title
         if (title.length > 25)
