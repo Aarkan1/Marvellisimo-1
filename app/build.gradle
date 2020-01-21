@@ -62,7 +62,7 @@ dependencies {
 
     implementation "com.xwray:groupie:2.7.0"
 
-    implementation 'org.mongodb:stitch-android-sdk:4.0.5'
+    implementation 'org.mongodb:stitch-android-sdk:4.6.0'
 
     implementation 'com.google.code.gson:gson:2.8.6'
 

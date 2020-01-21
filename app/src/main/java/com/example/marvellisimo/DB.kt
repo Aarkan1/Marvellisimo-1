@@ -7,15 +7,13 @@ import com.mongodb.client.model.Filters
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.core.services.mongodb.remote.RemoteUpdateOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bson.Document
 
 class DB {
     companion object {
         val client = Stitch.getDefaultAppClient()
         val mongoClient = client.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
-        val coll = mongoClient.getDatabase("marvellisimo").getCollection("users")
+        val users = mongoClient.getDatabase("marvellisimo").getCollection("users")
 
         fun saveEntity(collectionName: String, entity: Any, uid: String) {
             val coll = mongoClient.getDatabase("marvellisimo").getCollection(collectionName)
@@ -27,7 +25,7 @@ class DB {
 
         fun findLoggedInUser() {
             val docs: ArrayList<Document> = ArrayList()
-            coll.find(Document("uid", client.auth.user!!.id))
+            users.find(Document("uid", client.auth.user!!.id))
                 .limit(100)
                 .into(docs)
                 .addOnCompleteListener { task ->

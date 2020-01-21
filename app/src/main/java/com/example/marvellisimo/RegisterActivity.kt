@@ -24,7 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         textView_regrister.setOnClickListener {
-            val intent = Intent(this,LoginActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
     }
@@ -53,8 +53,10 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["username"] = username
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
+                            userDoc["favoriteSeries"] = ArrayList<String>()
+                            userDoc["favoriteCharacters"] = ArrayList<String>()
 
-                            DB.coll.insertOne(userDoc)
+                            DB.users.insertOne(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         } else {

@@ -4,6 +4,7 @@ import com.example.marvellisimo.marvelEntities.CharacterDataWrapper
 import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
 import io.reactivex.Single
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MarvelService {
@@ -18,6 +19,9 @@ interface MarvelService {
     ): CharacterDataWrapper
 
 
+    @GET("characters/{characterId}")
+    suspend fun getCharacterById(@Path("characterID") characterId: String): CharacterDataWrapper
+
     @GET("series")
     suspend fun getAllSeries(
         @Query("titleStartsWith") titleStartsWith: String? = null,
@@ -28,4 +32,6 @@ interface MarvelService {
         @Query("offset") offset: Int? = null
     ): SeriesDataWrapper
 
+    @GET("series/{seriesId}")
+    suspend fun getSeriesById(@Path("seriesId") seriesId: String): SeriesDataWrapper
 }
