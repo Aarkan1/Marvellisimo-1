@@ -30,9 +30,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
         val selectedCharacter = intent.getParcelableExtra<Character>("item")
 
         if (selectedCharacter is Character) {
-
             supportActionBar!!.title = selectedCharacter.name
-
 
             for (serie in selectedCharacter.series!!.items!!){
                 Log.d("___", "name of the serie: ${serie.name}")

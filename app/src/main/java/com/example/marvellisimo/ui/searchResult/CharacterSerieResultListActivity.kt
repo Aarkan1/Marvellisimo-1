@@ -8,17 +8,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.CharacterDetailsActivity
-import com.example.marvellisimo.SerieDetailsActivity
-import com.example.marvellisimo.MarvelRetrofit
-import com.example.marvellisimo.R
+import com.example.marvellisimo.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.marvelEntities.CharacterDataWrapper
 import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.models.User
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
+import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -97,8 +97,19 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun getAllCharacters(searchString: String?) {
+        var realmCharacters: CharacterDataWrapper
+
         CoroutineScope(IO).launch {
-            // TODO: Read from realm first
+            val realm = Realm.getDefaultInstance()
+            val results = realm.where(CharacterDataWrapper::class.java)
+                .equalTo("searchString", searchString)
+                .findAll()
+
+            if (results.isNotEmpty()) {
+                realmCharacters = results[0]!!
+                Log.d("realm", "Loading CharacterDataWrapper: $realmCharacters, searchString: $searchString")
+                addCharactersToResultList(realmCharacters.data!!.results)
+            }
             try {
                 val characters = MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = searchString)
                 characters.searchString = searchString
@@ -106,13 +117,18 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 //                characters.data.results.forEach {
 //                    Log.d(TAG, it.toString())
 //                }
-                CoroutineScope(Main).launch {
+                if (results.isEmpty()) {
                     addCharactersToResultList(characters.data!!.results)
                 }
-                // TODO: Save to realm
+
+                realm.executeTransaction {
+                    realm.insertOrUpdate(characters)
+                    Log.d("realm", "Updating CharacterDataWrapper: $characters, searchString: $searchString")
+                }
             } catch (e: Exception) {
                 Log.d(TAG, "Error getAllCharacters ")
             }
+            realm.close()
         }
     }
 
@@ -131,17 +147,22 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun addCharactersToResultList(characters: RealmList<Character>?) {
-        adapter.clear()
-        for (character in characters!!) {
-            character.thumbnail!!.path = (character.thumbnail!!.path
-                ?.replace("http:", "https:") ?: character.thumbnail!!.path) + "." + character.thumbnail!!.extension
+        CoroutineScope(Main).launch {
+            val realm = Realm.getDefaultInstance()
+            adapter.clear()
+            for (character in characters!!) {
+                character.thumbnail!!.path = (character.thumbnail!!.path
+                    ?.replace("http:", "https:")
+                    ?: character.thumbnail!!.path) + "." + character.thumbnail!!.extension
 
-            adapter.add(
-                CharacterSearchResultItem(character)
-            )
+                adapter.add(
+                    CharacterSearchResultItem(character)
+                )
+            }
+            recyclerView_search_result.adapter = adapter
+            dialog.dismiss()
+            realm.close()
         }
-        recyclerView_search_result.adapter = adapter
-        dialog.dismiss()
     }
 
 
