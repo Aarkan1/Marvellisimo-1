@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.core.services.mongodb.remote.RemoteUpdateOptions
+import io.realm.Realm
 import org.bson.Document
 
 class DB {
