@@ -32,4 +32,17 @@ class FavoritesViewModel @Inject constructor(
             favoriteSeries.value = series
         }
     }
+
+    fun removeCharacterFromFavorites(id: String) = CoroutineScope(IO).launch {
+        repository.removeCharactersFromFavorites(id)
+        val characters = repository.fetchFavoriteCharacters()
+        CoroutineScope(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
+    }
+
+
+    fun removeSeriesFromFavorites(id: String) = CoroutineScope(IO).launch {
+        repository.removeSeriesFromFavorites(id)
+        val series = repository.fetchFavoriteSeries()
+        CoroutineScope(Main).launch { favoriteSeries.value = series.toTypedArray() }
+    }
 }

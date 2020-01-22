@@ -94,19 +94,29 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         startActivity(intent)
     }
 
+    override fun onRemoveCharacterClick(character: Character) {
+        viewModel.removeCharacterFromFavorites(character.id.toString())
+    }
+
     override fun onSeriesClick(series: Series) {
         val intent = Intent(this, SerieDetailsActivity::class.java)
         intent.putExtra("item", series)
         startActivity(intent)
     }
+
+    override fun onRemoveSeriesClick(series: Series) {
+        viewModel.removeSeriesFromFavorites(series.id.toString())
+    }
 }
 
 interface CharacterItemActionListener {
     fun onCharacterClick(character: Character)
+    fun onRemoveCharacterClick(character: Character)
 }
 
 interface SeriesItemActionListener {
     fun onSeriesClick(series: Series)
+    fun onRemoveSeriesClick(series: Series)
 }
 
 class CharacterItem(
@@ -124,6 +134,12 @@ class CharacterItem(
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.setOnClickListener { characterItemActionListener.onCharacterClick(character) }
+        viewHolder.itemView.favorite_item_info.setOnClickListener {
+            characterItemActionListener.onCharacterClick(character)
+        }
+        viewHolder.itemView.favorite_item_button_delete.setOnClickListener {
+            characterItemActionListener.onRemoveCharacterClick(character)
+        }
 
         viewHolder.itemView.favorite_item_description_textView.text = character.description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
@@ -144,7 +160,10 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
+        viewHolder.itemView.favorite_item_info.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
+        viewHolder.itemView.favorite_item_button_delete.setOnClickListener {
+            seriesItemActionListener.onRemoveSeriesClick(series)
+        }
 
         viewHolder.itemView.favorite_item_description_textView.text = series.description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
