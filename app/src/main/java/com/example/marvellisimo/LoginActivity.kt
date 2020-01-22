@@ -3,10 +3,7 @@ package com.example.marvellisimo
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import com.mongodb.stitch.android.core.Stitch
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -23,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         textView_login.setOnClickListener {
-            val intent = Intent(this, RegristerActivity::class.java)
+            val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
     }

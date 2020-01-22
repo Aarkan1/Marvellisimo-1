@@ -15,7 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
-import com.example.marvellisimo.search.SearchActivity
+import com.example.marvellisimo.activity.search.SearchActivity
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 

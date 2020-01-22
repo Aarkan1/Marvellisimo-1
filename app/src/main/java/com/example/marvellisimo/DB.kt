@@ -18,7 +18,7 @@ class DB {
 
         val client = Stitch.getDefaultAppClient()
         val mongoClient = client.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
-        val coll = mongoClient.getDatabase("marvellisimo").getCollection("users")
+        val users = mongoClient.getDatabase("marvellisimo").getCollection("users")
 
         private fun initUser() {
             val uid = client.auth.user?.id
@@ -62,7 +62,7 @@ class DB {
             initUser()
 
             val docs: ArrayList<Document> = ArrayList()
-            coll.find(Document("uid", client.auth.user!!.id))
+            users.find(Document("uid", client.auth.user!!.id))
                 .limit(1)
                 .into(docs)
                 .addOnCompleteListener { task ->
