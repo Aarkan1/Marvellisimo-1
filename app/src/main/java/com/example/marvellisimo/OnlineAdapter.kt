@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class OnlineAdapter(val onlines: ArrayList<Online>, val onlineActionListener: OnlineActionListener) :
+class OnlineAdapter(var onlines: ArrayList<Online>, val onlineActionListener: OnlineActionListener) :
     RecyclerView.Adapter<OnlineViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OnlineViewHolder {
         val view = LayoutInflater
