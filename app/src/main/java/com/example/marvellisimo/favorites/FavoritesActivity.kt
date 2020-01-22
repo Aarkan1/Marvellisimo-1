@@ -9,6 +9,7 @@ import android.widget.Switch
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.marvellisimo.CharacterDetailsActivity
+import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
@@ -20,11 +21,13 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
+import javax.inject.Inject
 
 private const val TAG = "Favorites"
 
 class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, SeriesItemActionListener {
 
+    @Inject
     lateinit var viewModel: FavoritesViewModel
 
     private val charactersAdapter = GroupAdapter<GroupieViewHolder>()
@@ -35,12 +38,14 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favorites)
 
-        viewModel = ViewModelProviders.of(this).get(FavoritesViewModel::class.java)
-
-        Log.d(TAG, actionBar.toString())
-
+        MarvellisimoApplication.applicationComponent.inject(this)
         supportActionBar?.title = "Favorites"
 
+        observeViewModel()
+        viewModel.fetchFavorites()
+    }
+
+    private fun observeViewModel() {
         viewModel.favoriteCharacters.observe(this, Observer<Array<Character>> {
             charactersAdapter.clear()
             it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
@@ -55,8 +60,6 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
             if (it == SearchType.CHARACTERS) recycler_view_favorites.adapter = charactersAdapter
             else recycler_view_favorites.adapter = seriesAdapter
         })
-
-        viewModel.fetchFavorites()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

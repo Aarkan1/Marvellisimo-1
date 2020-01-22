@@ -11,7 +11,9 @@ open class User : RealmObject() {
     var username: String? = null
     var avatar: String? = null
     @Ignore
-    var favorites: ArrayList<String>? = null
+    var favoriteCharacters: ArrayList<String>? = null
+    @Ignore
+    var favoriteSeries: ArrayList<String>? = null
 //  one-to-many relationship to other RealmObjects
 //  var ownedDogs: RealmList<Dog> = RealmList()
 }

@@ -2,6 +2,8 @@ package com.example.marvellisimo
 
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +11,9 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import javax.inject.Singleton
 
+@Module
 object MarvelRetrofit {
     private const val LOG = false
     private const val PUBLIC_KEY = "f5c6a6461fdefb8a6299942dc378c182"
@@ -17,6 +21,16 @@ object MarvelRetrofit {
     private const val BASE_URL = "https://gateway.marvel.com:443/v1/public/"
 
     val marvelService: MarvelService = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .client(getOkHttpClient())
+        .build()
+        .create(MarvelService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideMarvelService(): MarvelService = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
 //        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
