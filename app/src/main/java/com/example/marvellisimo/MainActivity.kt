@@ -2,7 +2,6 @@ package com.example.marvellisimo
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,8 +14,8 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
-import com.example.marvellisimo.favorites.FavoritesActivity
-import com.example.marvellisimo.search.SearchActivity
+import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"

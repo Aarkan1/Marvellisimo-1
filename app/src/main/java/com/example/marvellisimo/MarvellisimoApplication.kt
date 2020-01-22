@@ -1,9 +1,9 @@
 package com.example.marvellisimo
 
 import android.app.Application
-import android.util.Log
-import com.example.marvellisimo.favorites.FavoritesActivity
-import com.example.marvellisimo.favorites.FavoritesViewModel
+import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.repository.MarvelProvider
 import com.mongodb.stitch.android.core.Stitch
 import dagger.Component
 import io.realm.Realm
@@ -11,9 +11,10 @@ import io.realm.RealmConfiguration
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [MarvelRetrofit::class])
+@Component(modules = [MarvelProvider::class])
 interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
+    fun inject(activity: SearchActivity)
 }
 
 class MarvellisimoApplication : Application() {

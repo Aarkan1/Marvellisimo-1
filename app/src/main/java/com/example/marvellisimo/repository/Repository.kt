@@ -5,7 +5,9 @@ import com.example.marvellisimo.DB
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.services.MarvelService
+import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.bson.Document
@@ -19,6 +21,24 @@ private const val TAG = "Repository"
 class Repository @Inject constructor(
     private val marvelService: MarvelService
 ) {
+
+    suspend fun fetchHistory(phrase: String = ""): List<String> {
+        Log.d(TAG, "fetchHistory: $phrase")
+        return Realm.getDefaultInstance().where(HistoryItem::class.java)
+            .notEqualTo("phrase", phrase)
+            .like("phrase", "$phrase*")
+            .sort("updated", Sort.DESCENDING)
+            .limit(50)
+            .findAll()
+            .toArray().map { (it as HistoryItem).phrase }
+    }
+
+    suspend fun updateHistory(phrase: String) {
+        Log.d(TAG, "updateHistory: $phrase")
+        Realm.getDefaultInstance()
+            .executeTransaction { it.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis())) }
+    }
+
     suspend fun fetchCurrentUser(): User? {
         Log.d(TAG, "fetchUser with id: ${DB.client.auth.user!!.id}")
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(DB.client.auth.user!!.id)))

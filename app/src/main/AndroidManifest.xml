@@ -16,7 +16,7 @@
             tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".CharacterDetailsActivity"></activity>
 
-        <activity android:name=".favorites.FavoritesActivity">
+        <activity android:name="com.example.marvellisimo.activity.favorites.FavoritesActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".MainActivity"/>
@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".search.SearchActivity"
+                android:name="com.example.marvellisimo.activity.search.SearchActivity"
                 android:label="Search"
                 android:parentActivityName=".MainActivity"
                 android:theme="@style/AppTheme.NoActionBar">

@@ -1,4 +1,4 @@
-package com.example.marvellisimo.favorites
+package com.example.marvellisimo.activity.favorites
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.example.marvellisimo.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R

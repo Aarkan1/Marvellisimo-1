@@ -1,4 +1,4 @@
-package com.example.marvellisimo.search
+package com.example.marvellisimo.activity.search
 
 import android.app.SearchManager
 import android.content.Context
@@ -13,38 +13,35 @@ import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.models.SearchType
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import kotlinx.android.synthetic.main.activity_search.*
-import kotlinx.android.synthetic.main.search_options_fragment.*
 import kotlinx.android.synthetic.main.search_options_fragment.view.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
+import javax.inject.Inject
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), HistoryListActionListener {
     private lateinit var historyAdapter: HistoryViewAdapter
-    private lateinit var viewModel: SearchViewModel
+
+    @Inject
+    lateinit var viewModel: SearchViewModel
 
     private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        Log.d(TAG, "Getting viewModel")
-        viewModel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         createViewAdapter()
 
@@ -52,7 +49,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        CoroutineScope(IO).launch { withContext(IO) { viewModel.loadHistory() } }
+        viewModel.fetchHistory()
 
         Log.d(TAG, "onCreate: ends")
     }
@@ -101,7 +98,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
             override fun onQueryTextChange(s: String?): Boolean {
                 Log.d(TAG, "searchView: text changed")
                 if (s == null) return true
-                viewModel.loadHistory(s)
+                viewModel.fetchHistory(s)
                 return true
             }
         })

@@ -1,12 +1,8 @@
-package com.example.marvellisimo.favorites
+package com.example.marvellisimo.activity.favorites
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.CharacterDataWrapper
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
 import com.example.marvellisimo.models.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.*
