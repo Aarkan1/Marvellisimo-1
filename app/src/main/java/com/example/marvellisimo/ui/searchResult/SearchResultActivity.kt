@@ -31,12 +31,12 @@ import kotlin.math.log
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
-    private lateinit var viewModel: SearchResultViewModel
+    private lateinit var viewModel: CharacterSearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
-        viewModel = ViewModelProviders.of(this).get(SearchResultViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
@@ -67,7 +67,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
 
         viewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
             addCharactersToResultList(it)
-            Log.d(TAG, "size allCharacters beeeeefore: ${it.size}")
         })
     }
 

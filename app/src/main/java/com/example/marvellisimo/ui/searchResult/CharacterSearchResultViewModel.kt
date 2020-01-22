@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 const val TAG = "CharacterSerieResultListActivityy"
 
-class SearchResultViewModel : ViewModel() {
+class CharacterSearchResultViewModel : ViewModel() {
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
     var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
     private var cache = false
@@ -50,30 +50,26 @@ class SearchResultViewModel : ViewModel() {
     private fun getAllCharactersFromRealm(searchString: String) {
 
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(CharacterRealm::class.java)
+            val results = it.where(CharacterRealmObject::class.java)
                 .equalTo("id", searchString)
                 .findAll()
-                .toArray().map { (it as CharacterRealm) }
+                .toArray().map { (it as CharacterRealmObject) }
 
             if (results.isEmpty()) {
                 cache = true
             } else {
-                Log.d(TAG, "size: ${results.size}")
-                Log.d(TAG, "size allCharacters before: ${allCharacters.value!!.size}")
-
                 val characters = results[0].characterList.map { Character().apply {
                     name = it.name
                     description = it.description
-                    thumbnail = it.thumbnail
+                    thumbnail!!.path = it.thumbnail!!.path
                     series = it.series
                     id = it.id
                 } }
 
                 CoroutineScope(Main).launch{
                     allCharacters.value = arrayListOf( *characters.toTypedArray())
+                    Log.d(TAG, "getting characters from Realm")
                 }
-                    Log.d(TAG, "size allCharacters after: ${allCharacters.value!!.size}")
-
                     cache = false
                 }
 
@@ -86,7 +82,7 @@ class SearchResultViewModel : ViewModel() {
         list.addAll(result)
 
         Realm.getDefaultInstance().executeTransaction {
-            it.insertOrUpdate(CharacterRealm(searchString,list))
+            it.insertOrUpdate(CharacterRealmObject(searchString,list))
         }
     }
 

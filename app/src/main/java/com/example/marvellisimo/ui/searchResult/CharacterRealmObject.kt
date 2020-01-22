@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey
 import io.realm.RealmObject
 
 
-open class CharacterRealm (
+open class CharacterRealmObject (
     @PrimaryKey
     var id: String = "",
     var characterList: RealmList<Character> = RealmList()): RealmObject()
