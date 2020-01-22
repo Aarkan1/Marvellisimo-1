@@ -22,6 +22,22 @@ class Repository @Inject constructor(
     private val marvelService: MarvelService
 ) {
 
+    private fun userToDocument(user: User) = Document().apply {
+        put("uid", user.uid)
+        put("username", user.username)
+        put("avatar", user.avatar)
+        put("favoriteCharacters", user.favoriteCharacters)
+        put("favoriteSeries", user.favoriteSeries)
+    }
+
+    private fun documentToUser(document: Document) = User().apply {
+        uid = document["uid"] as String
+        username = document["username"] as String
+        avatar = document["avatar"] as String
+        favoriteCharacters = document["favoriteCharacters"] as ArrayList<String>
+        favoriteSeries = document["favoriteSeries"] as ArrayList<String>
+    }
+
     suspend fun fetchHistory(phrase: String = ""): List<String> {
         Log.d(TAG, "fetchHistory: $phrase")
         return Realm.getDefaultInstance().where(HistoryItem::class.java)
@@ -40,30 +56,59 @@ class Repository @Inject constructor(
     }
 
     suspend fun fetchCurrentUser(): User? {
-        Log.d(TAG, "fetchUser with id: ${DB.client.auth.user!!.id}")
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(DB.client.auth.user!!.id)))
+        Log.d(TAG, "fetchCurrentUser: starts")
+        val id = DB.client?.auth?.user?.id ?: return null
+
+        Log.d(TAG, "fetchUser, id: $id")
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
         val result = DB.users.findOne(filter)
 
         // This is hacky but it not possible to force block Mongo Stitch query
-        // we need to block because of coroutines
+        // and we need to block because of coroutines
         while (!result.isComplete) delay(5)
         Log.d(TAG, "Fetched user: ${result?.result}")
 
         return if (result.result == null) null
-        else User().apply {
-            uid = result.result["uid"] as String
-            username = result.result["username"] as String
-            avatar = result.result["avatar"] as String
-            favoriteCharacters = result.result["favoriteCharacters"] as ArrayList<String>
-            favoriteSeries = result.result["favoriteSeries"] as ArrayList<String>
-        }
+        else documentToUser(result.result)
+    }
+
+    suspend fun addCharacterToFavorites(id: String) {
+        Log.d(TAG, "addCharacterToFavorites: starts")
+        val user = fetchCurrentUser() ?: throw Exception("No User")
+
+        if (user.favoriteCharacters == null) user.favoriteCharacters = ArrayList()
+
+        if (user.favoriteCharacters!!.contains(id)) return
+
+        user.favoriteCharacters!!.add(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
+        val replacement = userToDocument(user)
+
+        val task = DB.users.findOneAndReplace(filter, replacement)
+        while (!task.isComplete) delay(5)
+        return
+    }
+
+    suspend fun removeCharactersFromFavorites(id: String) {
+        Log.d(TAG, "addCharacterToFavorites: starts")
+        val user = fetchCurrentUser() ?: throw Exception("No User")
+
+        if (user.favoriteCharacters == null) user.favoriteCharacters = ArrayList()
+
+        user.favoriteCharacters!!.remove(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
+        val replacement = userToDocument(user)
+
+        val task = DB.users.findOneAndReplace(filter, replacement)
+        while (!task.isComplete) delay(5)
+        return
     }
 
     suspend fun fetchFavoriteCharacters(): List<Character> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
         val user = fetchCurrentUser() ?: throw Exception("No user")
-        if (user.favoriteCharacters == null) throw Exception("No favoriteCharacters")
-
         val favoriteCharacters = user.favoriteCharacters ?: return emptyList()
 
         return favoriteCharacters
@@ -72,10 +117,40 @@ class Repository @Inject constructor(
             .mapNotNull { it }
     }
 
+    suspend fun addSeriesToFavorites(id: String) {
+        Log.d(TAG, "addSeriesToFavorites: starts ")
+        val user = fetchCurrentUser() ?: throw Exception("No user")
+
+        if (user.favoriteSeries == null) user.favoriteSeries = ArrayList()
+        if (user.favoriteSeries!!.contains(id)) return
+        user.favoriteSeries!!.add(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
+        val replacement = userToDocument(user)
+
+        val task = DB.users.findOneAndReplace(filter, replacement)
+        while (!task.isComplete) delay(5)
+        return
+    }
+
+    suspend fun removeSeriesFromFavorites(id: String) {
+        Log.d(TAG, "addSeriesToFavorites: starts ")
+        val user = fetchCurrentUser() ?: throw Exception("No user")
+
+        if (user.favoriteSeries == null) user.favoriteSeries = ArrayList()
+        user.favoriteSeries!!.remove(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
+        val replacement = userToDocument(user)
+
+        val task = DB.users.findOneAndReplace(filter, replacement)
+        while (!task.isComplete) delay(5)
+        return
+    }
+
     suspend fun fetchFavoriteSeries(): List<Series> {
         Log.d(TAG, "fetchFavoriteSeries: starts")
         val user = fetchCurrentUser() ?: throw Exception("No user")
-        if (user.favoriteSeries == null) throw Exception("No favoriteSeries")
 
         val favoriteSeries = user.favoriteSeries ?: return emptyList()
 
@@ -85,7 +160,7 @@ class Repository @Inject constructor(
             .mapNotNull { it }
     }
 
-    // we should check caches here
+    // TODO we should check caches here
     suspend fun fetchSeriesById(id: String): Series? {
         Log.d(TAG, "fetchSeriesById: $id")
 
@@ -93,7 +168,7 @@ class Repository @Inject constructor(
         return if (results.isNotEmpty()) results[0] else null
     }
 
-    // we should check caches here
+    // TODO we should check caches here
     suspend fun fetchCharacterById(id: String): Character? {
         Log.d(TAG, "fetchCharacterById: $id")
 

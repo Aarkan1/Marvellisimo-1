@@ -3,7 +3,7 @@ package com.example.marvellisimo.activity.favorites
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.models.SearchType
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -31,5 +31,18 @@ class FavoritesViewModel @Inject constructor(
             favoriteCharacters.value = characters
             favoriteSeries.value = series
         }
+    }
+
+    fun removeCharacterFromFavorites(id: String) = CoroutineScope(IO).launch {
+        repository.removeCharactersFromFavorites(id)
+        val characters = repository.fetchFavoriteCharacters()
+        CoroutineScope(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
+    }
+
+
+    fun removeSeriesFromFavorites(id: String) = CoroutineScope(IO).launch {
+        repository.removeSeriesFromFavorites(id)
+        val series = repository.fetchFavoriteSeries()
+        CoroutineScope(Main).launch { favoriteSeries.value = series.toTypedArray() }
     }
 }

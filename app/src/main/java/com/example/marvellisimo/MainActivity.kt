@@ -15,6 +15,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
+import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
@@ -77,6 +78,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_search -> {
                 startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            R.id.action_favorites -> {
+                startActivity(Intent(this, FavoritesActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

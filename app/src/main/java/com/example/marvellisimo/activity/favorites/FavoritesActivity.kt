@@ -13,12 +13,13 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.models.SearchType
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
+import kotlinx.android.synthetic.main.favorite_item.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 import javax.inject.Inject
 
@@ -93,19 +94,29 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         startActivity(intent)
     }
 
+    override fun onRemoveCharacterClick(character: Character) {
+        viewModel.removeCharacterFromFavorites(character.id.toString())
+    }
+
     override fun onSeriesClick(series: Series) {
         val intent = Intent(this, SerieDetailsActivity::class.java)
         intent.putExtra("item", series)
         startActivity(intent)
     }
+
+    override fun onRemoveSeriesClick(series: Series) {
+        viewModel.removeSeriesFromFavorites(series.id.toString())
+    }
 }
 
 interface CharacterItemActionListener {
     fun onCharacterClick(character: Character)
+    fun onRemoveCharacterClick(character: Character)
 }
 
 interface SeriesItemActionListener {
     fun onSeriesClick(series: Series)
+    fun onRemoveSeriesClick(series: Series)
 }
 
 class CharacterItem(
@@ -118,15 +129,21 @@ class CharacterItem(
     }
 
     override fun getLayout(): Int {
-        return R.layout.search_result_item
+        return R.layout.favorite_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.setOnClickListener { characterItemActionListener.onCharacterClick(character) }
+        viewHolder.itemView.favorite_item_info.setOnClickListener {
+            characterItemActionListener.onCharacterClick(character)
+        }
+        viewHolder.itemView.favorite_item_button_delete.setOnClickListener {
+            characterItemActionListener.onRemoveCharacterClick(character)
+        }
 
-        viewHolder.itemView.search_result_item_description_textView.text = character.description
-        viewHolder.itemView.search_result_item_name_textView.text = character.name
-        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        viewHolder.itemView.favorite_item_description_textView.text = character.description
+        viewHolder.itemView.favorite_item_name_textView.text = character.name
+        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
@@ -139,14 +156,17 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
     }
 
     override fun getLayout(): Int {
-        return R.layout.search_result_item
+        return R.layout.favorite_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
+        viewHolder.itemView.favorite_item_info.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
+        viewHolder.itemView.favorite_item_button_delete.setOnClickListener {
+            seriesItemActionListener.onRemoveSeriesClick(series)
+        }
 
-        viewHolder.itemView.search_result_item_description_textView.text = series.description
-        viewHolder.itemView.search_result_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        viewHolder.itemView.favorite_item_description_textView.text = series.description
+        viewHolder.itemView.favorite_item_name_textView.text = series.title
+        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
