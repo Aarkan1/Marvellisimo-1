@@ -33,6 +33,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var dialog: AlertDialog
     private lateinit var characterViewModel: CharacterSearchResultViewModel
     private lateinit var serieViewModel: SerieSearchResultViewModel
+    private lateinit var searchString: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
-        val searchString =intent.getStringExtra("search") ?: ""
+        searchString =intent.getStringExtra("search") ?: ""
         val searchType =intent.getStringExtra("type") ?: "characters"
 
         createProgressDialog()
@@ -88,7 +89,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         adapter.setOnItemClickListener { item, view ->
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
-                //intent.putExtra("item", item.character)
+                intent.putExtra("id", item.character.id)
+                intent.putExtra("searchString", searchString)
             }
             else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)

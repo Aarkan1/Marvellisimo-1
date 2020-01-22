@@ -6,26 +6,45 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
-import com.squareup.picasso.Picasso
+import com.example.marvellisimo.ui.searchResult.CharacterSearchResultViewModel
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
-
+    private lateinit var characterViewModel: CharacterSearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_details)
 
+        characterViewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
+
+
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         character_detail_serie_list_recyclerView.addItemDecoration(dividerItemDecoration)
+
+        val id =intent.getIntExtra("id", 0)
+        val searchString =intent.getStringExtra("searchString")
+
+        Log.d("CharacterSerieResultListActivityy", "id: $id")
+        Log.d("CharacterSerieResultListActivityy", "search string: $searchString")
+
+
+        CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO) {
+            characterViewModel.getOneCharacterFromRealm(id, searchString) }
+        }
+
+
 
        /* val selectedCharacter = intent.getParcelableExtra<Character>("item")
 

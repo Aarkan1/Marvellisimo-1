@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
@@ -18,8 +17,8 @@ const val TAG = "CharacterSerieResultListActivityy"
 
 class CharacterSearchResultViewModel : ViewModel() {
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
-    var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
     private var cache = false
+    lateinit var character: Character
 
     fun getAllCharacters(searchString: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -83,6 +82,34 @@ class CharacterSearchResultViewModel : ViewModel() {
 
         Realm.getDefaultInstance().executeTransaction {
             it.insertOrUpdate(CharacterRealmObject(searchString,list))
+        }
+    }
+
+    fun getOneCharacterFromRealm(idd: Int, searchString: String?) {
+
+        Realm.getDefaultInstance().executeTransaction {
+            val results = it.where(CharacterRealmObject::class.java)
+                .equalTo("id", searchString)
+                .findAll()
+                .toArray().map { (it as CharacterRealmObject) }
+
+
+            val characters = results[0].characterList.filter {
+                it.id == idd
+            }.map { Character().apply {
+                name = it.name
+                description = it.description
+                thumbnail!!.path = it.thumbnail!!.path
+                series = it.series
+                id = it.id
+            } }
+
+            CoroutineScope(Main).launch{
+                arrayListOf( *characters.toTypedArray()).map {
+                    Log.d(TAG, "des: ${it.description}")
+                    character = it
+                }
+            }
         }
     }
 }
