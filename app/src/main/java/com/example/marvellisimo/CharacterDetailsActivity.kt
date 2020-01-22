@@ -6,10 +6,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
+import com.example.marvellisimo.ui.searchResult.CharacterNonRealm
 import com.example.marvellisimo.ui.searchResult.CharacterSearchResultViewModel
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
@@ -36,36 +42,41 @@ class CharacterDetailsActivity : AppCompatActivity() {
         val id =intent.getIntExtra("id", 0)
         val searchString =intent.getStringExtra("searchString")
 
-        Log.d("CharacterSerieResultListActivityy", "id: $id")
-        Log.d("CharacterSerieResultListActivityy", "search string: $searchString")
-
-
         CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO) {
             characterViewModel.getOneCharacterFromRealm(id, searchString) }
         }
 
+        characterViewModel.character.observe(this, Observer<CharacterNonRealm> {
+
+            supportActionBar!!.title = it.name
 
 
-       /* val selectedCharacter = intent.getParcelableExtra<Character>("item")
 
-        if (selectedCharacter is Character) {
-
-            supportActionBar!!.title = selectedCharacter.name
+             if (it.series!!.items!!.isNotEmpty()) {
 
 
-            for (serie in selectedCharacter.series!!.items){
-                Log.d("___", "name of the serie: ${serie.name}")
-                adapter.add(CharacterDetailSeriesListItem(serie))
 
-            }
+                        for (serie in it.series!!.items!!) {
+                             adapter.add(CharacterDetailSeriesListItem(serie))
+                            }
+
+                }
+
+
             character_detail_serie_list_recyclerView.adapter = adapter
 
-            var des = selectedCharacter.description
+            var des = it.description
             if (des.isEmpty()) des = "No description found"
 
             selected_character_description_textView.text = des
-            selected_character_name_textView.text = selectedCharacter.name
-            Picasso.get().load(selectedCharacter.thumbnail!!.path).into(selected_character_imageView)*/
+            selected_character_name_textView.text = it.name
+            if (it.thumbnail!!.path.isNotEmpty()) {
+                Picasso.get().load(it.thumbnail!!.path).into(selected_character_imageView)
+            }
+        })
+
+
+
 
 
     }

@@ -18,7 +18,7 @@ const val TAG = "CharacterSerieResultListActivityy"
 class CharacterSearchResultViewModel : ViewModel() {
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
     private var cache = false
-    lateinit var character: Character
+    var character = MutableLiveData<CharacterNonRealm>().apply { value = CharacterNonRealm() }
 
     fun getAllCharacters(searchString: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -49,10 +49,10 @@ class CharacterSearchResultViewModel : ViewModel() {
     private fun getAllCharactersFromRealm(searchString: String) {
 
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(CharacterRealmObject::class.java)
+            val results = it.where(CharacterRealmObjectWrapper::class.java)
                 .equalTo("id", searchString)
                 .findAll()
-                .toArray().map { (it as CharacterRealmObject) }
+                .toArray().map { (it as CharacterRealmObjectWrapper) }
 
             if (results.isEmpty()) {
                 cache = true
@@ -61,13 +61,14 @@ class CharacterSearchResultViewModel : ViewModel() {
                     name = it.name
                     description = it.description
                     thumbnail!!.path = it.thumbnail!!.path
-                    series = it.series
+                    series!!.items = it.series!!.items
+
                     id = it.id
                 } }
 
                 CoroutineScope(Main).launch{
                     allCharacters.value = arrayListOf( *characters.toTypedArray())
-                    Log.d(TAG, "getting characters from Realm")
+                    //Log.d(TAG, "getting characters from Realm")
                 }
                     cache = false
                 }
@@ -81,34 +82,26 @@ class CharacterSearchResultViewModel : ViewModel() {
         list.addAll(result)
 
         Realm.getDefaultInstance().executeTransaction {
-            it.insertOrUpdate(CharacterRealmObject(searchString,list))
+            it.insertOrUpdate(CharacterRealmObjectWrapper(searchString,list))
         }
     }
 
     fun getOneCharacterFromRealm(idd: Int, searchString: String?) {
 
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(CharacterRealmObject::class.java)
+            val results = it.where(CharacterRealmObjectWrapper::class.java)
                 .equalTo("id", searchString)
                 .findAll()
-                .toArray().map { (it as CharacterRealmObject) }
-
-
-            val characters = results[0].characterList.filter {
-                it.id == idd
-            }.map { Character().apply {
-                name = it.name
-                description = it.description
-                thumbnail!!.path = it.thumbnail!!.path
-                series = it.series
-                id = it.id
-            } }
+                .toArray().map { CharacterObjectWrapperNonRealm(it as CharacterRealmObjectWrapper) }
 
             CoroutineScope(Main).launch{
-                arrayListOf( *characters.toTypedArray()).map {
-                    Log.d(TAG, "des: ${it.description}")
-                    character = it
+                results.forEach {
+                    it.characterList.filter { idd == it.id  }
+                        .forEach {
+                        character.value = it
+                    }
                 }
+
             }
         }
     }

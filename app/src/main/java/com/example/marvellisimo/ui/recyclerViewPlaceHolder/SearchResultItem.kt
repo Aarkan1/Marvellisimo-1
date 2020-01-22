@@ -1,16 +1,19 @@
 package com.example.marvellisimo.ui.recyclerViewPlaceHolder
 
+import android.text.Layout
 import android.util.Log
 import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.marvelEntities.SeriesSummary
+import com.example.marvellisimo.ui.searchResult.SeriesSummaryNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.character_detail_series_list.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -79,13 +82,21 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
 }
 
 
-class CharacterDetailSeriesListItem (val serie: SeriesSummary): Item<GroupieViewHolder>() {
+class CharacterDetailSeriesListItem (val serie: SeriesSummaryNonRealm): Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        return R.layout.character_detail_series_list
+        var layout: Int = 1
+            layout = R.layout.character_detail_series_list
+
+
+        return layout
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.serie_textView.text = serie.name
+            val name = serie.name
+
+
+            val namee = name
+                viewHolder.itemView.serie_textView.text = namee
 
     }
 }
