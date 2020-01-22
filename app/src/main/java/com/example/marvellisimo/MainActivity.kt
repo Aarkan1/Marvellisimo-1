@@ -2,6 +2,7 @@ package com.example.marvellisimo
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -14,8 +15,8 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
-import com.example.marvellisimo.activity.favorites.FavoritesActivity
-import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.search.SearchActivity
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
@@ -30,12 +31,16 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        DB.initRealm()
 
         if (!DB.client.auth.isLoggedIn) {
             val intent = Intent(this, LoginActivity::class.java)
             // reset activity stack/history
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+        } else {
+            DB.findAndUpdateLoggedInUser()
+
         }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
@@ -59,22 +64,34 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_logout -> {
-            DB.client.auth.logout()
-            startActivity(Intent(this, LoginActivity::class.java)); true
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected: starts")
+
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                DB.client.auth.logout()
+                DB.user = null
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        R.id.action_search -> {
-            startActivity(Intent(this, SearchActivity::class.java)); true
-        }
-        R.id.action_favorites -> {
-            startActivity(Intent(this, FavoritesActivity::class.java)); true
-        }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // close realm instances on activity or fragment closing
+        // to prevent memory leaks
+        Realm.getDefaultInstance().close()
     }
 }
