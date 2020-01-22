@@ -15,8 +15,6 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
-import android.widget.Toast
-import com.example.marvellisimo.search.SearchActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
@@ -102,6 +100,12 @@ class MainActivity : AppCompatActivity() {
             R.id.action_logout ->{
                 DB.client.auth.logout()
                 val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        when (item.itemId){
+            R.id.action_OnlineList ->{
+                val intent = Intent(this, OnlineActivity::class.java)
                 startActivity(intent)
             }
         }
