@@ -22,4 +22,9 @@
     <string name="go_to_login">Go to login</string>
     <string name="toolbar_search">Search</string>
     <string name="logout">Logout</string>
+    <string name="friends">Friends</string>
+    <string name="friendlist">FriendList</string>
+    <string name="textview">TextView</string>
+    <string name="online">Online</string>
+    <string name="onlinelist">OnlineList</string>
 </resources>
