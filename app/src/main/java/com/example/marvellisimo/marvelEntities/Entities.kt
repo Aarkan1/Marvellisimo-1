@@ -57,7 +57,7 @@ open class SeriesSummary (
 
 
 
-data class SeriesDataWrapper(
+open class SeriesDataWrapper(
     val code: Int, //The HTTP status code of the returned result.,
     val status: String, // (string, optional): A string description of the call status.,
     //copyright (string, optional): The copyright notice for the returned result.,
@@ -67,7 +67,7 @@ data class SeriesDataWrapper(
     //etag (string, optional): A digest value of the content returned by the call.
     )
 
-data class SeriesDataContainer (
+open class SeriesDataContainer (
     //offset (int, optional): The requested offset (number of skipped results) of the call.,
     //limit (int, optional): The requested result limit.,
     val total: Int, //(int, optional): The total number of resources available given the current filter set.,
@@ -75,17 +75,17 @@ data class SeriesDataContainer (
     val results: Array<Series> // The list of series returned by the call
 )
 
-data class Series (
-    val id: Int, //(int, optional): The unique ID of the series resource.,
-    val title: String, // (string, optional): The canonical title of the series.,
-    var description: String, // (string, optional): A description of the series.,
+open class Series (
+    var id: Int = 1, //(int, optional): The unique ID of the series resource.,
+    var title: String = "", // (string, optional): The canonical title of the series.,
+    var description: String? = "hej", // (string, optional): A description of the series.,
     //resourceURI (string, optional): The canonical URL identifier for this resource.,
     //urls (Array[Url], optional): A set of public web site URLs for the resource.,
-    val startYear: Int, // (int, optional): The first year of publication for the series.,
-    val endYear: Int, // (int, optional): The last year of publication for the series (conventionally, 2099 for ongoing series) .,
-    val rating: String, // (string, optional): The age-appropriateness rating for the series.,
+    var startYear: Int = 1, // (int, optional): The first year of publication for the series.,
+    var endYear: Int = 1, // (int, optional): The last year of publication for the series (conventionally, 2099 for ongoing series) .,
+    var rating: String = "", // (string, optional): The age-appropriateness rating for the series.,
     //modified (Date, optional): The date the resource was most recently modified.,*/
-    val thumbnail: Image //The representative image for this series.,
+    var thumbnail: Image? = Image("", "") //The representative image for this series.,
     //comics (ComicList, optional): A resource list containing comics in this series.,
     //stories (StoryList, optional): A resource list containing stories which occur in comics in this series.,
     //events (EventList, optional): A resource list containing events which take place in comics in this series.,
@@ -93,7 +93,7 @@ data class Series (
     //creators (CreatorList, optional): A resource list of creators whose work appears in comics in this series.,
     //next (SeriesSummary, optional): A summary representation of the series which follows this series.,
     //previous (SeriesSummary, optional): A summary representation of the series which preceded this series.*/
-)
+): RealmObject()
 
 open class Image (
     var path: String= "", // The directory path of to the image.,

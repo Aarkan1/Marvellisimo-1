@@ -31,12 +31,14 @@ import kotlin.math.log
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
-    private lateinit var viewModel: CharacterSearchResultViewModel
+    private lateinit var characterViewModel: CharacterSearchResultViewModel
+    private lateinit var serieViewModel: SerieSearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
-        viewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
+        characterViewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
+        serieViewModel = ViewModelProviders.of(this).get(SerieSearchResultViewModel::class.java)
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
@@ -55,17 +57,17 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun getAllSeries(searchString: String) {
-        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllSeries(searchString) } }
+        CoroutineScope(IO).launch { withContext(IO) { serieViewModel.getAllSeries(searchString) } }
 
-        viewModel.allSeries.observe(this, Observer<ArrayList<Series>> {
+        serieViewModel.allSeries.observe(this, Observer<ArrayList<Series>> {
             addSeriesToResultList(it)
         })
     }
 
     private fun getAllCharacters(searchString: String) {
-        viewModel.getAllCharacters(searchString)
+        characterViewModel.getAllCharacters(searchString)
 
-        viewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
+        characterViewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
             addCharactersToResultList(it)
         })
     }
@@ -100,11 +102,6 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     private fun addSeriesToResultList(series: ArrayList<Series>) {
         adapter.clear()
         for (serie in series) {
-            serie.thumbnail.path = serie.thumbnail.path
-                .replace("http:", "https:") + "." + serie.thumbnail.extension
-
-            if (serie.description == null) serie.description = "No description found"
-
             adapter.add(
                 SeriesSearchResultItem(serie)
             )

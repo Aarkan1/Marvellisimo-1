@@ -35,8 +35,6 @@ class CharacterSearchResultItem (val character: Character): Item<GroupieViewHold
             name = character.name.substring(0, 25) + "..."
 
             CoroutineScope(Main).launch {
-
-                Log.d("Hej", character.name)
                 viewHolder.itemView.search_result_item_description_textView.text = des
                 viewHolder.itemView.search_result_item_name_textView.text = name
 
@@ -55,17 +53,28 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        CoroutineScope(IO).launch {
+            val str1 = serie.thumbnail!!.path
 
-        var des = serie.description
-        if (des.length > 200) des = des.substring(0, 140) + "..."
 
-        var title = serie.title
-        if (title.length > 25)
-            title = serie.title.substring(0, 25) + "..."
+            var des = serie.description
+            if (des != null) {
+                if (des.length > 200) des = des.substring(0, 140) + "..."
+            }
+            else des = "No description found"
 
-        viewHolder.itemView.search_result_item_description_textView.text = des
-        viewHolder.itemView.search_result_item_name_textView.text = title
-        Picasso.get().load(serie.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+            var title = serie.title
+            if (title.length > 25)
+                title = serie.title.substring(0, 25) + "..."
+
+            CoroutineScope(Main).launch {
+                val path = str1
+
+                viewHolder.itemView.search_result_item_description_textView.text = des
+                viewHolder.itemView.search_result_item_name_textView.text = title
+                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
+            }
+        }
     }
 }
 
