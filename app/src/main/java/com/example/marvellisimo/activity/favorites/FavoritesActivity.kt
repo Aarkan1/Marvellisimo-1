@@ -19,6 +19,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
+import kotlinx.android.synthetic.main.favorite_item.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 import javax.inject.Inject
 
@@ -118,15 +119,15 @@ class CharacterItem(
     }
 
     override fun getLayout(): Int {
-        return R.layout.search_result_item
+        return R.layout.favorite_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.setOnClickListener { characterItemActionListener.onCharacterClick(character) }
 
-        viewHolder.itemView.search_result_item_description_textView.text = character.description
-        viewHolder.itemView.search_result_item_name_textView.text = character.name
-        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        viewHolder.itemView.favorite_item_description_textView.text = character.description
+        viewHolder.itemView.favorite_item_name_textView.text = character.name
+        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
@@ -139,14 +140,14 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
     }
 
     override fun getLayout(): Int {
-        return R.layout.search_result_item
+        return R.layout.favorite_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.setOnClickListener { seriesItemActionListener.onSeriesClick(series) }
 
-        viewHolder.itemView.search_result_item_description_textView.text = series.description
-        viewHolder.itemView.search_result_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.search_result_item_imageView)
+        viewHolder.itemView.favorite_item_description_textView.text = series.description
+        viewHolder.itemView.favorite_item_name_textView.text = series.title
+        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
