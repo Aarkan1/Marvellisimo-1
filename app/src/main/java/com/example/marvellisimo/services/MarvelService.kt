@@ -20,7 +20,7 @@ interface MarvelService {
 
 
     @GET("characters/{characterId}")
-    suspend fun getCharacterById(@Path("characterID") characterId: String): CharacterDataWrapper
+    suspend fun getCharacterById(@Path("characterId") characterId: String): CharacterDataWrapper
 
     @GET("series")
     suspend fun getAllSeries(

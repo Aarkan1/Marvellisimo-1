@@ -3,7 +3,7 @@ package com.example.marvellisimo.activity.favorites
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.models.SearchType
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO

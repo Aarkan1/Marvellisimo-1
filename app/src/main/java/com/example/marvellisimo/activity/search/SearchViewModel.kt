@@ -2,7 +2,7 @@ package com.example.marvellisimo.activity.search
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.models.SearchType
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO

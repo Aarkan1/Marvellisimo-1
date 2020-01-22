@@ -13,7 +13,7 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.models.SearchType
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder

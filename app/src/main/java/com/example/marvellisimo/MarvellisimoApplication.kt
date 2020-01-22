@@ -15,6 +15,7 @@ import javax.inject.Singleton
 interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
     fun inject(activity: SearchActivity)
+    fun inject(activity: CharacterDetailsActivity)
 }
 
 class MarvellisimoApplication : Application() {
