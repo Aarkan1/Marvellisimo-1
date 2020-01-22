@@ -160,7 +160,7 @@ class Repository @Inject constructor(
             .mapNotNull { it }
     }
 
-    // we should check caches here
+    // TODO we should check caches here
     suspend fun fetchSeriesById(id: String): Series? {
         Log.d(TAG, "fetchSeriesById: $id")
 
@@ -168,7 +168,7 @@ class Repository @Inject constructor(
         return if (results.isNotEmpty()) results[0] else null
     }
 
-    // we should check caches here
+    // TODO we should check caches here
     suspend fun fetchCharacterById(id: String): Character? {
         Log.d(TAG, "fetchCharacterById: $id")
 

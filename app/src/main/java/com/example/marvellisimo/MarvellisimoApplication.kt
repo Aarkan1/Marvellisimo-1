@@ -16,6 +16,7 @@ interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
     fun inject(activity: SearchActivity)
     fun inject(activity: CharacterDetailsActivity)
+    fun inject(activity: SerieDetailsActivity)
 }
 
 class MarvellisimoApplication : Application() {
