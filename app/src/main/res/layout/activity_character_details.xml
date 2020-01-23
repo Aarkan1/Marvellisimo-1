@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        tools:context=".SerieDetailsActivity">
+        tools:context=".activity.series_details.SerieDetailsActivity">
 
         <ImageView
             android:id="@+id/selected_character_imageView"

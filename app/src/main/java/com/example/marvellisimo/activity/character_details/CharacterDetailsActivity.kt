@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.character_details
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,16 +6,15 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.MarvellisimoApplication
+import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.Repository
-import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
-import com.example.marvellisimo.ui.searchResult.CharacterNonRealm
-import com.example.marvellisimo.ui.searchResult.CharacterSearchResultViewModel
+import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -24,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val TAG = "CharacterDetailsActivity"
@@ -36,7 +34,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
     @Inject
     lateinit var repository: Repository
     lateinit var selectedCharacter: CharacterNonRealm
-    private lateinit var characterViewModel: CharacterSearchResultViewModel
+    private lateinit var characterViewModel: CharacterDetailsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +42,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
-        characterViewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
+        characterViewModel = ViewModelProviders.of(this).get(CharacterDetailsViewModel::class.java)
 
 
         adapter = GroupAdapter()

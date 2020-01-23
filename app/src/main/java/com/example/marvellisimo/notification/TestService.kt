@@ -1,6 +1,5 @@
 package com.example.marvellisimo.notification
 
-import android.app.IntentService
 import android.app.PendingIntent
 import android.app.job.JobParameters
 import android.app.job.JobService
@@ -8,8 +7,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.marvellisimo.CharacterDetailsActivity
-import com.example.marvellisimo.MainActivity
+import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.Repository

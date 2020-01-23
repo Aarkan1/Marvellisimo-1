@@ -14,7 +14,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".CharacterDetailsActivity"></activity>
+        <activity android:name=".activity.character_details.CharacterDetailsActivity"></activity>
 
         <activity android:name="com.example.marvellisimo.activity.favorites.FavoritesActivity">
             <meta-data
@@ -22,8 +22,8 @@
                     android:value=".MainActivity"/>
         </activity>
 
-        <activity android:name=".SerieDetailsActivity"/>
-        <activity android:name=".ui.searchResult.CharacterSerieResultListActivity">
+        <activity android:name=".activity.series_details.SerieDetailsActivity"/>
+        <activity android:name=".activity.search_result.CharacterSerieResultListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".MainActivity"/>

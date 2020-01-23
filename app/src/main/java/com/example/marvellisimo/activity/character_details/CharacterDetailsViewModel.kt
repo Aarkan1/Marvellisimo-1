@@ -1,25 +1,29 @@
-package com.example.marvellisimo.ui.searchResult
+package com.example.marvellisimo.activity.character_details
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.example.marvellisimo.marvelEntities.Character
 import io.realm.Case
 import io.realm.Realm
-import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 
-const val TAG = "CharacterSerieResultListActivityy"
+private const val TAG = "CharacterSerieResultListActivityy"
 
-class CharacterSearchResultViewModel : ViewModel() {
+class CharacterDetailsViewModel : ViewModel() {
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
     private var cache = false
-    var character = MutableLiveData<CharacterNonRealm>().apply { value = CharacterNonRealm() }
+    var character = MutableLiveData<CharacterNonRealm>().apply { value =
+        CharacterNonRealm()
+    }
 
     fun getAllCharacters(searchString: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -94,7 +98,8 @@ class CharacterSearchResultViewModel : ViewModel() {
                 .findFirst()
 
             if (res != null) {
-                val characterFromRealm = CharacterNonRealm().apply {
+                val characterFromRealm = CharacterNonRealm()
+                    .apply {
                     name = res.name
                     description = res.description
                     thumbnail!!.path = res.thumbnail!!.path
@@ -125,7 +130,8 @@ class CharacterSearchResultViewModel : ViewModel() {
             CoroutineScope(Main).launch {
                 val res = characterFromMarvel.data.results[0]
 
-                val newCharacter = CharacterNonRealm().apply {
+                val newCharacter = CharacterNonRealm()
+                    .apply {
                     name = res.name
                     description = res.description
                     thumbnail!!.path = res.thumbnail!!.path

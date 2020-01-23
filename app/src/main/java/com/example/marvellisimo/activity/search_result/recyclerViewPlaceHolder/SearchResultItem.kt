@@ -1,19 +1,15 @@
-package com.example.marvellisimo.ui.recyclerViewPlaceHolder
+package com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder
 
-import android.text.Layout
-import android.util.Log
 import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.marvelEntities.SeriesSummary
-import com.example.marvellisimo.ui.searchResult.SeriesSummaryNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.character_detail_series_list.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch

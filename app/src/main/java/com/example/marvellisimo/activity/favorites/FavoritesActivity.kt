@@ -7,10 +7,10 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import androidx.lifecycle.Observer
-import com.example.marvellisimo.CharacterDetailsActivity
+import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.realm.SearchType
@@ -20,7 +20,6 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.favorite_item.view.*
-import kotlinx.android.synthetic.main.search_result_item.view.*
 import javax.inject.Inject
 
 private const val TAG = "Favorites"

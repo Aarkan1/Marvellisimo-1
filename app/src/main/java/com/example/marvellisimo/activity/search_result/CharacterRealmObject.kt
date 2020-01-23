@@ -1,10 +1,13 @@
-package com.example.marvellisimo.ui.searchResult
+package com.example.marvellisimo.activity.search_result
 
 open class CharacterNonRealm(
-    var thumbnail: ImageNonRealm? = ImageNonRealm("", ""),
-    var series: SeriesListNonRealm? = SeriesListNonRealm()           ,
-    var id: Int = 1                               ,
-    var name: String = ""                     ,
+    var thumbnail: ImageNonRealm? = ImageNonRealm(
+        "",
+        ""
+    ),
+    var series: SeriesListNonRealm? = SeriesListNonRealm(),
+    var id: Int = 1,
+    var name: String = "",
     var description: String = ""
 )
 

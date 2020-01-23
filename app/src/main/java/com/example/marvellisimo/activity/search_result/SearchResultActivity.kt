@@ -1,45 +1,43 @@
-package com.example.marvellisimo.ui.searchResult
+package com.example.marvellisimo.activity.search_result
 
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.CharacterDetailsActivity
-import com.example.marvellisimo.SerieDetailsActivity
+import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
+import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterSearchResultItem
-import com.example.marvellisimo.ui.recyclerViewPlaceHolder.SeriesSearchResultItem
+import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterSearchResultItem
+import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.SeriesSearchResultItem
+import com.example.marvellisimo.activity.series_details.SeriesDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.log
 
 class CharacterSerieResultListActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
-    private lateinit var characterViewModel: CharacterSearchResultViewModel
-    private lateinit var serieViewModel: SerieSearchResultViewModel
+    private lateinit var characterViewModel: CharacterDetailsViewModel
+    private lateinit var serieViewModel: SeriesDetailsViewModel
     private lateinit var searchString: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
-        characterViewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
-        serieViewModel = ViewModelProviders.of(this).get(SerieSearchResultViewModel::class.java)
+        characterViewModel = ViewModelProviders.of(this).get(CharacterDetailsViewModel::class.java)
+        serieViewModel = ViewModelProviders.of(this).get(SeriesDetailsViewModel::class.java)
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)

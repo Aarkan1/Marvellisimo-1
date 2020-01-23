@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.models.realm.SearchType
-import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import com.example.marvellisimo.activity.search_result.CharacterSerieResultListActivity
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.search_options_fragment.view.*
 import kotlinx.coroutines.CoroutineScope

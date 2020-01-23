@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.series_details
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,20 +7,20 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.example.marvellisimo.MarvellisimoApplication
+import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.Repository
-import com.example.marvellisimo.ui.searchResult.SerieSearchResultViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SerieDetailsActivity : AppCompatActivity() {
-    private lateinit var serieViewModel: SerieSearchResultViewModel
+    private lateinit var serieViewModel: SeriesDetailsViewModel
 
 
     // TODO this is only temporary, repository should be moved to viewModel
@@ -34,7 +34,7 @@ class SerieDetailsActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
-        serieViewModel = ViewModelProviders.of(this).get(SerieSearchResultViewModel::class.java)
+        serieViewModel = ViewModelProviders.of(this).get(SeriesDetailsViewModel::class.java)
 
 
         val serieId =intent.getIntExtra("id", 0)

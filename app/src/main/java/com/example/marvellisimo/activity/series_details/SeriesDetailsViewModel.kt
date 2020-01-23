@@ -1,22 +1,20 @@
-package com.example.marvellisimo.ui.searchResult
+package com.example.marvellisimo.activity.series_details
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
-import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
 import io.realm.Case
 import io.realm.Realm
-import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
+private const val TAG = "SerieDetailsViewModel"
 
-class SerieSearchResultViewModel : ViewModel() {
+class SeriesDetailsViewModel : ViewModel() {
     var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
     private var cache = false
     var serie = MutableLiveData<Series>().apply { value = Series() }
@@ -57,28 +55,30 @@ class SerieSearchResultViewModel : ViewModel() {
                 .where(Series::class.java)
                 .contains("title", searchString, Case.INSENSITIVE)
                 .findAll()
-                .toArray().map{ it as Series}
+                .toArray().map { it as Series }
 
             if (results.isEmpty()) {
                 cache = true
             } else {
-                val series = results.map { Series().apply {
-                    title = it.title
-                    description = it.description
-                    thumbnail!!.path = it.thumbnail!!.path
-                    id = it.id
-                    startYear = it.startYear
-                    endYear = it.endYear
-                    rating = it.rating
+                val series = results.map {
+                    Series().apply {
+                        title = it.title
+                        description = it.description
+                        thumbnail!!.path = it.thumbnail!!.path
+                        id = it.id
+                        startYear = it.startYear
+                        endYear = it.endYear
+                        rating = it.rating
 
-                } }
+                    }
+                }
 
-                CoroutineScope(Main).launch{
-                    allSeries.value = arrayListOf( *series.toTypedArray())
+                CoroutineScope(Main).launch {
+                    allSeries.value = arrayListOf(*series.toTypedArray())
                     Log.d(TAG, "getting series from Realm")
                 }
-                    cache = false
-                }
+                cache = false
+            }
         }
     }
 
@@ -108,7 +108,7 @@ class SerieSearchResultViewModel : ViewModel() {
                 CoroutineScope(Main).launch {
                     serie.value = serieFromRealm
                 }
-            }else getOneSerieFromMarvel(idd)
+            } else getOneSerieFromMarvel(idd)
         }
     }
 

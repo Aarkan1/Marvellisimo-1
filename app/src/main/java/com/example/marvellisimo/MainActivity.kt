@@ -17,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
-import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import com.example.marvellisimo.activity.search_result.CharacterSerieResultListActivity
 import android.view.MenuItem
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
