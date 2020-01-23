@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
+import io.realm.Case
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
@@ -49,15 +50,16 @@ class CharacterSearchResultViewModel : ViewModel() {
     private fun getAllCharactersFromRealm(searchString: String) {
 
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(CharacterRealmObjectWrapper::class.java)
-                .equalTo("id", searchString)
+            val results = it
+                .where(Character::class.java)
+                .contains("name", searchString, Case.INSENSITIVE)
                 .findAll()
-                .toArray().map { (it as CharacterRealmObjectWrapper) }
+                .toArray().map{ it as Character}
 
             if (results.isEmpty()) {
                 cache = true
             } else {
-                val characters = results[0].characterList.map { Character().apply {
+                val characters = results.map { Character().apply {
                     name = it.name
                     description = it.description
                     thumbnail!!.path = it.thumbnail!!.path
@@ -68,7 +70,7 @@ class CharacterSearchResultViewModel : ViewModel() {
 
                 CoroutineScope(Main).launch{
                     allCharacters.value = arrayListOf( *characters.toTypedArray())
-                    //Log.d(TAG, "getting characters from Realm")
+                    Log.d(TAG, "getting characters from Realm")
                 }
                     cache = false
                 }
@@ -78,17 +80,29 @@ class CharacterSearchResultViewModel : ViewModel() {
     }
 
     private fun saveToRealm(searchString: String, result: Array<Character>) {
-        val list = RealmList<Character>()
-        list.addAll(result)
-
-        Realm.getDefaultInstance().executeTransaction {
-            it.insertOrUpdate(CharacterRealmObjectWrapper(searchString,list))
+        result.forEach {character ->
+            Realm.getDefaultInstance().executeTransaction {
+                it.insertOrUpdate(character)
+            }
         }
+/*
+        Realm.getDefaultInstance().executeTransaction {
+            val results = it
+                .where(Character::class.java)
+                .contains("name", searchString, Case.INSENSITIVE)
+                .findAll()
+                .toArray().map{ it as Character}
+
+            CoroutineScope(Main).launch{
+                allCharacters.value = arrayListOf( *results.toTypedArray())
+            }
+        }*/
+
     }
 
-    fun getOneCharacterFromRealm(idd: Int, searchString: String?) {
+    fun getOneCharacterFromRealm(id: Int, searchString: String?) {
 
-        Realm.getDefaultInstance().executeTransaction {
+/*        Realm.getDefaultInstance().executeTransaction {
             val results = it.where(CharacterRealmObjectWrapper::class.java)
                 .equalTo("id", searchString)
                 .findAll()
@@ -101,6 +115,28 @@ class CharacterSearchResultViewModel : ViewModel() {
                         character.value = it
                     }
                 }
+            }
+        }*/
+
+
+        Realm.getDefaultInstance().executeTransaction {
+            val res = it.where(Character::class.java)
+                .equalTo("id", id)
+                .findFirst()
+
+            val characterFromRealm = CharacterNonRealm().apply {
+                name = res!!.name
+                description = res.description
+                thumbnail!!.path = res.thumbnail!!.path
+                series = SeriesListNonRealm()
+                series!!.items = ArrayList( res.series!!.items!!.map { SeriesSummaryNonRealm().apply {
+                    name = it.name
+                } })
+                this.id = res.id
+            }
+
+            CoroutineScope(Main).launch{
+                character.value = characterFromRealm
             }
         }
     }

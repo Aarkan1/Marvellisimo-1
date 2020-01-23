@@ -4,6 +4,7 @@ import android.os.Parcelable
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Ignore
+import io.realm.annotations.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 import org.jetbrains.annotations.NotNull
 
@@ -35,6 +36,7 @@ open class Character(
     val events: EventList, //, optional): A resource list of events in which this character appears.,*/
     //@Ignore
     var series: SeriesList? = SeriesList(), //, optional): A resource list of series in which this character appears.
+    @PrimaryKey
     var id: Int = 1, //, optional): The unique ID of the character resource.,
     var name: String = "", //, optional): The name of the character.,
     var description: String = "" //, optional): A short bio or description of the character.,

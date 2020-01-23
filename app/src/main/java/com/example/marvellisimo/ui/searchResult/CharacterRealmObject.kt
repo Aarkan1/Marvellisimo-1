@@ -24,7 +24,6 @@ open class CharacterObjectWrapperNonRealm (characterRealmObject: CharacterRealmO
 
     init {
         this.id = characterRealmObject.id
-        Log.d("___", "characterRealmObject id: ${characterRealmObject.id}")
         this.characterList = ArrayList( characterRealmObject.characterList.map {
             CharacterNonRealm().apply {
                 thumbnail = ImageNonRealm(it.thumbnail!!.path, it.thumbnail!!.extension)
