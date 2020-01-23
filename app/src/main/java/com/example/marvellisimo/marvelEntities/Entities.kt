@@ -78,6 +78,7 @@ open class SeriesDataContainer (
 )
 
 open class Series (
+    @PrimaryKey
     var id: Int = 1, //(int, optional): The unique ID of the series resource.,
     var title: String = "", // (string, optional): The canonical title of the series.,
     var description: String? = "hej", // (string, optional): A description of the series.,

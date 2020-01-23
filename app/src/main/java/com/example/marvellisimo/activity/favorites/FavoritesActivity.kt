@@ -90,7 +90,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onCharacterClick(character: Character) {
         val intent = Intent(this, CharacterDetailsActivity::class.java)
-        //intent.putExtra("item", character)
+        intent.putExtra("id", character.id)
         startActivity(intent)
     }
 

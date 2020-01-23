@@ -85,40 +85,9 @@ class CharacterSearchResultViewModel : ViewModel() {
                 it.insertOrUpdate(character)
             }
         }
-/*
-        Realm.getDefaultInstance().executeTransaction {
-            val results = it
-                .where(Character::class.java)
-                .contains("name", searchString, Case.INSENSITIVE)
-                .findAll()
-                .toArray().map{ it as Character}
-
-            CoroutineScope(Main).launch{
-                allCharacters.value = arrayListOf( *results.toTypedArray())
-            }
-        }*/
-
     }
 
     fun getOneCharacterFromRealm(id: Int, searchString: String?) {
-
-/*        Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(CharacterRealmObjectWrapper::class.java)
-                .equalTo("id", searchString)
-                .findAll()
-                .toArray().map { CharacterObjectWrapperNonRealm(it as CharacterRealmObjectWrapper) }
-
-            CoroutineScope(Main).launch{
-                results.forEach {
-                    it.characterList.filter { idd == it.id  }
-                        .forEach {
-                        character.value = it
-                    }
-                }
-            }
-        }*/
-
-
         Realm.getDefaultInstance().executeTransaction {
             val res = it.where(Character::class.java)
                 .equalTo("id", id)

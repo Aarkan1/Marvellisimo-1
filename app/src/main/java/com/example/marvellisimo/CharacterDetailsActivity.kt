@@ -33,7 +33,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
     // TODO This is only temporary - repository should be moved to viewModel
     @Inject
     lateinit var repository: Repository
-    lateinit var selectedCharacter: Character
+    lateinit var selectedCharacter: CharacterNonRealm
     private lateinit var characterViewModel: CharacterSearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +58,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         characterViewModel.character.observe(this, Observer<CharacterNonRealm> {
 
+            selectedCharacter = it
             supportActionBar!!.title = it.name
             if (it.series!!.items!!.isNotEmpty()) {
                 for (serie in it.series!!.items!!) {

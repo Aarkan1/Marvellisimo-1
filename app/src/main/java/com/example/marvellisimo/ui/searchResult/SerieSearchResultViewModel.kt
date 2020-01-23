@@ -7,6 +7,7 @@ import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
+import io.realm.Case
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +39,7 @@ class SerieSearchResultViewModel : ViewModel() {
                         }
                         allSeries.value = arrayListOf(*result)
 
-                        saveToRealm(searchString, result)
+                        saveToRealm(result)
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, "Error getAllSeries ")
@@ -50,15 +51,16 @@ class SerieSearchResultViewModel : ViewModel() {
     private fun getAllSeriesFromRealm(searchString: String) {
 
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(SerieRealmObject::class.java)
-                .equalTo("id", searchString)
+            val results = it
+                .where(Series::class.java)
+                .contains("title", searchString, Case.INSENSITIVE)
                 .findAll()
-                .toArray().map { (it as SerieRealmObject) }
+                .toArray().map{ it as Series}
 
             if (results.isEmpty()) {
                 cache = true
             } else {
-                val series = results[0].serieList.map { Series().apply {
+                val series = results.map { Series().apply {
                     title = it.title
                     description = it.description
                     thumbnail!!.path = it.thumbnail!!.path
@@ -78,37 +80,32 @@ class SerieSearchResultViewModel : ViewModel() {
         }
     }
 
-    private fun saveToRealm(searchString: String, result: Array<Series>) {
-        val list = RealmList<Series>()
-        list.addAll(result)
-
-        Realm.getDefaultInstance().executeTransaction {
-            it.insertOrUpdate(SerieRealmObject(searchString,list))
+    private fun saveToRealm(result: Array<Series>) {
+        result.forEach {Serie ->
+            Realm.getDefaultInstance().executeTransaction {
+                it.insertOrUpdate(Serie)
+            }
         }
     }
 
     fun getOneSerieFromRealm(idd: Int, searchString: String?) {
         Realm.getDefaultInstance().executeTransaction {
-            val results = it.where(SerieRealmObject::class.java)
-                .equalTo("id", searchString)
-                .findAll()
-                .toArray().map {it as SerieRealmObject }
+            val result = it.where(Series::class.java)
+                .equalTo("id", idd)
+                .findFirst()
 
-            val series = results[0].serieList.map { Series().apply {
-                title = it.title
-                description = it.description
-                thumbnail!!.path = it.thumbnail!!.path
-                id = it.id
-                startYear = it.startYear
-                endYear = it.endYear
-                rating = it.rating
+            val serieFromRealm = Series().apply {
+                title = result!!.title
+                description = result.description
+                thumbnail!!.path = result.thumbnail!!.path
+                id = result.id
+                startYear = result.startYear
+                endYear = result.endYear
+                rating = result.rating
 
-            } }
+            }
             CoroutineScope(Main).launch{
-                 arrayListOf( *series.toTypedArray())
-                     .filter { it.id == idd }
-                     .forEach { serie.value = it }
-
+                 serie.value = serieFromRealm
             }
         }
     }
