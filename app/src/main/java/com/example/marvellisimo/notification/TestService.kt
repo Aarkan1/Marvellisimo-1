@@ -8,6 +8,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.marvellisimo.CharacterDetailsActivity
 import com.example.marvellisimo.MainActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
@@ -48,12 +49,15 @@ class TestService : JobService() {
         return true
     }
 
-    private fun showNotification() = CoroutineScope(Main).launch {
+    private fun showNotification() = CoroutineScope(IO).launch {
         Log.d(TAG, "showNotification: starts ")
 
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+        val character = repository.fetchCharacterById("1009610") ?: return@launch
+
+        val intent = Intent(applicationContext, CharacterDetailsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        intent.putExtra("id", character.id)
 
         val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, 0)
 
@@ -66,8 +70,10 @@ class TestService : JobService() {
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
-        with(NotificationManagerCompat.from(applicationContext)) {
-            notify(0, builder.build())
+        CoroutineScope(Main).launch {
+            with(NotificationManagerCompat.from(applicationContext)) {
+                notify(0, builder.build())
+            }
         }
     }
 }
