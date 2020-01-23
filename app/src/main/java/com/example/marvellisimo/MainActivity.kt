@@ -69,16 +69,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun test() {
         Log.d(TAG, "test: starts")
-//        val serviceIntent = Intent(this, TestService::class.java)
-        val TEST_SERVICE_JOB_ID = 1000
 
         val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val job = JobInfo.Builder(
-            TEST_SERVICE_JOB_ID,
-            ComponentName(applicationContext, TestService::class.java)
-        )
+        val job = JobInfo.Builder(0, ComponentName(applicationContext, TestService::class.java))
             .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-//            .setPeriodic(1000)
             .build()
 
         jobScheduler.schedule(job)
