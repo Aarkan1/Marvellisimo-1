@@ -49,6 +49,8 @@ class TestService : JobService() {
     }
 
     private fun showNotification() = CoroutineScope(Main).launch {
+        Log.d(TAG, "showNotification: starts ")
+
         val intent = Intent(applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -58,8 +60,8 @@ class TestService : JobService() {
         val builder = NotificationCompat.Builder(applicationContext, MarvellisimoApplication.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_menu_camera)
             .setContentTitle("Marvellisimo")
-            .setContentText("Na Na Na Na Na Na Na Na Na Na Batman")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("Na Na Na Na Na Na Na Na Na Na Batman"))
+            .setContentText("Someone shared Spiderman with you")
+            .setStyle(NotificationCompat.BigTextStyle().bigText("This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text, This is a longer text"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
