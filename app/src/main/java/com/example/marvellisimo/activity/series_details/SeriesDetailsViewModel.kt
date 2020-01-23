@@ -19,72 +19,7 @@ private const val TAG = "SerieDetailsViewModel"
 class SeriesDetailsViewModel @Inject constructor(
     private val repository: Repository
 ) {
-    var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
-    private var cache = false
     var serie = MutableLiveData<Series>().apply { value = Series() }
-
-
-    fun getAllSeries(searchString: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            getAllSeriesFromRealm(searchString)
-
-            if (cache) {
-                try {
-                    val results =
-                        MarvelRetrofit.marvelService.getAllSeries(titleStartsWith = searchString)
-                    Log.d(TAG, "Getting series")
-                    CoroutineScope(Main).launch {
-                        val result = results.data.results
-                        result.forEach {
-                            it.thumbnail!!.path = it.thumbnail!!.path
-                                .replace("http:", "https:") + "." + it.thumbnail!!.extension
-                        }
-                        allSeries.value = arrayListOf(*result)
-
-                        result.forEach {
-                            saveToRealm(it)
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.d(TAG, "Error getAllSeries ")
-                }
-            }
-        }
-    }
-
-    private fun getAllSeriesFromRealm(searchString: String) {
-
-        Realm.getDefaultInstance().executeTransaction {
-            val results = it
-                .where(Series::class.java)
-                .contains("title", searchString, Case.INSENSITIVE)
-                .findAll()
-                .toArray().map { it as Series }
-
-            if (results.isEmpty()) {
-                cache = true
-            } else {
-                val series = results.map {
-                    Series().apply {
-                        title = it.title
-                        description = it.description
-                        thumbnail!!.path = it.thumbnail!!.path
-                        id = it.id
-                        startYear = it.startYear
-                        endYear = it.endYear
-                        rating = it.rating
-
-                    }
-                }
-
-                CoroutineScope(Main).launch {
-                    allSeries.value = arrayListOf(*series.toTypedArray())
-                    Log.d(TAG, "getting series from Realm")
-                }
-                cache = false
-            }
-        }
-    }
 
     private fun saveToRealm(serie: Series) {
         Realm.getDefaultInstance().executeTransaction {
@@ -92,15 +27,15 @@ class SeriesDetailsViewModel @Inject constructor(
         }
     }
 
-    fun getOneSerieFromRealm(idd: Int, searchString: String?) {
+    fun getOneSerieFromRealm(serieId: Int) {
         Realm.getDefaultInstance().executeTransaction {
             val result = it.where(Series::class.java)
-                .equalTo("id", idd)
+                .equalTo("id", serieId)
                 .findFirst()
 
             if (result != null) {
                 val serieFromRealm = Series().apply {
-                    title = result!!.title
+                    title = result.title
                     description = result.description
                     thumbnail!!.path = result.thumbnail!!.path
                     id = result.id
@@ -112,7 +47,7 @@ class SeriesDetailsViewModel @Inject constructor(
                 CoroutineScope(Main).launch {
                     serie.value = serieFromRealm
                 }
-            } else getOneSerieFromMarvel(idd)
+            } else getOneSerieFromMarvel(serieId)
         }
     }
 

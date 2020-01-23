@@ -6,14 +6,12 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
@@ -21,33 +19,25 @@ import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterSearchResultItem
 import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.SeriesSearchResultItem
-import com.example.marvellisimo.activity.series_details.SeriesDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CharacterSerieResultListActivity : AppCompatActivity() {
+class SearchResultActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
     private lateinit var searchString: String
 
     @Inject
-    lateinit var characterViewModel: CharacterDetailsViewModel
-
-    @Inject
-    lateinit var serieViewModel: SeriesDetailsViewModel
-
+    lateinit var viewModel: SearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
 
         MarvellisimoApplication.applicationComponent.inject(this)
-
-//        characterViewModel = ViewModelProviders.of(this).get(CharacterDetailsViewModel::class.java)
-//        serieViewModel = ViewModelProviders.of(this).get(SeriesDetailsViewModel::class.java)
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
@@ -66,17 +56,17 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
     }
 
     private fun getAllSeries(searchString: String) {
-        CoroutineScope(IO).launch { withContext(IO) { serieViewModel.getAllSeries(searchString) } }
+        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllSeries(searchString) } }
 
-        serieViewModel.allSeries.observe(this, Observer<ArrayList<Series>> {
+        viewModel.series.observe(this, Observer<ArrayList<Series>> {
             addSeriesToResultList(it)
         })
     }
 
     private fun getAllCharacters(searchString: String) {
-        characterViewModel.getAllCharacters(searchString)
+        viewModel.getAllCharacters(searchString)
 
-        characterViewModel.allCharacters.observe(this, Observer<ArrayList<Character>> {
+        viewModel.characters.observe(this, Observer<ArrayList<Character>> {
             addCharactersToResultList(it)
         })
     }

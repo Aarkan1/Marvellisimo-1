@@ -15,13 +15,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 class SerieDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
-    lateinit var selectedSerie: Series
+    private lateinit var selectedSerie: Series
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +29,8 @@ class SerieDetailsActivity : AppCompatActivity() {
         MarvellisimoApplication.applicationComponent.inject(this)
 
         val serieId = intent.getIntExtra("id", 0)
-        val searchString = intent.getStringExtra("searchString")
 
-        CoroutineScope(IO).launch {
-            withContext(IO) {
-                viewModel.getOneSerieFromRealm(serieId, searchString)
-            }
-        }
+        CoroutineScope(IO).launch { viewModel.getOneSerieFromRealm(serieId) }
 
         viewModel.serie.observe(this, Observer<Series> {
 

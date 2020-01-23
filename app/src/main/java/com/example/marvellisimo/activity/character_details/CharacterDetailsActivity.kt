@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
@@ -22,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 private const val TAG = "CharacterDetailsActivity"
 
@@ -31,7 +29,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: CharacterDetailsViewModel
-    lateinit var selectedCharacter: CharacterNonRealm
+
+    private lateinit var selectedCharacter: CharacterNonRealm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +46,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         Log.d(TAG, "id: $id")
 
-        val searchString = intent.getStringExtra("searchString")
-
-        CoroutineScope(IO).launch {
-            viewModel.getOneCharacterFromRealm(id, searchString)
-        }
+        CoroutineScope(IO).launch { viewModel.getOneCharacterFromRealm(id) }
 
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
 

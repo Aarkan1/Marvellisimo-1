@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.models.realm.SearchType
-import com.example.marvellisimo.activity.search_result.CharacterSerieResultListActivity
+import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.search_options_fragment.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -186,7 +186,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "switchToCharacterSerieList: starts")
         Log.d(TAG, "search is $search")
         startActivity(
-            Intent(this, CharacterSerieResultListActivity::class.java)
+            Intent(this, SearchResultActivity::class.java)
                 .putExtra("type", if (viewModel.searchType == SearchType.CHARACTERS) "characters" else "series")
                 .putExtra("search", search)
         )

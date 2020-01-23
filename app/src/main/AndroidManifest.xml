@@ -23,7 +23,7 @@
         </activity>
 
         <activity android:name=".activity.series_details.SerieDetailsActivity"/>
-        <activity android:name=".activity.search_result.CharacterSerieResultListActivity">
+        <activity android:name=".activity.search_result.SearchResultActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".MainActivity"/>
