@@ -94,7 +94,8 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
             }
             else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)
-               // intent.putExtra("item", item.serie)
+                intent.putExtra("id", item.serie.id)
+                intent.putExtra("searchString", searchString)
             }
             startActivity(intent)
         }

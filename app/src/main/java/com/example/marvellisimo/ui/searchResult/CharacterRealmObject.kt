@@ -29,12 +29,12 @@ open class CharacterObjectWrapperNonRealm (characterRealmObject: CharacterRealmO
                 series = SeriesListNonRealm()
                 series!!.items = ArrayList( it.series!!.items!!.map { SeriesSummaryNonRealm().apply {
                     name = it.name
-                } }.toMutableList())
+                } })
                 id = it.id
                 name = it.name
                 description = it.description
             }
-        }.toMutableList()              )
+        }             )
     }
 }
 

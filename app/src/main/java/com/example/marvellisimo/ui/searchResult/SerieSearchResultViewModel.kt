@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
 import io.realm.Realm
 import io.realm.RealmList
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,8 @@ import kotlinx.coroutines.launch
 class SerieSearchResultViewModel : ViewModel() {
     var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
     private var cache = false
+    var serie = MutableLiveData<Series>().apply { value = Series() }
+
 
     fun getAllSeries(searchString: String) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -72,9 +75,7 @@ class SerieSearchResultViewModel : ViewModel() {
                 }
                     cache = false
                 }
-
         }
-
     }
 
     private fun saveToRealm(searchString: String, result: Array<Series>) {
@@ -83,6 +84,32 @@ class SerieSearchResultViewModel : ViewModel() {
 
         Realm.getDefaultInstance().executeTransaction {
             it.insertOrUpdate(SerieRealmObject(searchString,list))
+        }
+    }
+
+    fun getOneSerieFromRealm(idd: Int, searchString: String?) {
+        Realm.getDefaultInstance().executeTransaction {
+            val results = it.where(SerieRealmObject::class.java)
+                .equalTo("id", searchString)
+                .findAll()
+                .toArray().map {it as SerieRealmObject }
+
+            val series = results[0].serieList.map { Series().apply {
+                title = it.title
+                description = it.description
+                thumbnail!!.path = it.thumbnail!!.path
+                id = it.id
+                startYear = it.startYear
+                endYear = it.endYear
+                rating = it.rating
+
+            } }
+            CoroutineScope(Main).launch{
+                 arrayListOf( *series.toTypedArray())
+                     .filter { it.id == idd }
+                     .forEach { serie.value = it }
+
+            }
         }
     }
 
