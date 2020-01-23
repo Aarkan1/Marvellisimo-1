@@ -1,5 +1,9 @@
 package com.example.marvellisimo
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +21,7 @@ import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.notification.TestService
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -58,6 +63,25 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
+        test()
+    }
+
+    private fun test() {
+        Log.d(TAG, "test: starts")
+//        val serviceIntent = Intent(this, TestService::class.java)
+        val TEST_SERVICE_JOB_ID = 1000
+
+        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        val job = JobInfo.Builder(
+            TEST_SERVICE_JOB_ID,
+            ComponentName(applicationContext, TestService::class.java)
+        )
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+//            .setPeriodic(1000)
+            .build()
+
+        jobScheduler.schedule(job)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -49,6 +49,13 @@
                     android:name="android.app.default_searchable"
                     android:value="com.example.marvellisimo.search.SearchActivity"></meta-data>
         </activity>
+
+        <service
+                android:name=".notification.TestService"
+                android:exported="false"
+                android:permission="android.permission.BIND_JOB_SERVICE">
+        </service>
+
     </application>
 
 </manifest>
