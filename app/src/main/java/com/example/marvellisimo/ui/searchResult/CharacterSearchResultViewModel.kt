@@ -140,6 +140,8 @@ class CharacterSearchResultViewModel : ViewModel() {
                 }
 
                 character.value = newCharacter
+                saveToRealm(res)
+
             }
         }
     }
