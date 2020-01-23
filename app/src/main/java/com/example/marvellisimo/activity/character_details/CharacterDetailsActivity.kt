@@ -46,7 +46,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         Log.d(TAG, "id: $id")
 
-        CoroutineScope(IO).launch { viewModel.getOneCharacterFromRealm(id) }
+        CoroutineScope(IO).launch { viewModel.getCharacter(id.toString()) }
 
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
 

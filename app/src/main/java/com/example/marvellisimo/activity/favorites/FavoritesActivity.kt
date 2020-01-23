@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
@@ -45,7 +46,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     }
 
     private fun observeViewModel() {
-        viewModel.favoriteCharacters.observe(this, Observer<Array<Character>> {
+        viewModel.favoriteCharacters.observe(this, Observer<Array<CharacterNonRealm>> {
             charactersAdapter.clear()
             it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
@@ -87,13 +88,13 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         return true
     }
 
-    override fun onCharacterClick(character: Character) {
+    override fun onCharacterClick(character: CharacterNonRealm) {
         val intent = Intent(this, CharacterDetailsActivity::class.java)
         intent.putExtra("id", character.id)
         startActivity(intent)
     }
 
-    override fun onRemoveCharacterClick(character: Character) {
+    override fun onRemoveCharacterClick(character: CharacterNonRealm) {
         viewModel.removeCharacterFromFavorites(character.id.toString())
     }
 
@@ -109,8 +110,8 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 }
 
 interface CharacterItemActionListener {
-    fun onCharacterClick(character: Character)
-    fun onRemoveCharacterClick(character: Character)
+    fun onCharacterClick(character: CharacterNonRealm)
+    fun onRemoveCharacterClick(character: CharacterNonRealm)
 }
 
 interface SeriesItemActionListener {
@@ -119,7 +120,7 @@ interface SeriesItemActionListener {
 }
 
 class CharacterItem(
-    private val character: Character, private val characterItemActionListener: CharacterItemActionListener
+    private val character: CharacterNonRealm, private val characterItemActionListener: CharacterItemActionListener
 ) : Item<GroupieViewHolder>() {
 
     init {

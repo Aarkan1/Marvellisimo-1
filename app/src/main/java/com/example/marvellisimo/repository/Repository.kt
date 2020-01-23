@@ -2,8 +2,10 @@ package com.example.marvellisimo.repository
 
 import android.util.Log
 import com.example.marvellisimo.DB
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
+import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.services.MarvelService
@@ -106,7 +108,7 @@ class Repository @Inject constructor(
         return
     }
 
-    suspend fun fetchFavoriteCharacters(): List<Character> {
+    suspend fun fetchFavoriteCharacters(): List<CharacterNonRealm> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
         val user = fetchCurrentUser() ?: throw Exception("No user")
         val favoriteCharacters = user.favoriteCharacters ?: return emptyList()
@@ -168,12 +170,48 @@ class Repository @Inject constructor(
         return if (results.isNotEmpty()) results[0] else null
     }
 
-    // TODO we should check caches here
-    suspend fun fetchCharacterById(id: String): Character? {
+    private fun saveCharacterToRealm(character: Character) {
+        Realm.getDefaultInstance().insertOrUpdate(character)
+    }
+
+    private fun fetchCharacterFromRealm(id: Int): CharacterNonRealm? {
+        val result = Realm.getDefaultInstance().where(Character::class.java).equalTo("id", id)
+            .findFirst() ?: return null
+
+        return CharacterNonRealm().apply {
+            name = result.name
+            description = result.description
+            thumbnail!!.path = result.thumbnail!!.path
+            series = SeriesListNonRealm()
+            series!!.items = ArrayList(result.series!!.items!!.map {
+                SeriesSummaryNonRealm().apply { name = it.name }
+            })
+            this.id = result.id
+        }
+    }
+
+    suspend fun fetchCharacterById(id: String): CharacterNonRealm? {
         Log.d(TAG, "fetchCharacterById: $id")
 
+        val realmResult = fetchCharacterFromRealm(id.toInt())
+        if (realmResult != null) return realmResult
+
         val results = marvelService.getCharacterById(id).data.results
-        return if (results.isNotEmpty()) results[0] else null
+        if (results.isEmpty()) return null
+
+        val character = CharacterNonRealm().apply {
+            name = results[0].name
+            description = results[0].description
+            thumbnail!!.path = results[0].thumbnail!!.path
+            series = SeriesListNonRealm()
+            series!!.items = ArrayList(results[0].series!!.items!!.map {
+                SeriesSummaryNonRealm().apply { name = it.name }
+            })
+            this.id = results[0].id
+        }
+        saveCharacterToRealm(results[0])
+
+        return character
     }
 }
 

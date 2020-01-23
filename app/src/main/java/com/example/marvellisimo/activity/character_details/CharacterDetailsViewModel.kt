@@ -22,69 +22,75 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
 
     var character = MutableLiveData<CharacterNonRealm>().apply { value = CharacterNonRealm() }
 
-    private fun saveToRealm(character: Character) {
-        Realm.getDefaultInstance().executeTransaction {
-            it.insertOrUpdate(character)
-        }
+    fun getCharacter(id: String) = CoroutineScope(IO).launch {
+        val char = repository.fetchCharacterById(id.toString())
+        CoroutineScope(Main).launch { character.value = char }
     }
 
-    fun getOneCharacterFromRealm(id: Int) {
-        Realm.getDefaultInstance().executeTransaction {
-            val res = it.where(Character::class.java)
-                .equalTo("id", id)
-                .findFirst()
+//    private fun saveToRealm(character: Character) {
+//        Realm.getDefaultInstance().executeTransaction {
+//            it.insertOrUpdate(character)
+//        }
+//    }
 
-            if (res != null) {
-                val characterFromRealm = CharacterNonRealm()
-                    .apply {
-                        name = res.name
-                        description = res.description
-                        thumbnail!!.path = res.thumbnail!!.path
-                        series = SeriesListNonRealm()
-                        series!!.items = ArrayList(res.series!!.items!!.map {
-                            SeriesSummaryNonRealm().apply { name = it.name }
-                        })
-                        this.id = res.id
-                    }
+//    fun getOneCharacterFromRealm(id: Int) {
+//        Realm.getDefaultInstance().executeTransaction {
+//            val res = it.where(Character::class.java)
+//                .equalTo("id", id)
+//                .findFirst()
+//
+//            if (res != null) {
+//                val characterFromRealm = CharacterNonRealm()
+//                    .apply {
+//                        name = res.name
+//                        description = res.description
+//                        thumbnail!!.path = res.thumbnail!!.path
+//                        series = SeriesListNonRealm()
+//                        series!!.items = ArrayList(res.series!!.items!!.map {
+//                            SeriesSummaryNonRealm().apply { name = it.name }
+//                        })
+//                        this.id = res.id
+//                    }
+//
+//                CoroutineScope(Main).launch {
+//                    character.value = characterFromRealm
+//                }
+//            } else {
+//                getOneCharacterFromMarvel(id)
+//            }
+//        }
+//    }
 
-                CoroutineScope(Main).launch {
-                    character.value = characterFromRealm
-                }
-            } else {
-                getOneCharacterFromMarvel(id)
-            }
-        }
-    }
-
-    private fun getOneCharacterFromMarvel(id: Int) {
-        CoroutineScope(IO).launch {
-            val characterFromMarvel = MarvelRetrofit.marvelService.getCharacterById(id.toString())
-
-            Log.d(TAG, "Getting character")
-            CoroutineScope(Main).launch {
-                val res = characterFromMarvel.data.results[0]
-
-                val newCharacter = CharacterNonRealm()
-                    .apply {
-                        name = res.name
-                        description = res.description
-                        thumbnail!!.path = res.thumbnail!!.path
-                            .replace("http:", "https:") + "." + res.thumbnail!!.extension
-                        series = SeriesListNonRealm()
-                        series!!.items = ArrayList(res.series!!.items!!.map {
-                            SeriesSummaryNonRealm().apply {
-                                name = it.name
-                            }
-                        })
-                        this.id = res.id
-                    }
-
-                character.value = newCharacter
-                saveToRealm(res)
-
-            }
-        }
-    }
+//    private fun getOneCharacterFromMarvel(id: Int) = CoroutineScope(IO).launch {
+//        val char = repository.fetchCharacterById(id.toString())
+//        CoroutineScope(Main).launch { character.value = char }
+//
+//            val characterFromMarvel = MarvelRetrofit.marvelService.getCharacterById(id.toString())
+//
+//            Log.d(TAG, "Getting character")
+//            CoroutineScope(Main).launch {
+//                val res = characterFromMarvel.data.results[0]
+//
+//                val newCharacter = CharacterNonRealm()
+//                    .apply {
+//                        name = res.name
+//                        description = res.description
+//                        thumbnail!!.path = res.thumbnail!!.path
+//                            .replace("http:", "https:") + "." + res.thumbnail!!.extension
+//                        series = SeriesListNonRealm()
+//                        series!!.items = ArrayList(res.series!!.items!!.map {
+//                            SeriesSummaryNonRealm().apply {
+//                                name = it.name
+//                            }
+//                        })
+//                        this.id = res.id
+//                    }
+//
+//                character.value = newCharacter
+//                saveToRealm(res)
+//
+//            }
+//    }
 
     fun addToFavorites(id: String) = CoroutineScope(IO).launch { repository.addCharacterToFavorites(id) }
 }

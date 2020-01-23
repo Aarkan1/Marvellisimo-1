@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.favorites
 
 import androidx.lifecycle.MutableLiveData
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.realm.SearchType
@@ -17,7 +18,7 @@ class FavoritesViewModel @Inject constructor(
 ) {
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
 
-    val favoriteCharacters = MutableLiveData<Array<Character>>()
+    val favoriteCharacters = MutableLiveData<Array<CharacterNonRealm>>()
     val favoriteSeries = MutableLiveData<Array<Series>>()
 
     fun fetchFavorites() = CoroutineScope(IO).launch {
