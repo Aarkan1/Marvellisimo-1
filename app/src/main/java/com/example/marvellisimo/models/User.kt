@@ -10,6 +10,8 @@ open class User : RealmObject() {
     var uid: String? = null
     var username: String? = null
     var avatar: String? = null
+    var email: String? = null
+
     @Ignore
     var favorites: ArrayList<String>? = null
 //  one-to-many relationship to other RealmObjects

@@ -1,9 +1,8 @@
 package com.example.marvellisimo
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.models.User
@@ -12,7 +11,6 @@ import kotlinx.android.synthetic.main.activity_online.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.bson.Document
@@ -32,6 +30,7 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
         addToRecycleView()
     }
 
+    //Flyta till Repository ??? // TABORT
     private suspend fun fetchUserById(id: String): User?{
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
         val result = DB.coll.findOne(filter)
@@ -42,63 +41,44 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
 
         return User().apply {
             username = result.result["username"] as String
+            var isOnline = true
+            isOnline = result.result["online"] as Boolean
         }
     }
 
-    private suspend fun fetchUsers(): ArrayList<User>{
-        val list = DB.client.auth.listUsers().map { it.id}
 
+    //Flyta till Repository ???
+    private suspend fun fetchUsers(): ArrayList<User>{
+        /*
+        val list = DB.client.auth.listUsers().map { it.id}
         val users = ArrayList<User>()
 
         for(id in list){
             val user = CoroutineScope(IO).async { fetchUserById(id) }.await()
             if(user != null) users.add(user)
         }
-
-        return users
+        */
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        var result = DB.coll.find().into(tempList)
+        while (!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
     }
 
-    private fun addToRecycleView() {
 
+
+    private fun addToRecycleView() {
         CoroutineScope(IO).launch {
             val usernames = fetchUsers().map { it.username }
             usernames.forEach { Log.d(TAG, it ) }
 
             CoroutineScope(Main).launch {
-
-                //if Loged in
+                //Läg till IFsats om inlogad
                 onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
                     .map { Online(it) }.toMutableList())
                 onlineAdapter.notifyDataSetChanged()
             }
         }
-
-        /* val list = DB.client.auth.listUsers()
-        //list.clear()
-        val a = list.map {
-            it.id + ", is logged in: " + it.isLoggedIn
-        }.toString()
-
-
-        //Lägg till if sats som kolar om isLoggedIn = true
-        val map = list.map {
-            val docs: ArrayList<Document> = ArrayList()
-            DB.coll.find(Document("uid", it.id))
-                .limit(100)
-                .into(docs)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val doc = docs[0].toJson()
-                        val gson = Gson()
-                        var user = gson.fromJson(doc, User::class.java)
-                        //val o = Online(user.username.toString())
-                        onlines.add(Online(user.username.toString() + it.isLoggedIn))
-                        createRecycleView()
-                        return@addOnCompleteListener
-                    }
-                }
-        } */
-
     }
 
     lateinit var onlineAdapter: OnlineAdapter
@@ -116,6 +96,7 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
         //TODO
         //Seend to yor online DB.client.auth.user?.profile?.email
         Log.d("msg", online.username)
+        //
 
     }
 }
