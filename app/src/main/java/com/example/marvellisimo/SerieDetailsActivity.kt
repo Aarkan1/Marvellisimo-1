@@ -46,6 +46,7 @@ class SerieDetailsActivity : AppCompatActivity() {
 
         serieViewModel.serie.observe(this, Observer<Series> {
 
+            selectedSerie = it
             supportActionBar!!.title = it.title
 
             val rating = if (it.rating.isEmpty()) "Rating not found "

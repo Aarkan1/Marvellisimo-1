@@ -90,22 +90,57 @@ class CharacterSearchResultViewModel : ViewModel() {
     fun getOneCharacterFromRealm(id: Int, searchString: String?) {
         Realm.getDefaultInstance().executeTransaction {
             val res = it.where(Character::class.java)
-                .equalTo("id", id)
+                .equalTo("id", id )
                 .findFirst()
 
-            val characterFromRealm = CharacterNonRealm().apply {
-                name = res!!.name
-                description = res.description
-                thumbnail!!.path = res.thumbnail!!.path
-                series = SeriesListNonRealm()
-                series!!.items = ArrayList( res.series!!.items!!.map { SeriesSummaryNonRealm().apply {
-                    name = it.name
-                } })
-                this.id = res.id
-            }
+            if (res != null) {
+                val characterFromRealm = CharacterNonRealm().apply {
+                    name = res.name
+                    description = res.description
+                    thumbnail!!.path = res.thumbnail!!.path
+                    series = SeriesListNonRealm()
+                    series!!.items = ArrayList(res.series!!.items!!.map {
+                        SeriesSummaryNonRealm().apply {
+                            name = it.name
+                        }
+                    })
+                    this.id = res.id
+                }
 
-            CoroutineScope(Main).launch{
-                character.value = characterFromRealm
+
+                CoroutineScope(Main).launch {
+                    character.value = characterFromRealm
+                }
+            }
+            else{
+                getOneCharacterFromMarvel(id)
+            }
+        }
+    }
+
+    private fun getOneCharacterFromMarvel(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val characterFromMarvel = MarvelRetrofit.marvelService.getCharacterById(id.toString())
+
+            Log.d(TAG, "Getting character")
+            CoroutineScope(Main).launch {
+                val res = characterFromMarvel.data.results[0]
+
+                val newCharacter = CharacterNonRealm().apply {
+                    name = res.name
+                    description = res.description
+                    thumbnail!!.path = res.thumbnail!!.path
+                        .replace("http:", "https:") + "." + res.thumbnail!!.extension
+                    series = SeriesListNonRealm()
+                    series!!.items = ArrayList(res.series!!.items!!.map {
+                        SeriesSummaryNonRealm().apply {
+                            name = it.name
+                        }
+                    })
+                    this.id = res.id
+                }
+
+                character.value = newCharacter
             }
         }
     }

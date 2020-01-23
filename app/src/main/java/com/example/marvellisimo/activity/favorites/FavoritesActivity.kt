@@ -100,7 +100,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onSeriesClick(series: Series) {
         val intent = Intent(this, SerieDetailsActivity::class.java)
-        //intent.putExtra("item", series)
+        intent.putExtra("id", series.id)
         startActivity(intent)
     }
 
