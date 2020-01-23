@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.repository
 
 import android.util.Log
 import com.example.marvellisimo.models.User
@@ -16,12 +16,12 @@ class DB {
         var user: User? = null
         lateinit var realm: Realm
 
-        val client = Stitch.getDefaultAppClient()
-        val mongoClient = client.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
-        val users = mongoClient.getDatabase("marvellisimo").getCollection("users")
+        val stitchClient = Stitch.getDefaultAppClient()
+        val mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
+        val collUsers = mongoClient.getDatabase("marvellisimo").getCollection("users")
 
         private fun initUser() {
-            val uid = client.auth.user?.id
+            val uid = stitchClient.auth.user?.id
             val results = realm.where(User::class.java)
                 .equalTo("uid", uid)
                 .findAll()
@@ -45,7 +45,9 @@ class DB {
 
             when (entity) {
                 is User -> {
-                    updateRealmUser(entity)
+                    updateRealmUser(
+                        entity
+                    )
                 }
             }
         }
@@ -57,36 +59,37 @@ class DB {
             }
         }
 
-        fun findAndUpdateLoggedInUser() {
-            if (!client.auth.isLoggedIn) return
-            initUser()
-
-            val docs: ArrayList<Document> = ArrayList()
-            users.find(Document("uid", client.auth.user!!.id))
-                .limit(1)
-                .into(docs)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val doc = docs[0].toJson()
-                        Log.d("STITCH", "Found doc: $doc")
-                        val gson = Gson()
-                        var user = gson.fromJson(doc, User::class.java)
-
-                        updateRealmUser(user)
-
-                        if(DB.user == null) {
-                            initUser()
-                        }
-
-//            test adding a favorite and save to mongoDB
-//                        user.favorites?.add("Ironman")
-//                        saveEntity("users", user, client.auth.user!!.id)
-
-                        return@addOnCompleteListener
-                    }
-                    Log.e("STITCH", "Error: " + task.exception.toString())
-                    task.exception!!.printStackTrace()
-                }
-        }
+//        fun findAndUpdateLoggedInUser() {
+//            if (!stitchClient.auth.isLoggedIn) return
+//            initUser()
+//
+//
+//            val docs: ArrayList<Document> = ArrayList()
+//            users.find(Document("uid", stitchClient.auth.user!!.id))
+//                .limit(1)
+//                .into(docs)
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        val doc = docs[0].toJson()
+//                        Log.d("STITCH", "Found doc: $doc")
+//                        val gson = Gson()
+//                        var user = gson.fromJson(doc, User::class.java)
+//
+//                        updateRealmUser(user)
+//
+//                        if(DB.user == null) {
+//                            initUser()
+//                        }
+//
+////            test adding a favorite and save to mongoDB
+////                        user.favorites?.add("Ironman")
+////                        saveEntity("users", user, client.auth.user!!.id)
+//
+//                        return@addOnCompleteListener
+//                    }
+//                    Log.e("STITCH", "Error: " + task.exception.toString())
+//                    task.exception!!.printStackTrace()
+//                }
+//        }
     }
 }

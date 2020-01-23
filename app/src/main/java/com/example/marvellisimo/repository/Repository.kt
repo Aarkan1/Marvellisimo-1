@@ -1,12 +1,16 @@
 package com.example.marvellisimo.repository
 
 import android.util.Log
-import com.example.marvellisimo.DB
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.services.MarvelService
+import com.google.gson.Gson
+import com.mongodb.stitch.android.core.Stitch
+import com.mongodb.stitch.android.core.StitchAppClient
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -21,22 +25,33 @@ private const val TAG = "Repository"
 class Repository @Inject constructor(
     private val marvelService: MarvelService
 ) {
+    var user: User?
+    var realm: Realm = Realm.getDefaultInstance()
+    private val gson = Gson()
 
-    private fun userToDocument(user: User) = Document().apply {
-        put("uid", user.uid)
-        put("username", user.username)
-        put("avatar", user.avatar)
-        put("favoriteCharacters", user.favoriteCharacters)
-        put("favoriteSeries", user.favoriteSeries)
+    init {
+        Log.d(TAG, "init singleton")
+        user = fetchCurrentUser()
     }
 
-    private fun documentToUser(document: Document) = User().apply {
-        uid = document["uid"] as String
-        username = document["username"] as String
-        avatar = document["avatar"] as String
-        favoriteCharacters = document["favoriteCharacters"] as ArrayList<String>
-        favoriteSeries = document["favoriteSeries"] as ArrayList<String>
-    }
+    private fun userToDocument(user: User) = gson.fromJson(gson.toJson(user), Document::class.java)
+    private fun documentToUser(document: Document) = gson.fromJson(gson.toJson(document), User::class.java)
+
+//    private fun userToDocument(user: User) = Document().apply {
+//        put("uid", user.uid)
+//        put("username", user.username)
+//        put("avatar", user.avatar)
+//        put("favoriteCharacters", user.favoriteCharacters)
+//        put("favoriteSeries", user.favoriteSeries)
+//    }
+
+//    private fun documentToUser(document: Document) = User().apply {
+//        uid = document["uid"] as String
+//        username = document["username"] as String
+//        avatar = document["avatar"] as String
+//        favoriteCharacters = document["favoriteCharacters"] as ArrayList<String>
+//        favoriteSeries = document["favoriteSeries"] as ArrayList<String>
+//    }
 
     suspend fun fetchHistory(phrase: String = ""): List<String> {
         Log.d(TAG, "fetchHistory: $phrase")
@@ -55,61 +70,70 @@ class Repository @Inject constructor(
             .executeTransaction { it.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis())) }
     }
 
-    suspend fun fetchCurrentUser(): User? {
+    fun fetchCurrentUser(): User? {
         Log.d(TAG, "fetchCurrentUser: starts")
-        val id = DB.client?.auth?.user?.id ?: return null
+        val id = DB.stitchClient.auth.user!!.id
 
-        Log.d(TAG, "fetchUser, id: $id")
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
-        val result = DB.users.findOne(filter)
+        CoroutineScope(IO).launch {
+            val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
+            DB.collUsers.findOne(filter)
+            .addOnCompleteListener { doc ->
+            Log.d(TAG, "fetchUser, doc: ${doc.result}")
+                realm.executeTransaction {
+                    realm.insertOrUpdate(documentToUser(doc.result))
+                }
+            }
+        }
 
         // This is hacky but it not possible to force block Mongo Stitch query
         // and we need to block because of coroutines
-        while (!result.isComplete) delay(5)
-        Log.d(TAG, "Fetched user: ${result?.result}")
+//        while (!result.isComplete) delay(5)
+//        Log.d(TAG, "Fetched user: ${result?.result}")
 
-        return if (result.result == null) null
-        else documentToUser(result.result)
+        val realmUser = realm.where(User::class.java)
+            .equalTo("uid", id)
+            .findAll()
+
+       return if (realmUser.isNotEmpty()) {
+            Log.d(TAG, "Loading RealmUser: ${realmUser[0]?.username}, uid: ${realmUser[0]?.uid}")
+            realmUser[0]
+        } else null
     }
 
     suspend fun addCharacterToFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
-        val user = fetchCurrentUser() ?: throw Exception("No User")
+        if(user == null) throw Exception("No user")
 
-        if (user.favoriteCharacters == null) user.favoriteCharacters = ArrayList()
+        if (user!!.favoriteCharacters.contains(id)) return
 
-        if (user.favoriteCharacters!!.contains(id)) return
+        user!!.favoriteCharacters.add(id)
 
-        user.favoriteCharacters!!.add(id)
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val replacement = userToDocument(user!!)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
-        val replacement = userToDocument(user)
-
-        val task = DB.users.findOneAndReplace(filter, replacement)
+        val task = DB.collUsers.findOneAndReplace(filter, replacement)
         while (!task.isComplete) delay(5)
         return
     }
 
     suspend fun removeCharactersFromFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
-        val user = fetchCurrentUser() ?: throw Exception("No User")
+        if(user == null) throw Exception("No user")
 
-        if (user.favoriteCharacters == null) user.favoriteCharacters = ArrayList()
+        user!!.favoriteCharacters.remove(id)
 
-        user.favoriteCharacters!!.remove(id)
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val replacement = userToDocument(user!!)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
-        val replacement = userToDocument(user)
-
-        val task = DB.users.findOneAndReplace(filter, replacement)
+        val task = DB.collUsers.findOneAndReplace(filter, replacement)
         while (!task.isComplete) delay(5)
         return
     }
 
     suspend fun fetchFavoriteCharacters(): List<Character> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
-        val user = fetchCurrentUser() ?: throw Exception("No user")
-        val favoriteCharacters = user.favoriteCharacters ?: return emptyList()
+        if(user == null) throw Exception("No user")
+        val favoriteCharacters = user!!.favoriteCharacters
 
         return favoriteCharacters
             .map { CoroutineScope(IO).async { fetchCharacterById(it) } }
@@ -119,40 +143,38 @@ class Repository @Inject constructor(
 
     suspend fun addSeriesToFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
-        val user = fetchCurrentUser() ?: throw Exception("No user")
+        if(user == null) throw Exception("No user")
 
-        if (user.favoriteSeries == null) user.favoriteSeries = ArrayList()
-        if (user.favoriteSeries!!.contains(id)) return
-        user.favoriteSeries!!.add(id)
+        if (user!!.favoriteSeries.contains(id)) return
+        user!!.favoriteSeries.add(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
-        val replacement = userToDocument(user)
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val replacement = userToDocument(user!!)
 
-        val task = DB.users.findOneAndReplace(filter, replacement)
+        val task = DB.collUsers.findOneAndReplace(filter, replacement)
         while (!task.isComplete) delay(5)
         return
     }
 
     suspend fun removeSeriesFromFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
-        val user = fetchCurrentUser() ?: throw Exception("No user")
+        if(user == null) throw Exception("No user")
 
-        if (user.favoriteSeries == null) user.favoriteSeries = ArrayList()
-        user.favoriteSeries!!.remove(id)
+        user!!.favoriteSeries.remove(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
-        val replacement = userToDocument(user)
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val replacement = userToDocument(user!!)
 
-        val task = DB.users.findOneAndReplace(filter, replacement)
+        val task = DB.collUsers.findOneAndReplace(filter, replacement)
         while (!task.isComplete) delay(5)
         return
     }
 
     suspend fun fetchFavoriteSeries(): List<Series> {
         Log.d(TAG, "fetchFavoriteSeries: starts")
-        val user = fetchCurrentUser() ?: throw Exception("No user")
+        if(user == null) throw Exception("No user")
 
-        val favoriteSeries = user.favoriteSeries ?: return emptyList()
+        val favoriteSeries = user!!.favoriteSeries
 
         return favoriteSeries
             .map { CoroutineScope(IO).async { fetchSeriesById(it) } }

@@ -4,12 +4,15 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.example.marvellisimo.repository.DB
+import com.example.marvellisimo.repository.Repository
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
 import kotlinx.android.synthetic.main.activity_register.*
 import org.bson.Document
 import org.bson.types.ObjectId
+import javax.inject.Inject
 
 private const val TAG = "RegisterActivity"
 
@@ -43,7 +46,7 @@ class RegisterActivity : AppCompatActivity() {
                 val credential = UserPasswordCredential(email, password)
                 // auto login after sign up
                 // because mongoDB Stitch requires confirmation + sign in to get a _id
-                DB.client.auth.loginWithCredential(credential)
+                DB.stitchClient.auth.loginWithCredential(credential)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             //Log.d("stitch", "Successfully registered user: ${task.result!!.id}")
@@ -56,7 +59,7 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["favoriteSeries"] = ArrayList<String>()
                             userDoc["favoriteCharacters"] = ArrayList<String>()
 
-                            DB.users.insertOne(userDoc)
+                            DB.collUsers.insertOne(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         } else {
