@@ -1,8 +1,10 @@
 package com.example.marvellisimo
 
 import android.app.Application
+import android.content.Intent
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.MarvelProvider
 import com.mongodb.stitch.android.core.Stitch
 import dagger.Component
@@ -17,6 +19,7 @@ interface ApplicationComponent {
     fun inject(activity: SearchActivity)
     fun inject(activity: CharacterDetailsActivity)
     fun inject(activity: SerieDetailsActivity)
+    fun inject(activity: MainActivity)
 }
 
 class MarvellisimoApplication : Application() {
@@ -27,7 +30,6 @@ class MarvellisimoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         applicationComponent = DaggerApplicationComponent.create()
 
         Realm.init(this)
@@ -39,5 +41,13 @@ class MarvellisimoApplication : Application() {
         Realm.setDefaultConfiguration(config)
 
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
+
+        val intent = if (DB.stitchClient.auth.isLoggedIn) {
+            Intent(this, MainActivity::class.java)
+        } else {
+            Intent(this, LoginActivity::class.java)
+        }
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
     }
 }

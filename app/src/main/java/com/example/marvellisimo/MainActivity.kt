@@ -17,35 +17,27 @@ import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
-import io.realm.Realm
+import com.example.marvellisimo.repository.DB
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var appBarConfiguration: AppBarConfiguration
+
+    @Inject
+    lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        DB.initRealm()
-
-        if (!DB.client.auth.isLoggedIn) {
-            val intent = Intent(this, LoginActivity::class.java)
-            // reset activity stack/history
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        } else {
-            DB.findAndUpdateLoggedInUser()
-
-        }
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             startActivity(Intent(this, CharacterSerieResultListActivity::class.java))
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -70,8 +62,8 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_logout -> {
-                DB.client.auth.logout()
-                DB.user = null
+                DB.stitchClient.auth.logout()
+                viewModel.repository.user = null
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 true
@@ -91,12 +83,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // close realm instances on activity or fragment closing
-        // to prevent memory leaks
-        Realm.getDefaultInstance().close()
     }
 }
