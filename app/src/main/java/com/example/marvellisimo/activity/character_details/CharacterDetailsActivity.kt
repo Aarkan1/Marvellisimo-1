@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.repository.Repository
 import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.squareup.picasso.Picasso
@@ -30,20 +29,15 @@ private const val TAG = "CharacterDetailsActivity"
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
-    // TODO This is only temporary - repository should be moved to viewModel
     @Inject
-    lateinit var repository: Repository
+    lateinit var viewModel: CharacterDetailsViewModel
     lateinit var selectedCharacter: CharacterNonRealm
-    private lateinit var characterViewModel: CharacterDetailsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_details)
 
         MarvellisimoApplication.applicationComponent.inject(this)
-
-        characterViewModel = ViewModelProviders.of(this).get(CharacterDetailsViewModel::class.java)
-
 
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
@@ -56,12 +50,10 @@ class CharacterDetailsActivity : AppCompatActivity() {
         val searchString = intent.getStringExtra("searchString")
 
         CoroutineScope(IO).launch {
-            withContext(IO) {
-                characterViewModel.getOneCharacterFromRealm(id, searchString)
-            }
+            viewModel.getOneCharacterFromRealm(id, searchString)
         }
 
-        characterViewModel.character.observe(this, Observer<CharacterNonRealm> {
+        viewModel.character.observe(this, Observer<CharacterNonRealm> {
 
             selectedCharacter = it
             supportActionBar!!.title = it.name
@@ -104,12 +96,9 @@ class CharacterDetailsActivity : AppCompatActivity() {
                     applicationContext, "You clicked add to favorites",
                     Toast.LENGTH_LONG
                 ).show()
-                addToFavorites(selectedCharacter.id.toString())
+                viewModel.addToFavorites(selectedCharacter.id.toString())
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
-    // TODO this is temporary, this method should be moved to viewModel
-    private fun addToFavorites(id: String) = CoroutineScope(IO).launch { repository.addCharacterToFavorites(id) }
 }

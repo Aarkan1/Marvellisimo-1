@@ -5,16 +5,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.marvellisimo.MarvelRetrofit
 import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.Repository
 import io.realm.Case
 import io.realm.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val TAG = "SerieDetailsViewModel"
 
-class SeriesDetailsViewModel : ViewModel() {
+class SeriesDetailsViewModel @Inject constructor(
+    private val repository: Repository
+) {
     var allSeries = MutableLiveData<ArrayList<Series>>().apply { value = ArrayList() }
     private var cache = false
     var serie = MutableLiveData<Series>().apply { value = Series() }
@@ -135,4 +139,7 @@ class SeriesDetailsViewModel : ViewModel() {
         }
     }
 
+    fun addSeriesToFavorites(id: String) = CoroutineScope(Dispatchers.IO).launch {
+        repository.addSeriesToFavorites(id)
+    }
 }

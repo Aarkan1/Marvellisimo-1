@@ -8,21 +8,26 @@ import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.repository.Repository
 import io.realm.Case
 import io.realm.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 private const val TAG = "CharacterSerieResultListActivityy"
 
-class CharacterDetailsViewModel : ViewModel() {
+class CharacterDetailsViewModel @Inject constructor(
+    private val repository: Repository
+) {
+
     var allCharacters = MutableLiveData<ArrayList<Character>>().apply { value = ArrayList() }
     private var cache = false
-    var character = MutableLiveData<CharacterNonRealm>().apply { value =
-        CharacterNonRealm()
+    var character = MutableLiveData<CharacterNonRealm>().apply {
+        value = CharacterNonRealm()
     }
 
     fun getAllCharacters(searchString: String) {
@@ -60,26 +65,28 @@ class CharacterDetailsViewModel : ViewModel() {
                 .where(Character::class.java)
                 .contains("name", searchString, Case.INSENSITIVE)
                 .findAll()
-                .toArray().map{ it as Character}
+                .toArray().map { it as Character }
 
             if (results.isEmpty()) {
                 cache = true
             } else {
-                val characters = results.map { Character().apply {
-                    name = it.name
-                    description = it.description
-                    thumbnail!!.path = it.thumbnail!!.path
-                    series!!.items = it.series!!.items
+                val characters = results.map {
+                    Character().apply {
+                        name = it.name
+                        description = it.description
+                        thumbnail!!.path = it.thumbnail!!.path
+                        series!!.items = it.series!!.items
 
-                    id = it.id
-                } }
+                        id = it.id
+                    }
+                }
 
-                CoroutineScope(Main).launch{
-                    allCharacters.value = arrayListOf( *characters.toTypedArray())
+                CoroutineScope(Main).launch {
+                    allCharacters.value = arrayListOf(*characters.toTypedArray())
                     Log.d(TAG, "getting characters from Realm")
                 }
-                    cache = false
-                }
+                cache = false
+            }
 
         }
 
@@ -94,29 +101,28 @@ class CharacterDetailsViewModel : ViewModel() {
     fun getOneCharacterFromRealm(id: Int, searchString: String?) {
         Realm.getDefaultInstance().executeTransaction {
             val res = it.where(Character::class.java)
-                .equalTo("id", id )
+                .equalTo("id", id)
                 .findFirst()
 
             if (res != null) {
                 val characterFromRealm = CharacterNonRealm()
                     .apply {
-                    name = res.name
-                    description = res.description
-                    thumbnail!!.path = res.thumbnail!!.path
-                    series = SeriesListNonRealm()
-                    series!!.items = ArrayList(res.series!!.items!!.map {
-                        SeriesSummaryNonRealm().apply {
-                            name = it.name
-                        }
-                    })
-                    this.id = res.id
-                }
+                        name = res.name
+                        description = res.description
+                        thumbnail!!.path = res.thumbnail!!.path
+                        series = SeriesListNonRealm()
+                        series!!.items = ArrayList(res.series!!.items!!.map {
+                            SeriesSummaryNonRealm().apply {
+                                name = it.name
+                            }
+                        })
+                        this.id = res.id
+                    }
 
                 CoroutineScope(Main).launch {
                     character.value = characterFromRealm
                 }
-            }
-            else{
+            } else {
                 getOneCharacterFromMarvel(id)
             }
         }
@@ -132,18 +138,18 @@ class CharacterDetailsViewModel : ViewModel() {
 
                 val newCharacter = CharacterNonRealm()
                     .apply {
-                    name = res.name
-                    description = res.description
-                    thumbnail!!.path = res.thumbnail!!.path
-                        .replace("http:", "https:") + "." + res.thumbnail!!.extension
-                    series = SeriesListNonRealm()
-                    series!!.items = ArrayList(res.series!!.items!!.map {
-                        SeriesSummaryNonRealm().apply {
-                            name = it.name
-                        }
-                    })
-                    this.id = res.id
-                }
+                        name = res.name
+                        description = res.description
+                        thumbnail!!.path = res.thumbnail!!.path
+                            .replace("http:", "https:") + "." + res.thumbnail!!.extension
+                        series = SeriesListNonRealm()
+                        series!!.items = ArrayList(res.series!!.items!!.map {
+                            SeriesSummaryNonRealm().apply {
+                                name = it.name
+                            }
+                        })
+                        this.id = res.id
+                    }
 
                 character.value = newCharacter
                 saveToRealm(res)
@@ -151,4 +157,6 @@ class CharacterDetailsViewModel : ViewModel() {
             }
         }
     }
+
+    fun addToFavorites(id: String) = CoroutineScope(Dispatchers.IO).launch { repository.addCharacterToFavorites(id) }
 }
