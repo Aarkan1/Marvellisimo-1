@@ -38,7 +38,9 @@ class CharacterSearchResultViewModel : ViewModel() {
                         }
                         allCharacters.value = arrayListOf(*result)
 
-                        saveToRealm(searchString, result)
+                        result.forEach {
+                            saveToRealm(it)
+                        }
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, "Error getAllCharacters ")
@@ -79,11 +81,9 @@ class CharacterSearchResultViewModel : ViewModel() {
 
     }
 
-    private fun saveToRealm(searchString: String, result: Array<Character>) {
-        result.forEach {character ->
-            Realm.getDefaultInstance().executeTransaction {
-                it.insertOrUpdate(character)
-            }
+    private fun saveToRealm(character: Character) {
+        Realm.getDefaultInstance().executeTransaction {
+            it.insertOrUpdate(character)
         }
     }
 
@@ -106,7 +106,6 @@ class CharacterSearchResultViewModel : ViewModel() {
                     })
                     this.id = res.id
                 }
-
 
                 CoroutineScope(Main).launch {
                     character.value = characterFromRealm

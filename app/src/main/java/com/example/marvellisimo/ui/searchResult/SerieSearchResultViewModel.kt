@@ -39,7 +39,9 @@ class SerieSearchResultViewModel : ViewModel() {
                         }
                         allSeries.value = arrayListOf(*result)
 
-                        saveToRealm(result)
+                        result.forEach {
+                            saveToRealm(it)
+                        }
                     }
                 } catch (e: Exception) {
                     Log.d(TAG, "Error getAllSeries ")
@@ -80,11 +82,9 @@ class SerieSearchResultViewModel : ViewModel() {
         }
     }
 
-    private fun saveToRealm(result: Array<Series>) {
-        result.forEach {Serie ->
-            Realm.getDefaultInstance().executeTransaction {
-                it.insertOrUpdate(Serie)
-            }
+    private fun saveToRealm(serie: Series) {
+        Realm.getDefaultInstance().executeTransaction {
+            it.insertOrUpdate(serie)
         }
     }
 
@@ -94,18 +94,43 @@ class SerieSearchResultViewModel : ViewModel() {
                 .equalTo("id", idd)
                 .findFirst()
 
-            val serieFromRealm = Series().apply {
-                title = result!!.title
-                description = result.description
-                thumbnail!!.path = result.thumbnail!!.path
-                id = result.id
-                startYear = result.startYear
-                endYear = result.endYear
-                rating = result.rating
+            if (result != null) {
+                val serieFromRealm = Series().apply {
+                    title = result!!.title
+                    description = result.description
+                    thumbnail!!.path = result.thumbnail!!.path
+                    id = result.id
+                    startYear = result.startYear
+                    endYear = result.endYear
+                    rating = result.rating
 
-            }
-            CoroutineScope(Main).launch{
-                 serie.value = serieFromRealm
+                }
+                CoroutineScope(Main).launch {
+                    serie.value = serieFromRealm
+                }
+            }else getOneSerieFromMarvel(idd)
+        }
+    }
+
+    private fun getOneSerieFromMarvel(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val serieFromMarvel = MarvelRetrofit.marvelService.getSeriesById(id.toString())
+
+            Log.d(TAG, "Getting Serie")
+            CoroutineScope(Main).launch {
+                val res = serieFromMarvel.data.results[0]
+
+                val newSerie = Series().apply {
+                    title = res.title
+                    description = res.description
+                    thumbnail!!.path = res.thumbnail!!.path
+                    this.id = res.id
+                    startYear = res.startYear
+                    endYear = res.endYear
+                    rating = res.rating
+                }
+                serie.value = newSerie
+                saveToRealm(newSerie)
             }
         }
     }
