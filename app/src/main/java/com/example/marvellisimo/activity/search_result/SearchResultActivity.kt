@@ -17,8 +17,6 @@ import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterSearchResultItem
-import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.SeriesSearchResultItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch

@@ -11,6 +11,7 @@ import com.example.marvellisimo.activity.character_details.CharacterDetailsActiv
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
@@ -51,7 +52,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
             it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
-        viewModel.favoriteSeries.observe(this, Observer<Array<Series>> {
+        viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> {
             seriesAdapter.clear()
             it.forEach { seriesAdapter.add(SeriesItem(it, this)) }
         })
@@ -98,13 +99,13 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         viewModel.removeCharacterFromFavorites(character.id.toString())
     }
 
-    override fun onSeriesClick(series: Series) {
+    override fun onSeriesClick(series: SeriesNonRealm) {
         val intent = Intent(this, SerieDetailsActivity::class.java)
         intent.putExtra("id", series.id)
         startActivity(intent)
     }
 
-    override fun onRemoveSeriesClick(series: Series) {
+    override fun onRemoveSeriesClick(series: SeriesNonRealm) {
         viewModel.removeSeriesFromFavorites(series.id.toString())
     }
 }
@@ -115,8 +116,8 @@ interface CharacterItemActionListener {
 }
 
 interface SeriesItemActionListener {
-    fun onSeriesClick(series: Series)
-    fun onRemoveSeriesClick(series: Series)
+    fun onSeriesClick(series: SeriesNonRealm)
+    fun onRemoveSeriesClick(series: SeriesNonRealm)
 }
 
 class CharacterItem(
@@ -147,12 +148,12 @@ class CharacterItem(
     }
 }
 
-class SeriesItem(private val series: Series, private val seriesItemActionListener: SeriesItemActionListener) :
+class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActionListener: SeriesItemActionListener) :
     Item<GroupieViewHolder>() {
 
     init {
-        series.thumbnail!!.path = series.thumbnail!!.path
-            .replace("http:", "https:") + "." + series.thumbnail!!.extension
+        series.thumbnail.path = series.thumbnail.path
+            .replace("http:", "https:") + "." + series.thumbnail.extension
     }
 
     override fun getLayout(): Int {
@@ -167,6 +168,6 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
 
         viewHolder.itemView.favorite_item_description_textView.text = series.description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
+        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }

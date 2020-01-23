@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.marvelEntities.Series
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -20,7 +21,6 @@ class SerieDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
-    private lateinit var selectedSerie: Series
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +30,9 @@ class SerieDetailsActivity : AppCompatActivity() {
 
         val serieId = intent.getIntExtra("id", 0)
 
-        CoroutineScope(IO).launch { viewModel.getOneSerieFromRealm(serieId) }
+        CoroutineScope(IO).launch { viewModel.getSeries(serieId.toString()) }
 
-        viewModel.serie.observe(this, Observer<Series> {
-
-            selectedSerie = it
+        viewModel.series.observe(this, Observer<SeriesNonRealm> {
             supportActionBar!!.title = it.title
 
             val rating = if (it.rating.isEmpty()) "Rating not found "
@@ -49,8 +47,8 @@ class SerieDetailsActivity : AppCompatActivity() {
 
             selected_item_description_textView.text = des
             selected_item_name_textView.text = it.title
-            if (it.thumbnail!!.path.isNotEmpty()) {
-                Picasso.get().load(it.thumbnail!!.path).into(selected_item_imageView)
+            if (it.thumbnail.path.isNotEmpty()) {
+                Picasso.get().load(it.thumbnail.path).into(selected_item_imageView)
             }
 
         })
@@ -72,11 +70,11 @@ class SerieDetailsActivity : AppCompatActivity() {
 
             }
             R.id.detail_menu_add_to_favorites -> {
+                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
                 Toast.makeText(
                     applicationContext, "You clicked add to favorites",
                     Toast.LENGTH_LONG
                 ).show()
-                viewModel.addSeriesToFavorites(selectedSerie.id.toString())
             }
         }
         return super.onOptionsItemSelected(item)

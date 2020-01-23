@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.marvellisimo.DB
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
+import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.User
@@ -150,7 +151,7 @@ class Repository @Inject constructor(
         return
     }
 
-    suspend fun fetchFavoriteSeries(): List<Series> {
+    suspend fun fetchFavoriteSeries(): List<SeriesNonRealm> {
         Log.d(TAG, "fetchFavoriteSeries: starts")
         val user = fetchCurrentUser() ?: throw Exception("No user")
 
@@ -162,12 +163,47 @@ class Repository @Inject constructor(
             .mapNotNull { it }
     }
 
-    // TODO we should check caches here
-    suspend fun fetchSeriesById(id: String): Series? {
+    private fun saveSeriesToRealm(series: Series) {
+        Realm.getDefaultInstance().insertOrUpdate(series)
+    }
+
+    private fun fetchSeriesFromRealm(id: Int): SeriesNonRealm? {
+        val result = Realm.getDefaultInstance().where(Series::class.java).equalTo("id", id)
+            .findFirst() ?: return null
+
+        return SeriesNonRealm().apply {
+            title = result.title
+            description = result.description
+            thumbnail.path = result.thumbnail?.path ?: ""
+            thumbnail.extension = result.thumbnail?.extension ?: ""
+            this.id = result.id
+            startYear = result.startYear
+            endYear = result.endYear
+            rating = result.rating
+        }
+    }
+
+    suspend fun fetchSeriesById(id: String): SeriesNonRealm? {
         Log.d(TAG, "fetchSeriesById: $id")
 
-        val results = marvelService.getSeriesById(id).data.results
-        return if (results.isNotEmpty()) results[0] else null
+        val realmResult = fetchSeriesFromRealm(id.toInt())
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getSeriesById(id).data.results
+        if (marvelResult.isEmpty()) return null
+
+        saveSeriesToRealm(marvelResult[0])
+
+        return SeriesNonRealm().apply {
+            title = marvelResult[0].title
+            description = marvelResult[0].description
+            thumbnail.path = marvelResult[0].thumbnail?.path ?: ""
+            thumbnail.extension = marvelResult[0].thumbnail?.extension ?: ""
+            this.id = marvelResult[0].id
+            startYear = marvelResult[0].startYear
+            endYear = marvelResult[0].endYear
+            rating = marvelResult[0].rating
+        }
     }
 
     private fun saveCharacterToRealm(character: Character) {
@@ -196,20 +232,20 @@ class Repository @Inject constructor(
         val realmResult = fetchCharacterFromRealm(id.toInt())
         if (realmResult != null) return realmResult
 
-        val results = marvelService.getCharacterById(id).data.results
-        if (results.isEmpty()) return null
+        val marvelResult = marvelService.getCharacterById(id).data.results
+        if (marvelResult.isEmpty()) return null
 
         val character = CharacterNonRealm().apply {
-            name = results[0].name
-            description = results[0].description
-            thumbnail!!.path = results[0].thumbnail!!.path
+            name = marvelResult[0].name
+            description = marvelResult[0].description
+            thumbnail!!.path = marvelResult[0].thumbnail!!.path
             series = SeriesListNonRealm()
-            series!!.items = ArrayList(results[0].series!!.items!!.map {
+            series!!.items = ArrayList(marvelResult[0].series!!.items!!.map {
                 SeriesSummaryNonRealm().apply { name = it.name }
             })
-            this.id = results[0].id
+            this.id = marvelResult[0].id
         }
-        saveCharacterToRealm(results[0])
+        saveCharacterToRealm(marvelResult[0])
 
         return character
     }

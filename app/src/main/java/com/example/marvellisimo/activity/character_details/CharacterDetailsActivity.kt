@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
+import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -30,8 +30,6 @@ class CharacterDetailsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: CharacterDetailsViewModel
 
-    private lateinit var selectedCharacter: CharacterNonRealm
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_details)
@@ -49,12 +47,14 @@ class CharacterDetailsActivity : AppCompatActivity() {
         CoroutineScope(IO).launch { viewModel.getCharacter(id.toString()) }
 
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
-
-            selectedCharacter = it
             supportActionBar!!.title = it.name
             if (it.series!!.items!!.isNotEmpty()) {
                 for (serie in it.series!!.items!!) {
-                    adapter.add(CharacterDetailSeriesListItem(serie))
+                    adapter.add(
+                        CharacterDetailSeriesListItem(
+                            serie
+                        )
+                    )
                 }
             }
 
@@ -87,11 +87,11 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
             }
             R.id.detail_menu_add_to_favorites -> {
+                viewModel.addToFavorites(viewModel.character.value?.id.toString())
                 Toast.makeText(
                     applicationContext, "You clicked add to favorites",
                     Toast.LENGTH_LONG
                 ).show()
-                viewModel.addToFavorites(selectedCharacter.id.toString())
             }
         }
         return super.onOptionsItemSelected(item)

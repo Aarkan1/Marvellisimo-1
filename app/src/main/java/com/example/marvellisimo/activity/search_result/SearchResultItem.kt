@@ -1,9 +1,8 @@
-package com.example.marvellisimo.activity.search_result.recyclerViewPlaceHolder
+package com.example.marvellisimo.activity.search_result
 
 import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
