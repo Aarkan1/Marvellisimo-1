@@ -27,6 +27,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+private const val TAG = "CharacterDetailsActivity"
+
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
@@ -49,11 +51,16 @@ class CharacterDetailsActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         character_detail_serie_list_recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val id =intent.getIntExtra("id", 0)
-        val searchString =intent.getStringExtra("searchString")
+        val id = intent.getIntExtra("id", 0)
 
-        CoroutineScope(IO).launch { withContext(IO) {
-            characterViewModel.getOneCharacterFromRealm(id, searchString) }
+        Log.d(TAG, "id: $id")
+
+        val searchString = intent.getStringExtra("searchString")
+
+        CoroutineScope(IO).launch {
+            withContext(IO) {
+                characterViewModel.getOneCharacterFromRealm(id, searchString)
+            }
         }
 
         characterViewModel.character.observe(this, Observer<CharacterNonRealm> {
@@ -62,7 +69,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
             supportActionBar!!.title = it.name
             if (it.series!!.items!!.isNotEmpty()) {
                 for (serie in it.series!!.items!!) {
-                     adapter.add(CharacterDetailSeriesListItem(serie))
+                    adapter.add(CharacterDetailSeriesListItem(serie))
                 }
             }
 
