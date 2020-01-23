@@ -92,7 +92,7 @@ class CharacterSearchResultViewModel : ViewModel() {
             val results = it.where(CharacterRealmObjectWrapper::class.java)
                 .equalTo("id", searchString)
                 .findAll()
-        .toArray().map { CharacterObjectWrapperNonRealm(it as CharacterRealmObjectWrapper) }
+                .toArray().map { CharacterObjectWrapperNonRealm(it as CharacterRealmObjectWrapper) }
 
             CoroutineScope(Main).launch{
                 results.forEach {
@@ -101,7 +101,6 @@ class CharacterSearchResultViewModel : ViewModel() {
                         character.value = it
                     }
                 }
-
             }
         }
     }

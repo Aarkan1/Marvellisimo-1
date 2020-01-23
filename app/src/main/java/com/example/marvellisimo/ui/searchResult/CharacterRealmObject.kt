@@ -1,5 +1,6 @@
 package com.example.marvellisimo.ui.searchResult
 
+import android.util.Log
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Image
 import com.example.marvellisimo.marvelEntities.SeriesSummary
@@ -23,6 +24,7 @@ open class CharacterObjectWrapperNonRealm (characterRealmObject: CharacterRealmO
 
     init {
         this.id = characterRealmObject.id
+        Log.d("___", "characterRealmObject id: ${characterRealmObject.id}")
         this.characterList = ArrayList( characterRealmObject.characterList.map {
             CharacterNonRealm().apply {
                 thumbnail = ImageNonRealm(it.thumbnail!!.path, it.thumbnail!!.extension)
@@ -34,7 +36,7 @@ open class CharacterObjectWrapperNonRealm (characterRealmObject: CharacterRealmO
                 name = it.name
                 description = it.description
             }
-        }             )
+        })
     }
 }
 
@@ -44,8 +46,6 @@ open class CharacterNonRealm(
     var id: Int = 1                               ,
     var name: String = ""                     ,
     var description: String = ""
-
-
 )
 
 open class SeriesListNonRealm (
@@ -54,11 +54,9 @@ open class SeriesListNonRealm (
 
 open class SeriesSummaryNonRealm (
         var name: String = "" // (string, optional): The canonical name of the series.
-
 )
 
 open class ImageNonRealm (
     var path: String= "", // The directory path of to the image.,
     var extension: String = "" // The file extension for the image.
-
-    )
+)

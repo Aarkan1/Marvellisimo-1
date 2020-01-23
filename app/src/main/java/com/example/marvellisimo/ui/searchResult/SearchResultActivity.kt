@@ -123,20 +123,4 @@ class CharacterSerieResultListActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
         dialog.dismiss()
     }
-
-
-    /*       MarvelRetrofit.marvelService.getAllCharacters(nameStartsWith = "Spider-Man")
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result, err ->
-                if (err?.message != null)
-                    Log.d(TAG, "Error getAllCharacters " + err.message)
-                else {
-                    Log.d(TAG, "I got a getAllCharacters $result")
-
-                    addCharactersToResultList(result.data.results)
-
-                }
-            }*/
-
 }

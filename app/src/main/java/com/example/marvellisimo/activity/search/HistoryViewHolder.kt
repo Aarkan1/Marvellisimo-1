@@ -1,9 +1,6 @@
-package com.example.marvellisimo.search
+package com.example.marvellisimo.activity.search
 
-import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marvellisimo.R
 import kotlinx.android.synthetic.main.history_item_fragment.view.*

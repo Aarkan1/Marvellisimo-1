@@ -3,30 +3,28 @@ package com.example.marvellisimo
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
-import kotlinx.android.synthetic.main.activity_regrister.*
+import kotlinx.android.synthetic.main.activity_register.*
 import org.bson.Document
 import org.bson.types.ObjectId
 
-private const val TAG = "RegristerActivity"
+private const val TAG = "RegisterActivity"
 
-class RegristerActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_regrister)
+        setContentView(R.layout.activity_register)
 
         btn_regrister.setOnClickListener {
             preformRegister()
         }
 
         textView_regrister.setOnClickListener {
-            val intent = Intent(this,LoginActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
     }
@@ -55,8 +53,10 @@ class RegristerActivity : AppCompatActivity() {
                             userDoc["username"] = username
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
+                            userDoc["favoriteSeries"] = ArrayList<String>()
+                            userDoc["favoriteCharacters"] = ArrayList<String>()
 
-                            DB.coll.insertOne(userDoc)
+                            DB.users.insertOne(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         } else {

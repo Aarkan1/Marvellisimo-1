@@ -30,4 +30,6 @@
     <string name="textview_search_options_search_for">Search For</string>
     <string name="imageview_close_button_description">exit</string>
     <string name="logout">Logout</string>
+    <string name="toolbar_favorites">Favorites</string>
+    <string name="favorite_item_character_image_description">Character Image</string>
 </resources>

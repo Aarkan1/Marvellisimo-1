@@ -8,22 +8,31 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.Repository
 import com.example.marvellisimo.ui.searchResult.SerieSearchResultViewModel
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_character_details.*
 import kotlinx.android.synthetic.main.activity_serie_details.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SerieDetailsActivity : AppCompatActivity() {
     private lateinit var serieViewModel: SerieSearchResultViewModel
 
 
+    // TODO this is only temporary, repository should be moved to viewModel
+    @Inject
+    lateinit var repository: Repository
+    lateinit var selectedSerie: Series
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serie_details)
+
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         serieViewModel = ViewModelProviders.of(this).get(SerieSearchResultViewModel::class.java)
 
@@ -31,7 +40,7 @@ class SerieDetailsActivity : AppCompatActivity() {
         val serieId =intent.getIntExtra("id", 0)
         val searchString =intent.getStringExtra("searchString")
 
-        CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO) {
+        CoroutineScope(IO).launch { withContext(IO) {
             serieViewModel.getOneSerieFromRealm(serieId, searchString) }
         }
 
@@ -45,7 +54,6 @@ class SerieDetailsActivity : AppCompatActivity() {
             selected_item_end_year_textView.text = it.endYear.toString()
             selected_item_start_year_textView.text = it.startYear.toString()
             selected_item_rating_textView.text = rating
-
 
             var des = it.description
             if (des == null) des = "No description found"
@@ -66,20 +74,27 @@ class SerieDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId){
-            R.id.detail_menu_send ->{
+        when (item.itemId) {
+            R.id.detail_menu_send -> {
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
-                    Toast.LENGTH_LONG).show()
+                    Toast.LENGTH_LONG
+                ).show()
 
             }
-            R.id.detail_menu_add_to_favorites ->{
+            R.id.detail_menu_add_to_favorites -> {
                 Toast.makeText(
                     applicationContext, "You clicked add to favorites",
-                    Toast.LENGTH_LONG).show()
-
+                    Toast.LENGTH_LONG
+                ).show()
+                addSeriesToFavorites(selectedSerie.id.toString())
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    // TODO This is only temporary, method should be moved to viewModel
+    private fun addSeriesToFavorites(id: String) = CoroutineScope(IO).launch {
+        repository.addSeriesToFavorites(id)
     }
 }

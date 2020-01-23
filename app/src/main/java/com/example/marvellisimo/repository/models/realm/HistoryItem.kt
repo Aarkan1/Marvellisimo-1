@@ -1,4 +1,4 @@
-package com.example.marvellisimo.search.realm
+package com.example.marvellisimo.repository.models.realm
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
