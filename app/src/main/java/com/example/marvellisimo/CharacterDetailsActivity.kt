@@ -6,11 +6,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.repository.Repository
 import com.example.marvellisimo.ui.recyclerViewPlaceHolder.CharacterDetailSeriesListItem
+import com.example.marvellisimo.ui.searchResult.CharacterNonRealm
+import com.example.marvellisimo.ui.searchResult.CharacterSearchResultViewModel
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -19,6 +24,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
@@ -26,7 +33,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
     // TODO This is only temporary - repository should be moved to viewModel
     @Inject
     lateinit var repository: Repository
-    lateinit var selectedCharacter: Character
+    lateinit var selectedCharacter: CharacterNonRealm
+    private lateinit var characterViewModel: CharacterSearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,33 +42,41 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
+        characterViewModel = ViewModelProviders.of(this).get(CharacterSearchResultViewModel::class.java)
+
+
         adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         character_detail_serie_list_recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val selectedCharacter = intent.getParcelableExtra<Character>("item")
+        val id =intent.getIntExtra("id", 0)
+        val searchString =intent.getStringExtra("searchString")
 
-        if (selectedCharacter is Character) {
-            this.selectedCharacter = selectedCharacter
+        CoroutineScope(IO).launch { withContext(IO) {
+            characterViewModel.getOneCharacterFromRealm(id, searchString) }
+        }
 
-            supportActionBar!!.title = selectedCharacter.name
+        characterViewModel.character.observe(this, Observer<CharacterNonRealm> {
 
-
-            for (serie in selectedCharacter.series.items) {
-                Log.d("___", "name of the serie: ${serie.name}")
-                adapter.add(CharacterDetailSeriesListItem(serie))
-
+            selectedCharacter = it
+            supportActionBar!!.title = it.name
+            if (it.series!!.items!!.isNotEmpty()) {
+                for (serie in it.series!!.items!!) {
+                     adapter.add(CharacterDetailSeriesListItem(serie))
+                }
             }
+
             character_detail_serie_list_recyclerView.adapter = adapter
 
-            var des = selectedCharacter.description
+            var des = it.description
             if (des.isEmpty()) des = "No description found"
 
             selected_character_description_textView.text = des
-            selected_character_name_textView.text = selectedCharacter.name
-            Picasso.get().load(selectedCharacter.thumbnail.path).into(selected_character_imageView)
-        }
-
+            selected_character_name_textView.text = it.name
+            if (it.thumbnail!!.path.isNotEmpty()) {
+                Picasso.get().load(it.thumbnail!!.path).into(selected_character_imageView)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

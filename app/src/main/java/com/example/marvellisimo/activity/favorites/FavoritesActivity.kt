@@ -90,7 +90,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onCharacterClick(character: Character) {
         val intent = Intent(this, CharacterDetailsActivity::class.java)
-        intent.putExtra("item", character)
+        intent.putExtra("id", character.id)
         startActivity(intent)
     }
 
@@ -100,7 +100,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onSeriesClick(series: Series) {
         val intent = Intent(this, SerieDetailsActivity::class.java)
-        intent.putExtra("item", series)
+        intent.putExtra("id", series.id)
         startActivity(intent)
     }
 
@@ -124,8 +124,8 @@ class CharacterItem(
 ) : Item<GroupieViewHolder>() {
 
     init {
-        character.thumbnail.path = character.thumbnail.path
-            .replace("http:", "https:") + "." + character.thumbnail.extension
+        character.thumbnail!!.path = character.thumbnail!!.path
+            .replace("http:", "https:") + "." + character.thumbnail!!.extension
     }
 
     override fun getLayout(): Int {
@@ -143,7 +143,7 @@ class CharacterItem(
 
         viewHolder.itemView.favorite_item_description_textView.text = character.description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
-        Picasso.get().load(character.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
+        Picasso.get().load(character.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
@@ -151,8 +151,8 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
     Item<GroupieViewHolder>() {
 
     init {
-        series.thumbnail.path = series.thumbnail.path
-            .replace("http:", "https:") + "." + series.thumbnail.extension
+        series.thumbnail!!.path = series.thumbnail!!.path
+            .replace("http:", "https:") + "." + series.thumbnail!!.extension
     }
 
     override fun getLayout(): Int {
@@ -167,6 +167,6 @@ class SeriesItem(private val series: Series, private val seriesItemActionListene
 
         viewHolder.itemView.favorite_item_description_textView.text = series.description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
+        Picasso.get().load(series.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }

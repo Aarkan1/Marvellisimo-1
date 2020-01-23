@@ -5,16 +5,23 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.Repository
+import com.example.marvellisimo.ui.searchResult.SerieSearchResultViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class SerieDetailsActivity : AppCompatActivity() {
+    private lateinit var serieViewModel: SerieSearchResultViewModel
+
 
     // TODO this is only temporary, repository should be moved to viewModel
     @Inject
@@ -27,23 +34,38 @@ class SerieDetailsActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
-        val selectedSerie = intent.getParcelableExtra<Series>("item")
-        if (selectedSerie is Series) {
-            this.selectedSerie = selectedSerie
-            val rating = if (selectedSerie.rating.isEmpty()) "Rating not found "
-            else selectedSerie.rating
+        serieViewModel = ViewModelProviders.of(this).get(SerieSearchResultViewModel::class.java)
 
-            supportActionBar!!.title = selectedSerie.title
 
-            selected_item_end_year_textView.text = selectedSerie.endYear.toString()
-            selected_item_start_year_textView.text = selectedSerie.startYear.toString()
+        val serieId =intent.getIntExtra("id", 0)
+        val searchString =intent.getStringExtra("searchString")
+
+        CoroutineScope(IO).launch { withContext(IO) {
+            serieViewModel.getOneSerieFromRealm(serieId, searchString) }
+        }
+
+        serieViewModel.serie.observe(this, Observer<Series> {
+
+            selectedSerie = it
+            supportActionBar!!.title = it.title
+
+            val rating = if (it.rating.isEmpty()) "Rating not found "
+            else it.rating
+
+            selected_item_end_year_textView.text = it.endYear.toString()
+            selected_item_start_year_textView.text = it.startYear.toString()
             selected_item_rating_textView.text = rating
 
+            var des = it.description
+            if (des == null) des = "No description found"
 
-            selected_item_description_textView.text = selectedSerie.description
-            selected_item_name_textView.text = selectedSerie.title
-            Picasso.get().load(selectedSerie.thumbnail.path).into(selected_item_imageView)
-        }
+            selected_item_description_textView.text = des
+            selected_item_name_textView.text = it.title
+            if (it.thumbnail!!.path.isNotEmpty()) {
+                Picasso.get().load(it.thumbnail!!.path).into(selected_item_imageView)
+            }
+
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
