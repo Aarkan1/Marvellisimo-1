@@ -53,15 +53,11 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["username"] = username
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
-<<<<<<< HEAD:app/src/main/java/com/example/marvellisimo/RegristerActivity.kt
                             userDoc["isOnline"] = true
-                            DB.coll.insertOne(userDoc)
-=======
+                            DB.users.insertOne(userDoc)
                             userDoc["favoriteSeries"] = ArrayList<String>()
                             userDoc["favoriteCharacters"] = ArrayList<String>()
-
                             DB.users.insertOne(userDoc)
->>>>>>> Dev:app/src/main/java/com/example/marvellisimo/RegisterActivity.kt
                             val intent = Intent(this, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)

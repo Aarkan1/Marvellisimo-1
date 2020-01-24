@@ -33,7 +33,7 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
     //Flyta till Repository ??? // TABORT
     private suspend fun fetchUserById(id: String): User?{
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
-        val result = DB.coll.findOne(filter)
+        val result = DB.users.findOne(filter)
 
         while (!result.isComplete) delay(5)
 
@@ -61,7 +61,7 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
         val gson = Gson()
         val tempList = ArrayList<Document>()
         val filter = Document().append("isOnline", Document().append("\$eq", true))
-        var result = DB.coll.find(filter).into(tempList)
+        var result = DB.users.find(filter).into(tempList)
         while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
     }

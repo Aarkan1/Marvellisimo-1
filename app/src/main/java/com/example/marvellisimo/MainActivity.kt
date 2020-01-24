@@ -95,7 +95,21 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            R.id.action_favorites -> {
+                startActivity(Intent(this, FavoritesActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+
         }
+    }
+        //KOd där inan
+        /*
+
         when (item.itemId){
             R.id.action_OnlineList ->{
                 val intent = Intent(this, OnlineActivity::class.java)
@@ -104,9 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
 
-        //KOd där inan
-        /*
-        val value = when (item.itemId) {
+ val value = when (item.itemId) {
             R.id.action_search -> {
                 startActivity(Intent(this, SearchActivity::class.java))
                 true
@@ -117,7 +129,11 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
+
+
+         */
+
+
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
