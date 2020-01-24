@@ -1,42 +1,47 @@
-package com.example.marvellisimo.search
+package com.example.marvellisimo.activity.search
 
 import android.app.SearchManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.SearchView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import com.example.marvellisimo.repository.models.realm.SearchType
+import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import kotlinx.android.synthetic.main.activity_search.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.android.synthetic.main.search_options_fragment.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), HistoryListActionListener {
-    lateinit var historyAdapter: HistoryViewAdapter
+    private lateinit var historyAdapter: HistoryViewAdapter
+
+    @Inject
     lateinit var viewModel: SearchViewModel
 
-    lateinit var searchView: SearchView
+    private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        Log.d(TAG, "Getting viewModel")
-        viewModel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         createViewAdapter()
 
@@ -44,7 +49,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        CoroutineScope(IO).launch { withContext(IO) { viewModel.loadHistory() } }
+        viewModel.fetchHistory()
 
         Log.d(TAG, "onCreate: ends")
     }
@@ -72,16 +77,14 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         searchView = menu.findItem(R.id.app_bar_search)?.actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
 
-
         searchManager.searchablesInGlobalSearch[0].voiceSearchEnabled
         Log.d(TAG, "globalSearch ${searchManager.searchablesInGlobalSearch.size}")
         Log.d(TAG, "searchable: ${searchableInfo ?: null}")
 
 //        Log.d(TAG, searchableInfo.toString())
-        searchView.setSearchableInfo(searchableInfo)
+        searchView?.setSearchableInfo(searchableInfo)
 
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String?): Boolean {
                 Log.d(TAG, "searchView: submitted - $s")
                 if (s == null) return false
@@ -95,13 +98,13 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
             override fun onQueryTextChange(s: String?): Boolean {
                 Log.d(TAG, "searchView: text changed")
                 if (s == null) return true
-                viewModel.loadHistory(s)
+                viewModel.fetchHistory(s)
                 return true
             }
         })
 
-        searchView.isIconified = false
-        searchView.queryHint = "Characters or series"
+        searchView?.isIconified = false
+        searchView?.queryHint = "Characters or series"
 
         Log.d(TAG, "onCreateOptionsMenu: ends")
         return true
@@ -115,10 +118,57 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
                 finish()
                 true
             }
+            R.id.action_switch -> {
+                showSearchOptionsPopup()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
         Log.d(TAG, "onOptionsItemSelected: starts")
         return value
+    }
+
+    private fun showSearchOptionsPopup() {
+        Log.d(TAG, "about to clearFocus")
+        searchView?.clearFocus()
+
+        Log.d(TAG, "about to setup display")
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        val width: Int = size.x
+        val height: Int = size.y
+
+        Log.d(TAG, "about to inflate popupView")
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.search_options_fragment, null)
+
+        val focusable = true
+
+        val popupWindow = PopupWindow(popupView, width - 250, height - 550, focusable)
+        popupWindow.showAtLocation(searchView, Gravity.CENTER, 0, 0)
+
+        popupView.imageview_close_button.setOnClickListener {
+            popupWindow.dismiss()
+        }
+
+        if (viewModel.searchType == SearchType.CHARACTERS) {
+            popupView.switch_search_options.setText(R.string.switch_search_options_characters)
+            popupView.switch_search_options.isChecked = false
+        } else {
+            popupView.switch_search_options.setText(R.string.switch_search_options_series)
+            popupView.switch_search_options.isChecked = true
+        }
+
+        popupView.switch_search_options.setOnCheckedChangeListener { switch, checked ->
+            if (checked) {
+                viewModel.searchType = SearchType.SERIES
+                switch.setText(R.string.switch_search_options_series)
+            } else {
+                viewModel.searchType = SearchType.CHARACTERS
+                switch.setText(R.string.switch_search_options_characters)
+            }
+        }
     }
 
     override fun itemClicked(item: String) {
@@ -129,14 +179,15 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
 
     override fun iconClicked(item: String) {
         Log.d(TAG, "iconClicked: starts")
-        searchView.setQuery(item, false)
+        searchView?.setQuery(item, false)
     }
 
     private fun switchToCharacterSerieList(search: String) {
         Log.d(TAG, "switchToCharacterSerieList: starts")
+        Log.d(TAG, "search is $search")
         startActivity(
-            Intent(this, CharacterSerieResultListActivity::class.java)
-                .putExtra("type", "character/serie")
+            Intent(this, SearchResultActivity::class.java)
+                .putExtra("type", if (viewModel.searchType == SearchType.CHARACTERS) "characters" else "series")
                 .putExtra("search", search)
         )
     }
