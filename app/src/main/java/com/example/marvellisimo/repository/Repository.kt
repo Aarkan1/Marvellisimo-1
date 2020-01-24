@@ -59,8 +59,10 @@ class Repository @Inject constructor(
 
     suspend fun updateHistory(phrase: String) {
         Log.d(TAG, "updateHistory: $phrase")
-        Realm.getDefaultInstance()
-            .executeTransaction { it.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis())) }
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis()))
+        realm.commitTransaction()
     }
 
     suspend fun fetchCurrentUser(): User? {
@@ -169,7 +171,10 @@ class Repository @Inject constructor(
     }
 
     private fun saveSeriesToRealm(series: Series) {
-        Realm.getDefaultInstance().insertOrUpdate(series)
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(series)
+        realm.commitTransaction()
     }
 
     private fun fetchSeriesFromRealm(id: Int): SeriesNonRealm? {
@@ -212,7 +217,10 @@ class Repository @Inject constructor(
     }
 
     private fun saveCharacterToRealm(character: Character) {
-        Realm.getDefaultInstance().insertOrUpdate(character)
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(character)
+        realm.commitTransaction()
     }
 
     private fun fetchCharacterFromRealm(id: Int): CharacterNonRealm? {
