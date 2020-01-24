@@ -13,8 +13,6 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -24,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.favorite_item.view.*
 import javax.inject.Inject
 
-private const val TAG = "Favorites"
+private const val TAG = "FavoritesActivity"
 
 class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, SeriesItemActionListener {
 
@@ -47,14 +45,14 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     }
 
     private fun observeViewModel() {
-        viewModel.favoriteCharacters.observe(this, Observer<Array<CharacterNonRealm>> {
+        viewModel.favoriteCharacters.observe(this, Observer<Array<CharacterNonRealm>> { arr ->
             charactersAdapter.clear()
-            it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
+            arr.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
-        viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> {
+        viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> { arr ->
             seriesAdapter.clear()
-            it.forEach { seriesAdapter.add(SeriesItem(it, this)) }
+            arr.forEach { seriesAdapter.add(SeriesItem(it, this)) }
         })
 
         viewModel.searchType.observe(this, Observer<SearchType> {
@@ -124,11 +122,6 @@ class CharacterItem(
     private val character: CharacterNonRealm, private val characterItemActionListener: CharacterItemActionListener
 ) : Item<GroupieViewHolder>() {
 
-    init {
-        character.thumbnail!!.path = character.thumbnail!!.path
-            .replace("http:", "https:") + "." + character.thumbnail!!.extension
-    }
-
     override fun getLayout(): Int {
         return R.layout.favorite_item
     }
@@ -144,17 +137,13 @@ class CharacterItem(
 
         viewHolder.itemView.favorite_item_description_textView.text = character.description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
+
         Picasso.get().load(character.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
 class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActionListener: SeriesItemActionListener) :
     Item<GroupieViewHolder>() {
-
-    init {
-        series.thumbnail.path = series.thumbnail.path
-            .replace("http:", "https:") + "." + series.thumbnail.extension
-    }
 
     override fun getLayout(): Int {
         return R.layout.favorite_item

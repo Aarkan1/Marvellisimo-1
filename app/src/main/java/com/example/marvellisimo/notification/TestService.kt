@@ -38,12 +38,12 @@ class TestService : JobService() {
 
     override fun onStartJob(p0: JobParameters?): Boolean {
         Log.d(TAG, "onHandleIntent: starts")
-        CoroutineScope(IO).launch {
-            while (true) {
-                if (Random.nextInt(10) < 2) showNotification()
-                delay(10000)
-            }
-        }
+//        CoroutineScope(IO).launch {
+//            while (true) {
+//                if (Random.nextInt(10) < 2) showNotification()
+//                delay(10000)
+//            }
+//        }
         return true
     }
 

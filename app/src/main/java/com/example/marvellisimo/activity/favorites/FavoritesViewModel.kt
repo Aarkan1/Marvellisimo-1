@@ -1,10 +1,9 @@
 package com.example.marvellisimo.activity.favorites
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.*
@@ -23,6 +22,7 @@ class FavoritesViewModel @Inject constructor(
     val favoriteSeries = MutableLiveData<Array<SeriesNonRealm>>()
 
     fun fetchFavorites() = CoroutineScope(IO).launch {
+        Log.d(TAG, "fetchFavorites: starts")
         val charactersDeferred = async { repository.fetchFavoriteCharacters() }
         val seriesDeferred = async { repository.fetchFavoriteSeries() }
 
@@ -36,6 +36,7 @@ class FavoritesViewModel @Inject constructor(
     }
 
     fun removeCharacterFromFavorites(id: String) = CoroutineScope(IO).launch {
+        Log.d(TAG, "removeCharacterFromFavorites: starts")
         repository.removeCharactersFromFavorites(id)
         val characters = repository.fetchFavoriteCharacters()
         CoroutineScope(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
@@ -43,6 +44,7 @@ class FavoritesViewModel @Inject constructor(
 
 
     fun removeSeriesFromFavorites(id: String) = CoroutineScope(IO).launch {
+        Log.d(TAG, "removeSeriesFromFavorites: starts")
         repository.removeSeriesFromFavorites(id)
         val series = repository.fetchFavoriteSeries()
         CoroutineScope(Main).launch { favoriteSeries.value = series.toTypedArray() }
