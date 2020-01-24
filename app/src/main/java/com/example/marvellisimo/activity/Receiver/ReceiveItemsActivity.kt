@@ -1,7 +1,9 @@
 package com.example.marvellisimo.activity.Receiver
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,6 +25,8 @@ class ReceiveItemsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: ReceivedItemViewModel
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
+    private lateinit var dialog: AlertDialog
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,13 +40,17 @@ class ReceiveItemsActivity : AppCompatActivity() {
 
         supportActionBar!!.title = "Received Item"
 
+        createProgressDialog()
         CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem() }
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
 
             adapter.clear()
 
+            var listSize = it.size
+
             it.forEach {item ->
+                listSize--
                 CoroutineScope(Dispatchers.IO).launch {
                     val character = viewModel.fetchItem(item.itemId)
                     CoroutineScope(Dispatchers.Main).launch {
@@ -51,9 +59,21 @@ class ReceiveItemsActivity : AppCompatActivity() {
                         }
                     }
                 }
+                if (listSize  == 0) dialog.dismiss()
             }
             received_item_List_recyclerView.adapter = adapter
         })
 
+    }
+
+    private fun createProgressDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = "Loading..."
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog.show()
     }
 }
