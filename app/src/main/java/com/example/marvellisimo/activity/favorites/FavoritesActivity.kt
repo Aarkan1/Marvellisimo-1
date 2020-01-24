@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
@@ -19,6 +21,7 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
+import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.favorite_item.view.*
 import javax.inject.Inject
 
@@ -40,6 +43,8 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         MarvellisimoApplication.applicationComponent.inject(this)
         supportActionBar?.title = "Favorites"
 
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+        recycler_view_favorites.addItemDecoration(dividerItemDecoration)
         observeViewModel()
         viewModel.fetchFavorites()
     }
@@ -138,7 +143,9 @@ class CharacterItem(
         viewHolder.itemView.favorite_item_description_textView.text = character.description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
-        Picasso.get().load(character.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
+        Picasso.get().load(character.thumbnail!!.path)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
@@ -157,6 +164,8 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
 
         viewHolder.itemView.favorite_item_description_textView.text = series.description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
+        Picasso.get().load(series.thumbnail.path)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.favorite_item_imageView)
     }
 }
