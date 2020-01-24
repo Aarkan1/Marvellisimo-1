@@ -19,10 +19,17 @@ class FavoritesViewModel @Inject constructor(
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
 
     val favoriteCharacters = MutableLiveData<Array<CharacterNonRealm>>()
+        .apply { value = emptyArray() }
+
     val favoriteSeries = MutableLiveData<Array<SeriesNonRealm>>()
+        .apply { value = emptyArray() }
+
+    val loading = MutableLiveData<Boolean>().apply { value = false }
 
     fun fetchFavorites() = CoroutineScope(IO).launch {
         Log.d(TAG, "fetchFavorites: starts")
+        CoroutineScope(Main).launch { loading.value = true }
+
         val charactersDeferred = async { repository.fetchFavoriteCharacters() }
         val seriesDeferred = async { repository.fetchFavoriteSeries() }
 
@@ -30,6 +37,7 @@ class FavoritesViewModel @Inject constructor(
         val series = seriesDeferred.await().toTypedArray()
 
         CoroutineScope(Main).launch {
+            loading.value = false
             favoriteCharacters.value = characters
             favoriteSeries.value = series
         }

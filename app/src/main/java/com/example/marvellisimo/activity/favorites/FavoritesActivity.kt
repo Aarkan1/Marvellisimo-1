@@ -1,11 +1,13 @@
 package com.example.marvellisimo.activity.favorites
 
+import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.Switch
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +23,6 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_favorites.*
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.favorite_item.view.*
 import javax.inject.Inject
 
@@ -34,6 +35,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     private val charactersAdapter = GroupAdapter<GroupieViewHolder>()
     private val seriesAdapter = GroupAdapter<GroupieViewHolder>()
+    private lateinit var loadingDialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -45,8 +47,21 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recycler_view_favorites.addItemDecoration(dividerItemDecoration)
+
+        createLoadingDialog()
+
         observeViewModel()
         viewModel.fetchFavorites()
+    }
+
+    private fun createLoadingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = "Loading..."
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        loadingDialog = builder.create()
     }
 
     private fun observeViewModel() {
@@ -63,6 +78,10 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         viewModel.searchType.observe(this, Observer<SearchType> {
             if (it == SearchType.CHARACTERS) recycler_view_favorites.adapter = charactersAdapter
             else recycler_view_favorites.adapter = seriesAdapter
+        })
+
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) loadingDialog.show() else loadingDialog.dismiss()
         })
     }
 
