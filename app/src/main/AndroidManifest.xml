@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".OnlineActivity" />
+        <activity android:name=".activity.online_list.OnlineActivity" />
 
         <meta-data
             android:name="android.app.default_searchable"

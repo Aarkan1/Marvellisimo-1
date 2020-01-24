@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.online_list
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

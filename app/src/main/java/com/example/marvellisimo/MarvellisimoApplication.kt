@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
@@ -25,6 +26,7 @@ interface ApplicationComponent {
     fun inject(activity: CharacterDetailsActivity)
     fun inject(activity: SerieDetailsActivity)
     fun inject(activity: SearchResultActivity)
+    fun inject(activity: OnlineActivity)
     fun inject(job: TestService)
 }
 

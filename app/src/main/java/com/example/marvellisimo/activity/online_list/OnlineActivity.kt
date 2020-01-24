@@ -1,82 +1,43 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.online_list
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.models.User
-import com.google.gson.Gson
+import com.example.marvellisimo.MarvellisimoApplication
+import com.example.marvellisimo.R
+import com.example.marvellisimo.repository.Repository
 import kotlinx.android.synthetic.main.activity_online.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.bson.Document
-import org.bson.types.ObjectId
+import javax.inject.Inject
 
-class OnlineActivity : AppCompatActivity(), OnlineActionListener {
+class OnlineActivity : AppCompatActivity(),
+    OnlineActionListener {
     private val TAG = "OnlineActivity"
     private var onlines = arrayListOf<Online>()
+
+    @Inject
+    lateinit var repository: Repository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_online)
+        MarvellisimoApplication.applicationComponent.inject(this)
+
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
-
         addToRecycleView()
     }
 
-    //Flyta till Repository ??? // TABORT
-    private suspend fun fetchUserById(id: String): User?{
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
-        val result = DB.users.findOne(filter)
-
-        while (!result.isComplete) delay(5)
-
-        if (result.result == null) return null
-
-        return User().apply {
-            username = result.result["username"] as String
-            var isOnline = true
-            isOnline = result.result["online"] as Boolean
-        }
-    }
-
-
-    //Flyta till Repository ???
-    private suspend fun fetchUsers(): ArrayList<User>{
-        /*
-        val list = DB.client.auth.listUsers().map { it.id}
-        val users = ArrayList<User>()
-
-        for(id in list){
-            val user = CoroutineScope(IO).async { fetchUserById(id) }.await()
-            if(user != null) users.add(user)
-        }
-        */
-        val gson = Gson()
-        val tempList = ArrayList<Document>()
-        val filter = Document().append("isOnline", Document().append("\$eq", true))
-        var result = DB.users.find(filter).into(tempList)
-        while (!result.isComplete) delay(5)
-        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
-    }
-
-
-
     private fun addToRecycleView() {
         CoroutineScope(IO).launch {
-            val usernames = fetchUsers().map { it.username }
-
-            usernames.forEach { Log.d(TAG, it ) }
-
+            val usernames = repository.fetchUsers().map { it.username }
             CoroutineScope(Main).launch {
-                //Läg till IFsats om inlogad
-
                 onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
                     .map { Online(it) }.toMutableList())
                 onlineAdapter.notifyDataSetChanged()

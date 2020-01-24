@@ -1,8 +1,9 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.online_list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marvellisimo.R
 
 class OnlineAdapter(var onlines: ArrayList<Online>, val onlineActionListener: OnlineActionListener) :
     RecyclerView.Adapter<OnlineViewHolder>() {
@@ -10,7 +11,10 @@ class OnlineAdapter(var onlines: ArrayList<Online>, val onlineActionListener: On
         val view = LayoutInflater
             .from(parent.context)
             .inflate(R.layout.online_fragment, parent, false)
-        return OnlineViewHolder(view, onlineActionListener)
+        return OnlineViewHolder(
+            view,
+            onlineActionListener
+        )
     }
 
     override fun getItemCount() = onlines.size

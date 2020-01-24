@@ -20,6 +20,7 @@ import android.view.Menu
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import android.view.MenuItem
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.notification.TestService
 import io.realm.Realm
@@ -103,37 +104,15 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, FavoritesActivity::class.java))
                 true
             }
+            R.id.action_OnlineList -> {
+                startActivity(Intent(this, OnlineActivity::class.java))
+                Log.d( "msg","OnlineActivity")
+                true
+            }
             else -> super.onOptionsItemSelected(item)
 
         }
     }
-        //KOd där inan
-        /*
-
-        when (item.itemId){
-            R.id.action_OnlineList ->{
-                val intent = Intent(this, OnlineActivity::class.java)
-                startActivity(intent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-
- val value = when (item.itemId) {
-            R.id.action_search -> {
-                startActivity(Intent(this, SearchActivity::class.java))
-                true
-            }
-            R.id.action_favorites -> {
-                startActivity(Intent(this, FavoritesActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
-
-         */
-
-
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)

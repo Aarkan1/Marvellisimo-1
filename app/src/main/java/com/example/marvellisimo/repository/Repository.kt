@@ -10,6 +10,7 @@ import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.services.MarvelService
+import com.google.gson.Gson
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -248,6 +249,15 @@ class Repository @Inject constructor(
         saveCharacterToRealm(marvelResult[0])
 
         return character
+    }
+
+    suspend fun fetchUsers(): ArrayList<User>{
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        val filter = Document().append("isOnline", Document().append("\$eq", true))
+        var result = DB.users.find(filter).into(tempList)
+        while (!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
     }
 }
 
