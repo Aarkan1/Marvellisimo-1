@@ -6,55 +6,82 @@ import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope as CS
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+
 import javax.inject.Inject
+import kotlin.Exception
 
 private const val TAG = "FavoritesViewModel"
 
-class FavoritesViewModel @Inject constructor(
-    private val repository: Repository
-) {
-    val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
+class FavoritesViewModel @Inject constructor(private val repository: Repository) {
 
+    val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
     val favoriteCharacters = MutableLiveData<Array<CharacterNonRealm>>()
         .apply { value = emptyArray() }
-
     val favoriteSeries = MutableLiveData<Array<SeriesNonRealm>>()
         .apply { value = emptyArray() }
-
     val loading = MutableLiveData<Boolean>().apply { value = false }
+    val toastMessage = MutableLiveData<String>().apply { value = "" }
 
-    fun fetchFavorites() = CoroutineScope(IO).launch {
-        Log.d(TAG, "fetchFavorites: starts")
-        CoroutineScope(Main).launch { loading.value = true }
+    fun fetchFavoriteCharacters() = CS(IO).launch {
+        Log.d(TAG, "fetchFavoriteCharacters: starts")
+        if (searchType.value == SearchType.CHARACTERS && favoriteCharacters.value.isNullOrEmpty())
+            CS(Main).launch { loading.value = true }
 
-        val charactersDeferred = async { repository.fetchFavoriteCharacters() }
-        val seriesDeferred = async { repository.fetchFavoriteSeries() }
-
-        val characters = charactersDeferred.await().toTypedArray()
-        val series = seriesDeferred.await().toTypedArray()
-
-        CoroutineScope(Main).launch {
-            loading.value = false
-            favoriteCharacters.value = characters
-            favoriteSeries.value = series
+        try {
+            val characters = repository.fetchFavoriteCharacters().toTypedArray()
+            CS(Main).launch { favoriteCharacters.value = characters }
+        } catch (ex: Exception) {
+            CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }
+
+        CS(Main).launch { toastMessage.value = ""; loading.value = false }
     }
 
-    fun removeCharacterFromFavorites(id: String) = CoroutineScope(IO).launch {
+    fun fetchFavoriteSeries() = CS(IO).launch {
+        Log.d(TAG, "fetchFavoriteCharacters: starts")
+        if (searchType.value == SearchType.SERIES && favoriteSeries.value.isNullOrEmpty())
+            CS(Main).launch { loading.value = true }
+
+        try {
+            val series = repository.fetchFavoriteSeries().toTypedArray()
+            CS(Main).launch { favoriteSeries.value = series }
+        } catch (ex: Exception) {
+            CS(Main).launch { toastMessage.value = "Something went wrong..." }
+        }
+
+        CS(Main).launch { toastMessage.value = ""; loading.value = false }
+    }
+
+    fun removeCharacterFromFavorites(id: String) = CS(IO).launch {
         Log.d(TAG, "removeCharacterFromFavorites: starts")
-        repository.removeCharactersFromFavorites(id)
-        val characters = repository.fetchFavoriteCharacters()
-        CoroutineScope(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
+        CS(Main).launch { loading.value = true }
+        try {
+            repository.removeCharactersFromFavorites(id)
+            val characters = repository.fetchFavoriteCharacters()
+            CS(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
+        } catch (ex: Exception) {
+            toastMessage.value = "Something went wrong..."
+        }
+
+        CS(Main).launch { loading.value = false; toastMessage.value = "" }
     }
 
 
-    fun removeSeriesFromFavorites(id: String) = CoroutineScope(IO).launch {
+    fun removeSeriesFromFavorites(id: String) = CS(IO).launch {
         Log.d(TAG, "removeSeriesFromFavorites: starts")
-        repository.removeSeriesFromFavorites(id)
-        val series = repository.fetchFavoriteSeries()
-        CoroutineScope(Main).launch { favoriteSeries.value = series.toTypedArray() }
+        CS(Main).launch { loading.value = true }
+        try {
+            repository.removeSeriesFromFavorites(id)
+            val series = repository.fetchFavoriteSeries()
+            CS(Main).launch { favoriteSeries.value = series.toTypedArray() }
+        } catch (ex: Exception) {
+            toastMessage.value = "Something went wrong..."
+        }
+
+        CS(Main).launch { loading.value = false; toastMessage.value = "" }
     }
 }

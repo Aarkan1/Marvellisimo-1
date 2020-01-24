@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,14 +52,13 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         createLoadingDialog()
 
         observeViewModel()
-        viewModel.fetchFavorites()
     }
 
     private fun createLoadingDialog() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
         val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
-        message.text = "Loading..."
+        message.text = getString(R.string.loading_dialog_text)
         builder.setView(dialogView)
         builder.setCancelable(false)
         loadingDialog = builder.create()
@@ -76,12 +76,21 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         })
 
         viewModel.searchType.observe(this, Observer<SearchType> {
-            if (it == SearchType.CHARACTERS) recycler_view_favorites.adapter = charactersAdapter
-            else recycler_view_favorites.adapter = seriesAdapter
+            if (it == SearchType.CHARACTERS) {
+                recycler_view_favorites.adapter = charactersAdapter
+                viewModel.fetchFavoriteCharacters()
+            } else {
+                recycler_view_favorites.adapter = seriesAdapter
+                viewModel.fetchFavoriteSeries()
+            }
         })
 
         viewModel.loading.observe(this, Observer<Boolean> {
             if (it) loadingDialog.show() else loadingDialog.dismiss()
+        })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
     }
 
