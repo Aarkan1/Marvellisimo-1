@@ -17,8 +17,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
-import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import android.view.MenuItem
+import com.example.marvellisimo.activity.Receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.notification.TestService
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
-            startActivity(Intent(this, SearchResultActivity::class.java))
+            startActivity(Intent(this, ReceiveItemsActivity::class.java))
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navController = findNavController(R.id.nav_host_fragment)

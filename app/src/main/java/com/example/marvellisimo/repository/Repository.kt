@@ -7,9 +7,11 @@ import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
 import com.example.marvellisimo.marvelEntities.*
+import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.services.MarvelService
+import com.google.gson.Gson
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -269,6 +271,19 @@ class Repository @Inject constructor(
                 Log.e("___", "failed to insert document with: ", it.exception)
             }
         }
+    }
+
+    suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        val filter = Document()
+            .append("receiverId", Document().append("\$eq", "5e2aaf53d6503302ec2549c4"))
+
+        val result = DB.sendReceive.find().into(tempList)
+
+        while(!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
+
     }
 }
 
