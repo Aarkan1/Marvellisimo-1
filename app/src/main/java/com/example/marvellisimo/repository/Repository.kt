@@ -17,8 +17,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.bson.Document
 import org.bson.types.ObjectId
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 private const val TAG = "Repository"
 
@@ -253,11 +256,15 @@ class Repository @Inject constructor(
     }
 
     fun sendItemToFriend(itemId: String, type: String) {
+        val currentTimestamp = System.currentTimeMillis()
+
         val sendDoc = Document()
         sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
         sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
         sendDoc["itemId"] = itemId
         sendDoc["type"] = type
+        sendDoc["senderName"] = "Joan"
+        sendDoc["date"] = "$currentTimestamp"
 
         DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
             if (it.isSuccessful) {

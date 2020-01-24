@@ -4,9 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.models.ReceiveItem
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
+import kotlinx.android.synthetic.main.activity_receive_items.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,6 +22,7 @@ import javax.inject.Inject
 class ReceiveItemsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: ReceivedItemViewModel
+    private lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,17 +30,29 @@ class ReceiveItemsActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
-        supportActionBar!!.title = "Received Item"
+        adapter = GroupAdapter()
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+        received_item_List_recyclerView.addItemDecoration(dividerItemDecoration)
 
+        supportActionBar!!.title = "Received Item"
 
         CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem() }
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
-            Log.d("___", "item list size: ${it.size}")
 
-            it.forEach {
-                Log.d("___", it.receiverId)
+            adapter.clear()
+
+            it.forEach {item ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    val character = viewModel.fetchItem(item.itemId)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (character != null) {
+                            adapter.add(ReceivedItem(character, item.senderName, item.date.toLong()))
+                        }
+                    }
+                }
             }
+            received_item_List_recyclerView.adapter = adapter
         })
 
     }
