@@ -249,6 +249,27 @@ class Repository @Inject constructor(
 
         return character
     }
+
+    fun sendItemToFriend(itemId: String, type: String) {
+        val sendDoc = Document()
+        sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
+        sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
+        sendDoc["itemId"] = itemId
+        sendDoc["type"] = type
+
+        DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d(
+                    "___", String.format(
+                        "successfully inserted item with id %s",
+                        it.result.insertedId
+                    )
+                )
+            } else {
+                Log.e("___", "failed to insert document with: ", it.exception)
+            }
+        }
+    }
 }
 
 
