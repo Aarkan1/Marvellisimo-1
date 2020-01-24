@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.search
 
+import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
@@ -81,7 +82,6 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "globalSearch ${searchManager.searchablesInGlobalSearch.size}")
         Log.d(TAG, "searchable: ${searchableInfo ?: null}")
 
-//        Log.d(TAG, searchableInfo.toString())
         searchView?.setSearchableInfo(searchableInfo)
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -128,6 +128,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         return value
     }
 
+    @SuppressLint("InflateParams")
     private fun showSearchOptionsPopup() {
         Log.d(TAG, "about to clearFocus")
         searchView?.clearFocus()
