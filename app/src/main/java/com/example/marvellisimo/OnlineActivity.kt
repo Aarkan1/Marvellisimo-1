@@ -60,7 +60,8 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
         */
         val gson = Gson()
         val tempList = ArrayList<Document>()
-        var result = DB.coll.find().into(tempList)
+        val filter = Document().append("isOnline", Document().append("\$eq", true))
+        var result = DB.coll.find(filter).into(tempList)
         while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
     }
@@ -70,10 +71,12 @@ class OnlineActivity : AppCompatActivity(), OnlineActionListener {
     private fun addToRecycleView() {
         CoroutineScope(IO).launch {
             val usernames = fetchUsers().map { it.username }
+
             usernames.forEach { Log.d(TAG, it ) }
 
             CoroutineScope(Main).launch {
                 //Läg till IFsats om inlogad
+
                 onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
                     .map { Online(it) }.toMutableList())
                 onlineAdapter.notifyDataSetChanged()
