@@ -55,7 +55,7 @@ class RegristerActivity : AppCompatActivity() {
                             userDoc["username"] = username
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
-
+                            userDoc["isOnline"] = true
                             DB.coll.insertOne(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
