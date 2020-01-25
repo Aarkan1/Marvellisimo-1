@@ -72,6 +72,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.detail_menu_send -> {
+                    viewModel.sendToFriend(viewModel.character.value?.id.toString(), "character")
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
                     Toast.LENGTH_LONG

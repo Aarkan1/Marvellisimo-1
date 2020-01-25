@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.example.marvellisimo">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.marvellisimo">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-            android:name=".MarvellisimoApplication"
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/AppTheme"
-            tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.character_details.CharacterDetailsActivity"></activity>
-
-        <activity android:name="com.example.marvellisimo.activity.favorites.FavoritesActivity">
+        android:name=".MarvellisimoApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activity.Receiver.ReceiveItemsActivity"></activity>
+        <activity android:name=".activity.character_details.CharacterDetailsActivity" />
+        <activity android:name=".activity.favorites.FavoritesActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
-
-        <activity android:name=".activity.series_details.SeriesDetailsActivity"/>
+        <activity android:name=".activity.series_details.SeriesDetailsActivity" />
         <activity android:name=".activity.search_result.SearchResultActivity">
             <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".MainActivity"/>
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
-        <activity android:windowSoftInputMode="stateVisible|adjustResize" android:name=".RegisterActivity"></activity>
-        <activity android:windowSoftInputMode="stateVisible|adjustResize" android:name=".LoginActivity"/>
         <activity
-                android:name=".MainActivity"
-                android:label="@string/app_name"
-                android:theme="@style/AppTheme.NoActionBar">
+            android:name=".RegisterActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name=".LoginActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-                android:name="com.example.marvellisimo.activity.search.SearchActivity"
-                android:label="Search"
-                android:parentActivityName=".MainActivity"
-                android:theme="@style/AppTheme.NoActionBar">
+            android:name=".activity.search.SearchActivity"
+            android:label="Search"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
-                    android:name="android.app.default_searchable"
-                    android:value="com.example.marvellisimo.search.SearchActivity"></meta-data>
+                android:name="android.app.default_searchable"
+                android:value="com.example.marvellisimo.search.SearchActivity" />
         </activity>
 
         <service
-                android:name=".notification.TestService"
-                android:exported="false"
-                android:permission="android.permission.BIND_JOB_SERVICE">
-        </service>
-
+            android:name=".notification.TestService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
     </application>
 
 </manifest>

@@ -5,18 +5,23 @@ import com.example.marvellisimo.DB
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.marvelEntities.*
+import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
+import com.google.gson.Gson
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.bson.Document
 import org.bson.types.ObjectId
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 private const val TAG = "Repository"
 
@@ -332,6 +337,44 @@ class Repository @Inject constructor(
         }
 
         return characters
+    }
+
+    fun sendItemToFriend(itemId: String, type: String) {
+        val currentTimestamp = System.currentTimeMillis()
+
+        val sendDoc = Document()
+        sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
+        sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
+        sendDoc["itemId"] = itemId
+        sendDoc["type"] = type
+        sendDoc["senderName"] = "Joan"
+        sendDoc["date"] = "$currentTimestamp"
+
+        DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d(
+                    "___", String.format(
+                        "successfully inserted item with id %s",
+                        it.result.insertedId
+                    )
+                )
+            } else {
+                Log.e("___", "failed to insert document with: ", it.exception)
+            }
+        }
+    }
+
+    suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        val filter = Document()
+            .append("receiverId", Document().append("\$eq", "5e2aaf53d6503302ec2549c4"))
+
+        val result = DB.sendReceive.find().into(tempList)
+
+        while(!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
+
     }
 }
 

@@ -19,6 +19,7 @@ class DB {
         val client = Stitch.getDefaultAppClient()
         val mongoClient = client.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
         val users = mongoClient.getDatabase("marvellisimo").getCollection("users")
+        val sendReceive = mongoClient.getDatabase("marvellisimo").getCollection("send")
 
         private fun initUser() {
             val uid = client.auth.user?.id
