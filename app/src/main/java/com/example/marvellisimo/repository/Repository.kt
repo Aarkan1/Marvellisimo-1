@@ -8,6 +8,7 @@ import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
 import com.example.marvellisimo.repository.models.realm.HistoryItem
+import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
 import io.realm.*
 import kotlinx.coroutines.*
@@ -198,16 +199,59 @@ class Repository @Inject constructor(
 
         saveSeriesToRealm(marvelResult[0])
 
-        return SeriesNonRealm().apply {
-            title = marvelResult[0].title
-            description = marvelResult[0].description
-            thumbnail.path = marvelResult[0].thumbnail?.path ?: ""
-            thumbnail.extension = marvelResult[0].thumbnail?.extension ?: ""
-            this.id = marvelResult[0].id
-            startYear = marvelResult[0].startYear
-            endYear = marvelResult[0].endYear
-            rating = marvelResult[0].rating
+        return SeriesNonRealm(marvelResult[0])
+    }
+
+    private suspend fun saveSeriesSearchResultToRealm(searchPhrase: String, results: MutableList<String>) {
+        Log.d(TAG, "saveSeriesSearchResultToRealm: starts")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(SeriesSearchResult().apply {
+            this.searchPhrase = searchPhrase
+            seriesIds.addAll(results)
+        })
+        realm.commitTransaction()
+    }
+
+    private suspend fun fetchSeriesFromRealm(phrase: String): ArrayList<SeriesNonRealm>? {
+        Log.d(TAG, "fetchSeriesFromRealm: $phrase")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val result = realm.where(SeriesSearchResult::class.java).equalTo("searchPhrase", phrase)
+            .findFirst()
+
+        if (result == null) {
+            realm.commitTransaction()
+            return null
         }
+
+        val series = ArrayList<SeriesNonRealm>()
+        val seriesDeferred = ArrayList<Deferred<SeriesNonRealm?>>()
+
+        result.seriesIds.mapNotNull { it }
+            .forEach { seriesDeferred.add(CoroutineScope(IO).async { fetchSeriesById(it) }) }
+
+        realm.commitTransaction()
+
+        seriesDeferred.forEach { deffered -> deffered.await()?.let { series.add(it) } }
+        return series
+    }
+
+    suspend fun fetchSeries(phrase: String): MutableList<SeriesNonRealm> {
+        Log.d(TAG, "fetchSeries: $phrase")
+        val realmResult = fetchSeriesFromRealm(phrase)
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getAllSeries(phrase)
+        val series = marvelResult.data.results.map { SeriesNonRealm(it) }.toMutableList()
+
+        CoroutineScope(IO).launch {
+            marvelResult.data.results.forEach { saveSeriesToRealm(it) }
+            saveSeriesSearchResultToRealm(phrase, series.map { it.id.toString() }.toMutableList())
+        }
+
+        return series
     }
 
     private fun saveCharacterToRealm(character: Character) {
@@ -251,7 +295,7 @@ class Repository @Inject constructor(
     }
 
     private suspend fun fetchCharactersFromRealm(phrase: String): ArrayList<CharacterNonRealm>? {
-        Log.d(TAG, "fetchCharacterFromRealm: starts")
+        Log.d(TAG, "fetchCharacterFromRealm: $phrase")
         val realm = Realm.getDefaultInstance()
         realm.beginTransaction()
 
@@ -276,11 +320,9 @@ class Repository @Inject constructor(
     }
 
     suspend fun fetchCharacters(phrase: String): MutableList<CharacterNonRealm> {
-        Log.d(TAG, "fetchCharacters: starts")
+        Log.d(TAG, "fetchCharacters: $phrase")
         val realmResult = fetchCharactersFromRealm(phrase)
-        if (realmResult != null) {
-            return realmResult
-        }
+        if (realmResult != null) return realmResult
 
         val marvelResult = marvelService.getAllCharacters(phrase)
         val characters = marvelResult.data.results.map { CharacterNonRealm(it) }.toMutableList()

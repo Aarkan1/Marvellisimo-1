@@ -19,7 +19,7 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
 
     fun getCharacter(id: String) = CoroutineScope(IO).launch {
         Log.d(TAG, "getCharacter: starts")
-        val char = repository.fetchCharacterById(id.toString())
+        val char = repository.fetchCharacterById(id)
         CoroutineScope(Main).launch { character.value = char }
     }
 

@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.search_result
 
 import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.marvelEntities.Series
 
 class CharacterNonRealm(character: Character? = null) {
     var thumbnail: ImageNonRealm? = ImageNonRealm("", "")
@@ -10,7 +11,7 @@ class CharacterNonRealm(character: Character? = null) {
     var description: String = ""
 
     init {
-        if (character != null){
+        if (character != null) {
             name = character.name
             description = character.description
             thumbnail!!.path = character.thumbnail!!.path
@@ -24,15 +25,28 @@ class CharacterNonRealm(character: Character? = null) {
     }
 }
 
-class SeriesNonRealm(
-    var id: Int = 1,
-    var title: String = "",
-    var description: String? = "hej",
-    var startYear: Int = 1,
-    var endYear: Int = 1,
-    var rating: String = "",
+class SeriesNonRealm(series: Series? = null) {
+    var id: Int = 1
+    var title: String = ""
+    var description: String? = ""
+    var startYear: Int = 1
+    var endYear: Int = 1
+    var rating: String = ""
     var thumbnail: ImageNonRealm = ImageNonRealm("", "")
-)
+
+    init {
+        if(series != null){
+            title = series.title
+            description = series.description
+            thumbnail.path = series.thumbnail?.path ?: ""
+            thumbnail.extension = series.thumbnail?.extension ?: ""
+            this.id = series.id
+            startYear = series.startYear
+            endYear = series.endYear
+            rating = series.rating
+        }
+    }
+}
 
 class SeriesListNonRealm(
     var items: ArrayList<SeriesSummaryNonRealm>? = ArrayList()//, optional): The list of returned series in this collection.

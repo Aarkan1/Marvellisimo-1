@@ -3,6 +3,7 @@ package com.example.marvellisimo.activity.search_result
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -15,7 +16,6 @@ import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
-import com.example.marvellisimo.marvelEntities.Series
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -32,6 +32,7 @@ class SearchResultActivity : AppCompatActivity() {
     lateinit var viewModel: SearchResultViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
 
@@ -54,9 +55,9 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun getAllSeries(searchString: String) {
-        CoroutineScope(IO).launch { viewModel.getAllSeries(searchString) }
+        CoroutineScope(IO).launch { viewModel.getSeries(searchString) }
 
-        viewModel.series.observe(this, Observer<ArrayList<Series>> {
+        viewModel.series.observe(this, Observer<ArrayList<SeriesNonRealm>> {
             addSeriesToResultList(it)
         })
     }
@@ -89,7 +90,7 @@ class SearchResultActivity : AppCompatActivity() {
                 intent.putExtra("searchString", searchString)
             } else if (item is SeriesSearchResultItem) {
                 intent = Intent(this, SerieDetailsActivity::class.java)
-                intent.putExtra("id", item.serie.id)
+                intent.putExtra("id", item.series.id)
                 intent.putExtra("searchString", searchString)
             }
             startActivity(intent)
@@ -97,7 +98,7 @@ class SearchResultActivity : AppCompatActivity() {
         recyclerView_search_result.adapter = adapter
     }
 
-    private fun addSeriesToResultList(series: ArrayList<Series>) {
+    private fun addSeriesToResultList(series: ArrayList<SeriesNonRealm>) {
         adapter.clear()
         for (serie in series) {
             adapter.add(SeriesSearchResultItem(serie))

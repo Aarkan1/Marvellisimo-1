@@ -1,18 +1,12 @@
 package com.example.marvellisimo.activity.search_result
 
-import android.util.Log
 import com.example.marvellisimo.R
-import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.character_detail_series_list.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
 
 private val TAG = "CharacterSearchResultItem"
 
@@ -35,51 +29,38 @@ class CharacterSearchResultItem(val character: CharacterNonRealm) : Item<Groupie
 
         val path = character.thumbnail!!.path.replace("http:", "https:") + "." + character.thumbnail!!.extension
 
-        Log.d(TAG, "path is : $path")
-
         Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
 
-class SeriesSearchResultItem(val serie: Series) : Item<GroupieViewHolder>() {
+class SeriesSearchResultItem(val series: SeriesNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        CoroutineScope(IO).launch {
-            val str1 = serie.thumbnail!!.path
+        var des = series.description
+        if (des != null) {
+            if (des.length > 200) des = des.substring(0, 140) + "..."
+        } else des = "No description found"
 
+        var title = series.title
+        if (title.length > 25)
+            title = series.title.substring(0, 25) + "..."
 
-            var des = serie.description
-            if (des != null) {
-                if (des.length > 200) des = des.substring(0, 140) + "..."
-            } else des = "No description found"
+        val path = series.thumbnail.path.replace("http:", "https:") + "." + series.thumbnail.extension
 
-            var title = serie.title
-            if (title.length > 25)
-                title = serie.title.substring(0, 25) + "..."
-
-            CoroutineScope(Main).launch {
-                val path = str1
-
-                viewHolder.itemView.search_result_item_description_textView.text = des
-                viewHolder.itemView.search_result_item_name_textView.text = title
-                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
-            }
-        }
+        viewHolder.itemView.search_result_item_description_textView.text = des
+        viewHolder.itemView.search_result_item_name_textView.text = title
+        Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
 
 class CharacterDetailSeriesListItem(val serie: SeriesSummaryNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        var layout: Int = 1
-        layout = R.layout.character_detail_series_list
-
-
-        return layout
+        return R.layout.character_detail_series_list
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
