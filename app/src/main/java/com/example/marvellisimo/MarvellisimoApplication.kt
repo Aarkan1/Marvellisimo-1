@@ -46,7 +46,11 @@ class MarvellisimoApplication : Application() {
             .schemaVersion(0)
             .deleteRealmIfMigrationNeeded()
             .build()
+
         Realm.setDefaultConfiguration(config)
+
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction{ it .deleteAll()}
 
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
 

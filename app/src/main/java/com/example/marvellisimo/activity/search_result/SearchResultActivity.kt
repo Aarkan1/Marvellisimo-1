@@ -15,13 +15,13 @@ import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
-import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+private const val TAG = "SearchResultActivity"
 
 class SearchResultActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
@@ -54,7 +54,7 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun getAllSeries(searchString: String) {
-        CoroutineScope(IO).launch { withContext(IO) { viewModel.getAllSeries(searchString) } }
+        CoroutineScope(IO).launch { viewModel.getAllSeries(searchString) }
 
         viewModel.series.observe(this, Observer<ArrayList<Series>> {
             addSeriesToResultList(it)
@@ -62,9 +62,9 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun getAllCharacters(searchString: String) {
-        viewModel.getAllCharacters(searchString)
+        viewModel.getCharacters(searchString)
 
-        viewModel.characters.observe(this, Observer<ArrayList<Character>> {
+        viewModel.characters.observe(this, Observer<ArrayList<CharacterNonRealm>> {
             addCharactersToResultList(it)
         })
     }
@@ -100,20 +100,16 @@ class SearchResultActivity : AppCompatActivity() {
     private fun addSeriesToResultList(series: ArrayList<Series>) {
         adapter.clear()
         for (serie in series) {
-            adapter.add(
-                SeriesSearchResultItem(serie)
-            )
+            adapter.add(SeriesSearchResultItem(serie))
         }
         recyclerView_search_result.adapter = adapter
         dialog.dismiss()
     }
 
-    private fun addCharactersToResultList(characters: ArrayList<Character>) {
+    private fun addCharactersToResultList(characters: ArrayList<CharacterNonRealm>) {
         adapter.clear()
         for (character in characters) {
-            adapter.add(
-                CharacterSearchResultItem(character)
-            )
+            adapter.add(CharacterSearchResultItem(character))
         }
         recyclerView_search_result.adapter = adapter
         dialog.dismiss()

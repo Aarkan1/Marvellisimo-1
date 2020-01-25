@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.search_result
 
+import android.util.Log
 import com.example.marvellisimo.R
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
@@ -13,39 +14,35 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
+private val TAG = "CharacterSearchResultItem"
 
-class CharacterSearchResultItem (val character: Character): Item<GroupieViewHolder>() {
+class CharacterSearchResultItem(val character: CharacterNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        CoroutineScope(IO).launch {
-            val str1 = character.thumbnail!!.path
+        var des = character.description
+        if (des.length > 200) des = des.substring(0, 140) + "..."
+        else if (des.isEmpty()) des = "No description found"
 
-            var des = character.description
-            if (des.length > 200) des = des.substring(0, 140) + "..."
-            else if (des.length <= 0)
-                des = "No description found"
-
-            var name = character.name
-            if (name.length > 25)
+        var name = character.name
+        if (name.length > 25)
             name = character.name.substring(0, 25) + "..."
 
-            CoroutineScope(Main).launch {
-                viewHolder.itemView.search_result_item_description_textView.text = des
-                viewHolder.itemView.search_result_item_name_textView.text = name
+        viewHolder.itemView.search_result_item_description_textView.text = des
+        viewHolder.itemView.search_result_item_name_textView.text = name
 
-                val path = str1
-                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
+        val path = character.thumbnail!!.path.replace("http:", "https:") + "." + character.thumbnail!!.extension
 
-            }
-        }
+        Log.d(TAG, "path is : $path")
+
+        Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
 
-class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
+class SeriesSearchResultItem(val serie: Series) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
@@ -58,8 +55,7 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
             var des = serie.description
             if (des != null) {
                 if (des.length > 200) des = des.substring(0, 140) + "..."
-            }
-            else des = "No description found"
+            } else des = "No description found"
 
             var title = serie.title
             if (title.length > 25)
@@ -77,21 +73,21 @@ class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
 }
 
 
-class CharacterDetailSeriesListItem (val serie: SeriesSummaryNonRealm): Item<GroupieViewHolder>() {
+class CharacterDetailSeriesListItem(val serie: SeriesSummaryNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         var layout: Int = 1
-            layout = R.layout.character_detail_series_list
+        layout = R.layout.character_detail_series_list
 
 
         return layout
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-            val name = serie.name
+        val name = serie.name
 
 
-            val namee = name
-                viewHolder.itemView.serie_textView.text = namee
+        val namee = name
+        viewHolder.itemView.serie_textView.text = namee
 
     }
 }
