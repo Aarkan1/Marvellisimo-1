@@ -176,16 +176,7 @@ class Repository @Inject constructor(
         val result = Realm.getDefaultInstance().where(Series::class.java).equalTo("id", id)
             .findFirst() ?: return null
 
-        return SeriesNonRealm().apply {
-            title = result.title
-            description = result.description
-            thumbnail.path = result.thumbnail?.path ?: ""
-            thumbnail.extension = result.thumbnail?.extension ?: ""
-            this.id = result.id
-            startYear = result.startYear
-            endYear = result.endYear
-            rating = result.rating
-        }
+        return SeriesNonRealm(result)
     }
 
     suspend fun fetchSeriesById(id: String): SeriesNonRealm? {

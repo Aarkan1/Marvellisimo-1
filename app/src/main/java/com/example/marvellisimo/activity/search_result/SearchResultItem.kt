@@ -1,7 +1,6 @@
 package com.example.marvellisimo.activity.search_result
 
 import com.example.marvellisimo.R
-import com.example.marvellisimo.marvelEntities.Series
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -27,9 +26,9 @@ class CharacterSearchResultItem(val character: CharacterNonRealm) : Item<Groupie
         viewHolder.itemView.search_result_item_description_textView.text = des
         viewHolder.itemView.search_result_item_name_textView.text = name
 
-        val path = character.thumbnail!!.path.replace("http:", "https:") + "." + character.thumbnail!!.extension
-
-        Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
+        if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
@@ -49,11 +48,12 @@ class SeriesSearchResultItem(val series: SeriesNonRealm) : Item<GroupieViewHolde
         if (title.length > 25)
             title = series.title.substring(0, 25) + "..."
 
-        val path = series.thumbnail.path.replace("http:", "https:") + "." + series.thumbnail.extension
-
         viewHolder.itemView.search_result_item_description_textView.text = des
         viewHolder.itemView.search_result_item_name_textView.text = title
-        Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
+
+        if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
@@ -65,7 +65,6 @@ class CharacterDetailSeriesListItem(val serie: SeriesSummaryNonRealm) : Item<Gro
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         val name = serie.name
-
 
         val namee = name
         viewHolder.itemView.serie_textView.text = namee

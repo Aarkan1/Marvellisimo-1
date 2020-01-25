@@ -2,6 +2,7 @@ package com.example.marvellisimo.activity.series_details
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -9,15 +10,13 @@ import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.marvelEntities.Series
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SerieDetailsActivity : AppCompatActivity() {
+private const val TAG = "SeriesDetailsActivity"
+
+class SeriesDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
@@ -29,8 +28,6 @@ class SerieDetailsActivity : AppCompatActivity() {
         MarvellisimoApplication.applicationComponent.inject(this)
 
         val serieId = intent.getIntExtra("id", 0)
-
-        CoroutineScope(IO).launch { viewModel.getSeries(serieId.toString()) }
 
         viewModel.series.observe(this, Observer<SeriesNonRealm> {
             supportActionBar!!.title = it.title
@@ -47,11 +44,13 @@ class SerieDetailsActivity : AppCompatActivity() {
 
             selected_item_description_textView.text = des
             selected_item_name_textView.text = it.title
-            if (it.thumbnail.path.isNotEmpty()) {
-                Picasso.get().load(it.thumbnail.path).into(selected_item_imageView)
-            }
+            Log.d(TAG, "imageUrl: ${it.thumbnail.imageUrl}")
 
+            if (it.thumbnail.imageUrl.isNotEmpty())
+                Picasso.get().load(it.thumbnail.imageUrl).into(selected_item_imageView)
         })
+
+        viewModel.getSeries(serieId.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

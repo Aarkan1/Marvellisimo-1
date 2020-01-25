@@ -17,9 +17,6 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "CharacterDetailsActivity"
@@ -44,19 +41,13 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         Log.d(TAG, "id: $id")
 
-        CoroutineScope(IO).launch { viewModel.getCharacter(id.toString()) }
+        viewModel.getCharacter(id.toString())
 
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
             supportActionBar!!.title = it.name
-            if (it.series!!.items!!.isNotEmpty()) {
-                for (serie in it.series!!.items!!) {
-                    adapter.add(
-                        CharacterDetailSeriesListItem(
-                            serie
-                        )
-                    )
-                }
-            }
+
+            if (it.series!!.items!!.isNotEmpty()) for (serie in it.series!!.items!!)
+                adapter.add(CharacterDetailSeriesListItem(serie))
 
             character_detail_serie_list_recyclerView.adapter = adapter
 
@@ -65,9 +56,10 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
             selected_character_description_textView.text = des
             selected_character_name_textView.text = it.name
-            if (it.thumbnail!!.path.isNotEmpty()) {
-                Picasso.get().load(it.thumbnail!!.path).into(selected_character_imageView)
-            }
+
+            if (it.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(it.thumbnail.imageUrl)
+                .placeholder(R.drawable.ic_menu_camera)
+                .into(selected_character_imageView)
         })
     }
 

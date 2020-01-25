@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.R
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -74,7 +74,7 @@ class SearchResultActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
         val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
-        message.text = "Loading..."
+        message.text = getString(R.string.loading_dialog_text)
         builder.setView(dialogView)
         builder.setCancelable(false)
         dialog = builder.create()
@@ -89,7 +89,7 @@ class SearchResultActivity : AppCompatActivity() {
                 intent.putExtra("id", item.character.id)
                 intent.putExtra("searchString", searchString)
             } else if (item is SeriesSearchResultItem) {
-                intent = Intent(this, SerieDetailsActivity::class.java)
+                intent = Intent(this, SeriesDetailsActivity::class.java)
                 intent.putExtra("id", item.series.id)
                 intent.putExtra("searchString", searchString)
             }

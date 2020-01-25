@@ -17,7 +17,7 @@ import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -131,7 +131,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     }
 
     override fun onSeriesClick(series: SeriesNonRealm) {
-        val intent = Intent(this, SerieDetailsActivity::class.java)
+        val intent = Intent(this, SeriesDetailsActivity::class.java)
         intent.putExtra("id", series.id)
         startActivity(intent)
     }
@@ -171,7 +171,7 @@ class CharacterItem(
         viewHolder.itemView.favorite_item_description_textView.text = character.description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
-        Picasso.get().load(character.thumbnail!!.path)
+        if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
             .placeholder(R.drawable.ic_menu_camera)
             .into(viewHolder.itemView.favorite_item_imageView)
     }
@@ -192,7 +192,8 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
 
         viewHolder.itemView.favorite_item_description_textView.text = series.description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path)
+
+        if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
             .placeholder(R.drawable.ic_menu_camera)
             .into(viewHolder.itemView.favorite_item_imageView)
     }

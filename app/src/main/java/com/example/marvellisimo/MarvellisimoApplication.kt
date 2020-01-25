@@ -8,7 +8,7 @@ import com.example.marvellisimo.activity.character_details.CharacterDetailsActiv
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.notification.TestService
 import com.example.marvellisimo.repository.MarvelProvider
 import com.mongodb.stitch.android.core.Stitch
@@ -23,7 +23,7 @@ interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
     fun inject(activity: SearchActivity)
     fun inject(activity: CharacterDetailsActivity)
-    fun inject(activity: SerieDetailsActivity)
+    fun inject(activityS: SeriesDetailsActivity)
     fun inject(activity: SearchResultActivity)
     fun inject(job: TestService)
 }
