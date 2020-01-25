@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -15,18 +16,17 @@ import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "SearchResultActivity"
 
 class SearchResultActivity : AppCompatActivity() {
-    private lateinit var adapter: GroupAdapter<GroupieViewHolder>
+    private val seriesAdapter = GroupAdapter<GroupieViewHolder>()
+    private val charactersAdapter = GroupAdapter<GroupieViewHolder>()
     private lateinit var dialog: AlertDialog
     private lateinit var searchString: String
 
@@ -40,35 +40,48 @@ class SearchResultActivity : AppCompatActivity() {
 
         MarvellisimoApplication.applicationComponent.inject(this)
 
-        adapter = GroupAdapter()
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
+
+        createProgressDialog()
 
         searchString = intent.getStringExtra("search") ?: ""
         val searchType = intent.getStringExtra("type") ?: "characters"
 
-        createProgressDialog()
-
         supportActionBar!!.title = searchString
 
-        if (searchType == "series") getAllSeries(searchString) else getAllCharacters(searchString)
+        if (searchType == "series") viewModel.searchType.value = SearchType.SERIES
+        else viewModel.searchType.value = SearchType.CHARACTERS
 
         resultListListener()
+        observeViewModel()
     }
 
-    private fun getAllSeries(searchString: String) {
-        CoroutineScope(IO).launch { viewModel.getSeries(searchString) }
-
-        viewModel.series.observe(this, Observer<ArrayList<SeriesNonRealm>> {
-            addSeriesToResultList(it)
+    private fun observeViewModel() {
+        viewModel.characters.observe(this, Observer<ArrayList<CharacterNonRealm>> { arr ->
+            charactersAdapter.clear()
+            arr.forEach { charactersAdapter.add(CharacterSearchResultItem(it)) }
         })
-    }
 
-    private fun getAllCharacters(searchString: String) {
-        viewModel.getCharacters(searchString)
+        viewModel.series.observe(this, Observer<ArrayList<SeriesNonRealm>> { arr ->
+            seriesAdapter.clear()
+            arr.forEach { seriesAdapter.add(SeriesSearchResultItem(it)) }
+        })
 
-        viewModel.characters.observe(this, Observer<ArrayList<CharacterNonRealm>> {
-            addCharactersToResultList(it)
+        viewModel.searchType.observe(this, Observer<SearchType> {
+            if (it == SearchType.CHARACTERS) {
+                recyclerView_search_result.adapter = charactersAdapter
+                viewModel.getCharacters(searchString)
+            } else {
+                recyclerView_search_result.adapter = seriesAdapter
+                viewModel.getSeries(searchString)
+            }
+        })
+
+        viewModel.loading.observe(this, Observer<Boolean> { if (it) dialog.show() else dialog.dismiss() })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
     }
 
@@ -80,12 +93,11 @@ class SearchResultActivity : AppCompatActivity() {
         builder.setView(dialogView)
         builder.setCancelable(false)
         dialog = builder.create()
-        dialog.show()
     }
 
     private fun resultListListener() {
         lateinit var intent: Intent
-        adapter.setOnItemClickListener { item, view ->
+        seriesAdapter.setOnItemClickListener { item, view ->
             if (item is CharacterSearchResultItem) {
                 intent = Intent(this, CharacterDetailsActivity::class.java)
                 intent.putExtra("id", item.character.id)
@@ -97,24 +109,17 @@ class SearchResultActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        recyclerView_search_result.adapter = adapter
-    }
-
-    private fun addSeriesToResultList(series: ArrayList<SeriesNonRealm>) {
-        adapter.clear()
-        for (serie in series) {
-            adapter.add(SeriesSearchResultItem(serie))
+        charactersAdapter.setOnItemClickListener { item, view ->
+            if (item is CharacterSearchResultItem) {
+                intent = Intent(this, CharacterDetailsActivity::class.java)
+                intent.putExtra("id", item.character.id)
+                intent.putExtra("searchString", searchString)
+            } else if (item is SeriesSearchResultItem) {
+                intent = Intent(this, SeriesDetailsActivity::class.java)
+                intent.putExtra("id", item.series.id)
+                intent.putExtra("searchString", searchString)
+            }
+            startActivity(intent)
         }
-        recyclerView_search_result.adapter = adapter
-        dialog.dismiss()
-    }
-
-    private fun addCharactersToResultList(characters: ArrayList<CharacterNonRealm>) {
-        adapter.clear()
-        for (character in characters) {
-            adapter.add(CharacterSearchResultItem(character))
-        }
-        recyclerView_search_result.adapter = adapter
-        dialog.dismiss()
     }
 }
