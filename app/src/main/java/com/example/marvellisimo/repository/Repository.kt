@@ -2,8 +2,8 @@ package com.example.marvellisimo.repository
 
 import android.util.Log
 import com.example.marvellisimo.DB
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
@@ -235,7 +235,11 @@ class Repository @Inject constructor(
         if (realmResult != null) return realmResult
 
         val marvelResult = marvelService.getAllSeries(phrase)
-        val series = marvelResult.data.results.map { SeriesNonRealm(it) }.toMutableList()
+        val series = marvelResult.data.results.map {
+            SeriesNonRealm(
+                it
+            )
+        }.toMutableList()
 
         CoroutineScope(IO).launch {
             marvelResult.data.results.forEach { saveSeriesToRealm(it) }
@@ -316,7 +320,11 @@ class Repository @Inject constructor(
         if (realmResult != null) return realmResult
 
         val marvelResult = marvelService.getAllCharacters(phrase)
-        val characters = marvelResult.data.results.map { CharacterNonRealm(it) }.toMutableList()
+        val characters = marvelResult.data.results.map {
+            CharacterNonRealm(
+                it
+            )
+        }.toMutableList()
 
         CoroutineScope(IO).launch {
             marvelResult.data.results.forEach { saveCharacterToRealm(it) }

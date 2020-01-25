@@ -3,6 +3,8 @@ package com.example.marvellisimo.activity.search_result
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.repository.Repository
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import kotlinx.coroutines.CoroutineScope as CS
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main

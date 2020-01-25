@@ -2,7 +2,7 @@ package com.example.marvellisimo.activity.character_details
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.Repository
 
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,9 @@ private const val TAG = "CharacterDetailsViewModel"
 
 class CharacterDetailsViewModel @Inject constructor(private val repository: Repository) {
 
-    var character = MutableLiveData<CharacterNonRealm>().apply { value = CharacterNonRealm() }
+    var character = MutableLiveData<CharacterNonRealm>().apply { value =
+        CharacterNonRealm()
+    }
 
     fun getCharacter(id: String) = CoroutineScope(IO).launch {
         Log.d(TAG, "getCharacter: starts")

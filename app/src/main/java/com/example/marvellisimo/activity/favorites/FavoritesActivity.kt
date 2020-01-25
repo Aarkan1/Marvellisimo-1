@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso

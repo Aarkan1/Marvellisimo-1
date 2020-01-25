@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder

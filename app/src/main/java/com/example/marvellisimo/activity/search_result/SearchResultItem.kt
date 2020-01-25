@@ -1,6 +1,9 @@
 package com.example.marvellisimo.activity.search_result
 
 import com.example.marvellisimo.R
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesSummaryNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
