@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Switch
 import android.widget.TextView
@@ -17,6 +18,7 @@ import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.repository.models.realm.SearchType
@@ -138,5 +140,15 @@ class SearchResultActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
