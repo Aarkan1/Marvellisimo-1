@@ -34,7 +34,7 @@ class SearchResultViewModel @Inject constructor(
             val chars = repository.fetchCharacters(phrase)
             CS(Main).launch { characters.value = ArrayList(chars.toMutableList()) }
         } catch (ex: Exception) {
-            toastMessage.value = "Something went wrong..."
+            CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }
 
         CS(Main).launch {
