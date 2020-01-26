@@ -36,6 +36,16 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         MarvellisimoApplication.applicationComponent.inject(this)
 
+         if (!DB.stitchClient.auth.isLoggedIn) {
+             val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        }
+
+        viewModel.repository.fetchCurrentUser()
+
+        Log.d(TAG, viewModel.repository.user.toString())
+
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
             startActivity(Intent(this, CharacterSerieResultListActivity::class.java))
@@ -62,8 +72,9 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_logout -> {
+                Log.d(TAG, viewModel.repository.user.toString())
+                viewModel.logoutUser()
                 DB.stitchClient.auth.logout()
-                viewModel.repository.user = null
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 true

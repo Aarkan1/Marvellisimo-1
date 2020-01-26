@@ -5,6 +5,10 @@ import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
     val repository: Repository
-)
+) {
+    fun logoutUser() {
+        repository.updateUserOnlineStatus(false)
+    }
+}
 
 
