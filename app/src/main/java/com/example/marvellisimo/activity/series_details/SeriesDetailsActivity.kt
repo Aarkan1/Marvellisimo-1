@@ -1,11 +1,14 @@
 package com.example.marvellisimo.activity.series_details
 
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
+
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
@@ -21,6 +24,8 @@ class SeriesDetailsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
 
+    private lateinit var loadingDialog: AlertDialog
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serie_details)
@@ -29,10 +34,17 @@ class SeriesDetailsActivity : AppCompatActivity() {
 
         val serieId = intent.getIntExtra("id", 0)
 
+        createLoadingDialog()
+        observeViewModel()
+
+        viewModel.getSeries(serieId.toString())
+    }
+
+    private fun observeViewModel() {
         viewModel.series.observe(this, Observer<SeriesNonRealm> {
             supportActionBar!!.title = it.title
 
-            val rating = if (it.rating.isEmpty()) "Rating not found "
+            val rating = if (it.rating.isEmpty()) "Rating not found."
             else it.rating
 
             selected_item_end_year_textView.text = it.endYear.toString()
@@ -40,7 +52,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
             selected_item_rating_textView.text = rating
 
             var des = it.description
-            if (des == null) des = "No description found"
+            if (des.isNullOrBlank()) des = "No description found."
 
             selected_item_description_textView.text = des
             selected_item_name_textView.text = it.title
@@ -50,7 +62,23 @@ class SeriesDetailsActivity : AppCompatActivity() {
                 Picasso.get().load(it.thumbnail.imageUrl).into(selected_item_imageView)
         })
 
-        viewModel.getSeries(serieId.toString())
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) loadingDialog.show() else loadingDialog.dismiss()
+        })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun createLoadingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = getString(R.string.loading_dialog_text)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        loadingDialog = builder.create()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
