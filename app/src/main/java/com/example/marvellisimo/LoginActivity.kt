@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.marvellisimo.repository.DB
-import com.example.marvellisimo.repository.Repository
-import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
 import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject
@@ -16,9 +14,13 @@ private const val TAG = "LoginActivity"
 
 class LoginActivity: AppCompatActivity() {
 
+    @Inject
+    lateinit var viewModel: LoginViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         btn_login_login.setOnClickListener{
             preformLogin()
@@ -38,7 +40,9 @@ class LoginActivity: AppCompatActivity() {
         DB.stitchClient.auth.loginWithCredential(credential)
             .addOnCompleteListener {
                 if(!it.isSuccessful)return@addOnCompleteListener
-                  Log.d(TAG, "Successfully logged in as user " + it.result?.id)
+                Log.d(TAG, "Successfully logged in as user " + it.result?.id)
+
+                viewModel.updateLoggedInUser()
 
                 val intent = Intent(this, MainActivity::class.java)
                 // reset activity stack/history

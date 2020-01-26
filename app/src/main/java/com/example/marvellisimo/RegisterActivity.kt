@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.Repository
 import com.mongodb.stitch.android.core.Stitch
@@ -18,9 +19,13 @@ private const val TAG = "RegisterActivity"
 
 class RegisterActivity : AppCompatActivity() {
 
+    @Inject
+    lateinit var viewModel: RegisterViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         btn_regrister.setOnClickListener {
             preformRegister()
@@ -56,10 +61,11 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["username"] = username
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
+                            userDoc["isOnline"] = true
                             userDoc["favoriteSeries"] = ArrayList<String>()
                             userDoc["favoriteCharacters"] = ArrayList<String>()
 
-                            DB.collUsers.insertOne(userDoc)
+                            viewModel.createNewUser(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         } else {
