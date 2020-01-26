@@ -1,5 +1,9 @@
 package com.example.marvellisimo
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -18,7 +22,6 @@ import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.notification.TestService
-import io.realm.Realm
 import com.example.marvellisimo.repository.DB
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -89,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             R.id.action_logout -> {
                 Log.d(TAG, viewModel.repository.user.toString())
                 viewModel.logoutUser()
-                DB.stitchClient.auth.logout()
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 true

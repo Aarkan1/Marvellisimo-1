@@ -4,8 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
+import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
@@ -28,11 +28,10 @@ interface ApplicationComponent {
     fun inject(activityS: SeriesDetailsActivity)
     fun inject(activity: SearchResultActivity)
     fun inject(activity: ReceiveItemsActivity)
-    fun inject(job: TestService)
-    fun inject(activity: SerieDetailsActivity)
     fun inject(activity: MainActivity)
     fun inject(activity: LoginActivity)
     fun inject(activity: RegisterActivity)
+    fun inject(job: TestService)
 }
 
 class MarvellisimoApplication : Application() {
