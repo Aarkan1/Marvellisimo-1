@@ -168,7 +168,9 @@ class CharacterItem(
             characterItemActionListener.onRemoveCharacterClick(character)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = character.description
+        val description = if (character.description.isEmpty()) "No description found." else character.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
         if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
@@ -190,7 +192,9 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
             seriesItemActionListener.onRemoveSeriesClick(series)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = series.description
+        val description = if (series.description?.isEmpty() != false) "No description found." else series.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
 
         if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
