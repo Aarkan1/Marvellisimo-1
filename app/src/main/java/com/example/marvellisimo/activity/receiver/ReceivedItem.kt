@@ -1,7 +1,7 @@
-package com.example.marvellisimo.activity.Receiver
+package com.example.marvellisimo.activity.receiver
 
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item

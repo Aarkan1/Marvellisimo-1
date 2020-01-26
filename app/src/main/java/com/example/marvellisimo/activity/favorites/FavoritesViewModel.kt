@@ -2,8 +2,8 @@ package com.example.marvellisimo.activity.favorites
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.CoroutineScope as CS

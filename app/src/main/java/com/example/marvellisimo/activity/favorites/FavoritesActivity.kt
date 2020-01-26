@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -96,7 +96,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(TAG, "onCreateOptionsMenu: starts")
-        menuInflater.inflate(R.menu.favorties, menu)
+        menuInflater.inflate(R.menu.favorites, menu)
 
         val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
 
@@ -131,7 +131,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     }
 
     override fun onSeriesClick(series: SeriesNonRealm) {
-        val intent = Intent(this, SerieDetailsActivity::class.java)
+        val intent = Intent(this, SeriesDetailsActivity::class.java)
         intent.putExtra("id", series.id)
         startActivity(intent)
     }
@@ -168,10 +168,12 @@ class CharacterItem(
             characterItemActionListener.onRemoveCharacterClick(character)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = character.description
+        val description = if (character.description.isEmpty()) "No description found." else character.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
-        Picasso.get().load(character.thumbnail!!.path)
+        if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
             .placeholder(R.drawable.ic_menu_camera)
             .into(viewHolder.itemView.favorite_item_imageView)
     }
@@ -190,9 +192,12 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
             seriesItemActionListener.onRemoveSeriesClick(series)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = series.description
+        val description = if (series.description?.isEmpty() != false) "No description found." else series.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path)
+
+        if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
             .placeholder(R.drawable.ic_menu_camera)
             .into(viewHolder.itemView.favorite_item_imageView)
     }

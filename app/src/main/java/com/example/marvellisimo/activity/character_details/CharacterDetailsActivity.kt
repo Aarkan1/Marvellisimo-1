@@ -1,10 +1,12 @@
 package com.example.marvellisimo.activity.character_details
 
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -12,20 +14,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_character_details.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "CharacterDetailsActivity"
 
 class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
+
+    private lateinit var loadingDialog: AlertDialog
 
     @Inject
     lateinit var viewModel: CharacterDetailsViewModel
@@ -44,19 +45,18 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         Log.d(TAG, "id: $id")
 
-        CoroutineScope(IO).launch { viewModel.getCharacter(id.toString()) }
+        createLoadingDialog()
+        observeViewModel()
 
+        viewModel.getCharacter(id.toString())
+    }
+
+    private fun observeViewModel() {
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
             supportActionBar!!.title = it.name
-            if (it.series!!.items!!.isNotEmpty()) {
-                for (serie in it.series!!.items!!) {
-                    adapter.add(
-                        CharacterDetailSeriesListItem(
-                            serie
-                        )
-                    )
-                }
-            }
+
+            if (it.series!!.items!!.isNotEmpty()) for (serie in it.series!!.items!!)
+                adapter.add(CharacterDetailSeriesListItem(serie))
 
             character_detail_serie_list_recyclerView.adapter = adapter
 
@@ -65,10 +65,29 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
             selected_character_description_textView.text = des
             selected_character_name_textView.text = it.name
-            if (it.thumbnail!!.path.isNotEmpty()) {
-                Picasso.get().load(it.thumbnail!!.path).into(selected_character_imageView)
-            }
+
+            if (it.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(it.thumbnail.imageUrl)
+                .placeholder(R.drawable.ic_menu_camera)
+                .into(selected_character_imageView)
         })
+
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) loadingDialog.show() else loadingDialog.dismiss()
+        })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun createLoadingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = getString(R.string.loading_dialog_text)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        loadingDialog = builder.create()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,20 +99,14 @@ class CharacterDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.detail_menu_send -> {
-                    viewModel.sendToFriend(viewModel.character.value?.id.toString(), "character")
+                viewModel.sendToFriend(viewModel.character.value?.id.toString(), "character")
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
                     Toast.LENGTH_LONG
                 ).show()
 
             }
-            R.id.detail_menu_add_to_favorites -> {
-                viewModel.addToFavorites(viewModel.character.value?.id.toString())
-                Toast.makeText(
-                    applicationContext, "You clicked add to favorites",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            R.id.detail_menu_add_to_favorites -> viewModel.addToFavorites(viewModel.character.value?.id.toString())
         }
         return super.onOptionsItemSelected(item)
     }

@@ -4,12 +4,12 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import com.example.marvellisimo.activity.Receiver.ReceiveItemsActivity
+import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.notification.TestService
 import com.example.marvellisimo.repository.MarvelProvider
 import com.mongodb.stitch.android.core.Stitch
@@ -24,7 +24,7 @@ interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
     fun inject(activity: SearchActivity)
     fun inject(activity: CharacterDetailsActivity)
-    fun inject(activity: SerieDetailsActivity)
+    fun inject(activityS: SeriesDetailsActivity)
     fun inject(activity: SearchResultActivity)
     fun inject(activity: ReceiveItemsActivity)
     fun inject(job: TestService)
@@ -48,7 +48,11 @@ class MarvellisimoApplication : Application() {
             .schemaVersion(0)
             .deleteRealmIfMigrationNeeded()
             .build()
+
         Realm.setDefaultConfiguration(config)
+
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction{ it .deleteAll()}
 
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
 

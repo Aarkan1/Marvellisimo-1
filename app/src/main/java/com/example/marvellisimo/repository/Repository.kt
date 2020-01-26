@@ -2,14 +2,14 @@ package com.example.marvellisimo.repository
 
 import android.util.Log
 import com.example.marvellisimo.DB
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesListNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesSummaryNonRealm
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
 import com.example.marvellisimo.repository.models.realm.HistoryItem
+import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
 import io.realm.*
@@ -181,16 +181,7 @@ class Repository @Inject constructor(
         val result = Realm.getDefaultInstance().where(Series::class.java).equalTo("id", id)
             .findFirst() ?: return null
 
-        return SeriesNonRealm().apply {
-            title = result.title
-            description = result.description
-            thumbnail.path = result.thumbnail?.path ?: ""
-            thumbnail.extension = result.thumbnail?.extension ?: ""
-            this.id = result.id
-            startYear = result.startYear
-            endYear = result.endYear
-            rating = result.rating
-        }
+        return SeriesNonRealm(result)
     }
 
     suspend fun fetchSeriesById(id: String): SeriesNonRealm? {
@@ -204,16 +195,63 @@ class Repository @Inject constructor(
 
         saveSeriesToRealm(marvelResult[0])
 
-        return SeriesNonRealm().apply {
-            title = marvelResult[0].title
-            description = marvelResult[0].description
-            thumbnail.path = marvelResult[0].thumbnail?.path ?: ""
-            thumbnail.extension = marvelResult[0].thumbnail?.extension ?: ""
-            this.id = marvelResult[0].id
-            startYear = marvelResult[0].startYear
-            endYear = marvelResult[0].endYear
-            rating = marvelResult[0].rating
+        return SeriesNonRealm(marvelResult[0])
+    }
+
+    private suspend fun saveSeriesSearchResultToRealm(searchPhrase: String, results: MutableList<String>) {
+        Log.d(TAG, "saveSeriesSearchResultToRealm: starts")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(SeriesSearchResult().apply {
+            this.searchPhrase = searchPhrase
+            seriesIds.addAll(results)
+        })
+        realm.commitTransaction()
+    }
+
+    private suspend fun fetchSeriesFromRealm(phrase: String): ArrayList<SeriesNonRealm>? {
+        Log.d(TAG, "fetchSeriesFromRealm: $phrase")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val result = realm.where(SeriesSearchResult::class.java).equalTo("searchPhrase", phrase)
+            .findFirst()
+
+        if (result == null) {
+            realm.commitTransaction()
+            return null
         }
+
+        val series = ArrayList<SeriesNonRealm>()
+        val seriesDeferred = ArrayList<Deferred<SeriesNonRealm?>>()
+
+        result.seriesIds.mapNotNull { it }
+            .forEach { seriesDeferred.add(CoroutineScope(IO).async { fetchSeriesById(it) }) }
+
+        realm.commitTransaction()
+
+        seriesDeferred.forEach { deffered -> deffered.await()?.let { series.add(it) } }
+        return series
+    }
+
+    suspend fun fetchSeries(phrase: String): MutableList<SeriesNonRealm> {
+        Log.d(TAG, "fetchSeries: $phrase")
+        val realmResult = fetchSeriesFromRealm(phrase)
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getAllSeries(phrase)
+        val series = marvelResult.data.results.map {
+            SeriesNonRealm(
+                it
+            )
+        }.toMutableList()
+
+        CoroutineScope(IO).launch {
+            marvelResult.data.results.forEach { saveSeriesToRealm(it) }
+            saveSeriesSearchResultToRealm(phrase, series.map { it.id.toString() }.toMutableList())
+        }
+
+        return series
     }
 
     private fun saveCharacterToRealm(character: Character) {
@@ -224,19 +262,11 @@ class Repository @Inject constructor(
     }
 
     private fun fetchCharacterFromRealm(id: Int): CharacterNonRealm? {
+        Log.d(TAG, "fetchCharacterFromRealm: $id")
         val result = Realm.getDefaultInstance().where(Character::class.java).equalTo("id", id)
             .findFirst() ?: return null
 
-        return CharacterNonRealm().apply {
-            name = result.name
-            description = result.description
-            thumbnail!!.path = result.thumbnail!!.path
-            series = SeriesListNonRealm()
-            series!!.items = ArrayList(result.series!!.items!!.map {
-                SeriesSummaryNonRealm().apply { name = it.name }
-            })
-            this.id = result.id
-        }
+        return CharacterNonRealm(result)
     }
 
     suspend fun fetchCharacterById(id: String): CharacterNonRealm? {
@@ -248,19 +278,65 @@ class Repository @Inject constructor(
         val marvelResult = marvelService.getCharacterById(id).data.results
         if (marvelResult.isEmpty()) return null
 
-        val character = CharacterNonRealm().apply {
-            name = marvelResult[0].name
-            description = marvelResult[0].description
-            thumbnail!!.path = marvelResult[0].thumbnail!!.path
-            series = SeriesListNonRealm()
-            series!!.items = ArrayList(marvelResult[0].series!!.items!!.map {
-                SeriesSummaryNonRealm().apply { name = it.name }
-            })
-            this.id = marvelResult[0].id
-        }
-        saveCharacterToRealm(marvelResult[0])
+        CoroutineScope(IO).launch { saveCharacterToRealm(marvelResult[0]) }
 
-        return character
+        return CharacterNonRealm(marvelResult[0])
+    }
+
+    private suspend fun saveCharacterSearchResultToRealm(searchPhrase: String, results: MutableList<String>) {
+        Log.d(TAG, "saveCharacterSearchResultToRealm: starts")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(CharacterSearchResult().apply {
+            this.searchPhrase = searchPhrase
+            characterIds.addAll(results)
+        })
+        realm.commitTransaction()
+    }
+
+    private suspend fun fetchCharactersFromRealm(phrase: String): ArrayList<CharacterNonRealm>? {
+        Log.d(TAG, "fetchCharacterFromRealm: $phrase")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val result = realm.where(CharacterSearchResult::class.java).equalTo("searchPhrase", phrase)
+            .findFirst()
+
+        if (result == null) {
+            realm.commitTransaction()
+            return null
+        }
+
+        val characters = ArrayList<CharacterNonRealm>()
+        val charactersDeferred = ArrayList<Deferred<CharacterNonRealm?>>()
+
+        result.characterIds.mapNotNull { it }
+            .forEach { charactersDeferred.add(CoroutineScope(IO).async { fetchCharacterById(it) }) }
+
+        realm.commitTransaction()
+
+        charactersDeferred.forEach { deferred -> deferred.await()?.let { characters.add(it) } }
+        return characters
+    }
+
+    suspend fun fetchCharacters(phrase: String): MutableList<CharacterNonRealm> {
+        Log.d(TAG, "fetchCharacters: $phrase")
+        val realmResult = fetchCharactersFromRealm(phrase)
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getAllCharacters(phrase)
+        val characters = marvelResult.data.results.map {
+            CharacterNonRealm(
+                it
+            )
+        }.toMutableList()
+
+        CoroutineScope(IO).launch {
+            marvelResult.data.results.forEach { saveCharacterToRealm(it) }
+            saveCharacterSearchResultToRealm(phrase, characters.map { it.id.toString() }.toMutableList())
+        }
+
+        return characters
     }
 
     fun sendItemToFriend(itemId: String, type: String) {
