@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.DB
+import com.google.gson.Gson
 import com.mongodb.stitch.android.core.Stitch
 import io.realm.Realm
 import kotlinx.coroutines.*
@@ -45,24 +46,33 @@ class ApplicationLifecycle: Application.ActivityLifecycleCallbacks {
                 .findAll()
 
             if (realmUser.isNotEmpty()) {
-                val user = realmUser[0]
-                if (user != null) {
-                    val filter = Document().append("_id", Document().append("\$eq", ObjectId(user.uid)))
-                    val userDoc = Document()
-                    userDoc["isOnline"] = isOnline
-                    DB.collUsers.findOneAndUpdate(filter, userDoc)
-                    userDoc["_id"] = ObjectId(user.uid)
-                    userDoc["uid"] = user.uid
-                    userDoc["username"] = user.username
-                    userDoc["email"] = user.email
-                    userDoc["avatar"] = user.avatar
-                    userDoc["favoriteSeries"] = user.favoriteSeries
-                    userDoc["favoriteCharacters"] = user.favoriteCharacters
-
-                   DB.collUsers.findOneAndReplace(filter, userDoc)
+                updateUser(realmUser[0]!!, isOnline)
+            } else {
+                val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
+                DB.collUsers.findOne(filter)
+                .addOnCompleteListener { doc ->
+                    val gson = Gson()
+                    updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
                 }
             }
         }
+    }
+
+    private fun updateUser(user: User, isOnline: Boolean) {
+        val id = Stitch.getDefaultAppClient().auth.user?.id
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
+        val userDoc = Document()
+        userDoc["isOnline"] = isOnline
+        DB.collUsers.findOneAndUpdate(filter, userDoc)
+        userDoc["_id"] = ObjectId(user.uid)
+        userDoc["uid"] = user.uid
+        userDoc["username"] = user.username
+        userDoc["email"] = user.email
+        userDoc["avatar"] = user.avatar
+        userDoc["favoriteSeries"] = user.favoriteSeries
+        userDoc["favoriteCharacters"] = user.favoriteCharacters
+
+        DB.collUsers.findOneAndReplace(filter, userDoc)
     }
 
     override fun onActivityPaused(activity: Activity) {}
