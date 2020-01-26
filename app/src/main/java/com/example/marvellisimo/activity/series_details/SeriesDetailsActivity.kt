@@ -96,13 +96,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
                 ).show()
 
             }
-            R.id.detail_menu_add_to_favorites -> {
-                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
-                Toast.makeText(
-                    applicationContext, "You clicked add to favorites",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            R.id.detail_menu_add_to_favorites -> viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
         }
         return super.onOptionsItemSelected(item)
     }

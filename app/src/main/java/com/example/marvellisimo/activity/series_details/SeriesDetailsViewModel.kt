@@ -35,10 +35,17 @@ class SeriesDetailsViewModel @Inject constructor(
     }
 
     fun addSeriesToFavorites(id: String) = CS(IO).launch {
-        repository.addSeriesToFavorites(id)
-        CS(Main).launch {
-            toastMessage.value = "Added to favorites"
-            toastMessage.value = ""
+        try {
+            repository.addSeriesToFavorites(id)
+            CS(Main).launch {
+                toastMessage.value = "Added to favorites"
+                toastMessage.value = ""
+            }
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Something went wrong..."
+                toastMessage.value = ""
+            }
         }
     }
 }
