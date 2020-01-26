@@ -96,7 +96,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(TAG, "onCreateOptionsMenu: starts")
-        menuInflater.inflate(R.menu.favorties, menu)
+        menuInflater.inflate(R.menu.favorites, menu)
 
         val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
 

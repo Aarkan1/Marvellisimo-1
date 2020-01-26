@@ -4,7 +4,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.View
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -109,5 +111,32 @@ class SearchResultActivity : AppCompatActivity() {
             intent.putExtra("searchString", searchString)
         }
         startActivity(intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.d(TAG, "onCreateOptionsMenu")
+
+        menuInflater.inflate(R.menu.search_result, menu)
+
+        val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
+
+        if (viewModel.searchType.value == SearchType.CHARACTERS) {
+            switch.setText(R.string.switch_search_options_characters)
+            switch.isChecked = false
+        } else {
+            switch.setText(R.string.switch_search_options_series)
+            switch.isChecked = true
+        }
+
+        switch.setOnCheckedChangeListener { component, checked ->
+            if (checked) {
+                viewModel.searchType.value = SearchType.SERIES
+                component.setText(R.string.switch_search_options_series)
+            } else {
+                viewModel.searchType.value = SearchType.CHARACTERS
+                component.setText(R.string.switch_search_options_characters)
+            }
+        }
+        return true
     }
 }

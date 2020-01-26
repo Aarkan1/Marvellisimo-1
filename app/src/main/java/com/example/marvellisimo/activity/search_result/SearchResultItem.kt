@@ -60,7 +60,6 @@ class SeriesSearchResultItem(val series: SeriesNonRealm) : Item<GroupieViewHolde
     }
 }
 
-
 class CharacterDetailSeriesListItem(val serie: SeriesSummaryNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.character_detail_series_list
