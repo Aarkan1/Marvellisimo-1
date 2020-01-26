@@ -8,6 +8,7 @@ open class User : RealmObject() {
     @PrimaryKey
     var uid: String = ""
     var username: String = ""
+    var email: String = ""
     var avatar: String = ""
     var isOnline: Boolean = false
     @Ignore

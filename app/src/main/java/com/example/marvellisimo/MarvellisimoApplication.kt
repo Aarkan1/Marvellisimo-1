@@ -1,11 +1,10 @@
 package com.example.marvellisimo
 
 import android.app.Application
-import android.content.Intent
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
-import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.MarvelProvider
+import com.example.marvellisimo.services.ApplicationLifecycle
 import com.mongodb.stitch.android.core.Stitch
 import dagger.Component
 import io.realm.Realm
@@ -20,6 +19,8 @@ interface ApplicationComponent {
     fun inject(activity: CharacterDetailsActivity)
     fun inject(activity: SerieDetailsActivity)
     fun inject(activity: MainActivity)
+    fun inject(activity: LoginActivity)
+    fun inject(activity: RegisterActivity)
 }
 
 class MarvellisimoApplication : Application() {
@@ -42,12 +43,7 @@ class MarvellisimoApplication : Application() {
 
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
 
-        val intent = if (DB.stitchClient.auth.isLoggedIn) {
-            Intent(this, MainActivity::class.java)
-        } else {
-            Intent(this, LoginActivity::class.java)
-        }
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        // manage when app starts/closes
+        registerActivityLifecycleCallbacks(ApplicationLifecycle())
     }
 }
