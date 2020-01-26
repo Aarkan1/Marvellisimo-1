@@ -25,33 +25,12 @@ private const val TAG = "Repository"
 class Repository @Inject constructor(
     private val marvelService: MarvelService
 ) {
-    var user: User?
+    var user: User? = null
     var realm: Realm = Realm.getDefaultInstance()
     private val gson = Gson()
 
-    init {
-        Log.d(TAG, "init singleton")
-        user = fetchCurrentUser()
-    }
-
     private fun userToDocument(user: User) = gson.fromJson(gson.toJson(user), Document::class.java)
     private fun documentToUser(document: Document) = gson.fromJson(gson.toJson(document), User::class.java)
-
-//    private fun userToDocument(user: User) = Document().apply {
-//        put("uid", user.uid)
-//        put("username", user.username)
-//        put("avatar", user.avatar)
-//        put("favoriteCharacters", user.favoriteCharacters)
-//        put("favoriteSeries", user.favoriteSeries)
-//    }
-
-//    private fun documentToUser(document: Document) = User().apply {
-//        uid = document["uid"] as String
-//        username = document["username"] as String
-//        avatar = document["avatar"] as String
-//        favoriteCharacters = document["favoriteCharacters"] as ArrayList<String>
-//        favoriteSeries = document["favoriteSeries"] as ArrayList<String>
-//    }
 
     suspend fun fetchHistory(phrase: String = ""): List<String> {
         Log.d(TAG, "fetchHistory: $phrase")
@@ -70,34 +49,94 @@ class Repository @Inject constructor(
             .executeTransaction { it.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis())) }
     }
 
-    fun fetchCurrentUser(): User? {
+    fun fetchCurrentUser() {
         Log.d(TAG, "fetchCurrentUser: starts")
-        val id = DB.stitchClient.auth.user!!.id
+        val id = if(DB.stitchClient.auth.isLoggedIn)
+            DB.stitchClient.auth.user!!.id
+        else return
 
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
             DB.collUsers.findOne(filter)
             .addOnCompleteListener { doc ->
             Log.d(TAG, "fetchUser, doc: ${doc.result}")
+                doc.result["isOnline"] = true
                 realm.executeTransaction {
-                    realm.insertOrUpdate(documentToUser(doc.result))
+                    it.insertOrUpdate(documentToUser(doc.result))
                 }
             }
         }
-
-        // This is hacky but it not possible to force block Mongo Stitch query
-        // and we need to block because of coroutines
-//        while (!result.isComplete) delay(5)
-//        Log.d(TAG, "Fetched user: ${result?.result}")
 
         val realmUser = realm.where(User::class.java)
             .equalTo("uid", id)
             .findAll()
 
-       return if (realmUser.isNotEmpty()) {
+       if (realmUser.isNotEmpty()) {
             Log.d(TAG, "Loading RealmUser: ${realmUser[0]?.username}, uid: ${realmUser[0]?.uid}")
-            realmUser[0]
-        } else null
+            user = realmUser[0]
+        }
+    }
+
+    fun updateUser() {
+        if(user == null) throw Exception("No user")
+
+        CoroutineScope(IO).launch {
+            val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+            val replacement = userToDocument(user!!)
+
+            val task = DB.collUsers.findOneAndReplace(filter, replacement)
+            while (!task.isComplete) delay(5)
+            CoroutineScope(Dispatchers.Main).launch {
+                realm.executeTransaction {
+                    it.insertOrUpdate(documentToUser(task.result))
+                }
+            }
+        }
+    }
+
+    fun createNewUser(userDoc: Document) {
+        CoroutineScope(IO).launch {
+            DB.collUsers.insertOne(userDoc)
+            .addOnSuccessListener {
+                user = documentToUser(userDoc)
+                realm.executeTransaction {
+                    realm.insertOrUpdate(user!!)
+                }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error in createNewUser: ${it.message}")
+            }
+        }
+    }
+
+    fun updateUserOnlineStatus(isOnline: Boolean) {
+        if(user == null) throw Exception("No user")
+
+            val tempUser = User().apply {
+                this.uid = user!!.uid
+                this.username = user!!.username
+                this.avatar = user!!.avatar
+                this.isOnline = isOnline
+            }
+
+        CoroutineScope(IO).launch {
+            val filter = Document().append("_id", Document().append("\$eq", ObjectId(tempUser.uid)))
+            val replacement = userToDocument(tempUser)
+
+            val task = DB.collUsers.findOneAndReplace(filter, replacement)
+            while (!task.isComplete) delay(5)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                realm.executeTransaction {
+                    it.insertOrUpdate(documentToUser(task.result))
+                }
+            }
+        }
+
+        if(!isOnline) {
+            Log.d(TAG, "Logging out user")
+            user = null
+        }
     }
 
     suspend fun addCharacterToFavorites(id: String) {
@@ -108,11 +147,7 @@ class Repository @Inject constructor(
 
         user!!.favoriteCharacters.add(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-        val replacement = userToDocument(user!!)
-
-        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-        while (!task.isComplete) delay(5)
+        updateUser()
         return
     }
 
@@ -122,11 +157,7 @@ class Repository @Inject constructor(
 
         user!!.favoriteCharacters.remove(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-        val replacement = userToDocument(user!!)
-
-        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-        while (!task.isComplete) delay(5)
+        updateUser()
         return
     }
 
@@ -148,11 +179,7 @@ class Repository @Inject constructor(
         if (user!!.favoriteSeries.contains(id)) return
         user!!.favoriteSeries.add(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-        val replacement = userToDocument(user!!)
-
-        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-        while (!task.isComplete) delay(5)
+        updateUser()
         return
     }
 
@@ -162,11 +189,7 @@ class Repository @Inject constructor(
 
         user!!.favoriteSeries.remove(id)
 
-        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-        val replacement = userToDocument(user!!)
-
-        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-        while (!task.isComplete) delay(5)
+        updateUser()
         return
     }
 
