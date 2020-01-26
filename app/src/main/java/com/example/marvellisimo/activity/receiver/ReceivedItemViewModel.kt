@@ -1,9 +1,9 @@
-package com.example.marvellisimo.activity.Receiver
+package com.example.marvellisimo.activity.receiver
 
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.repository.Repository
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

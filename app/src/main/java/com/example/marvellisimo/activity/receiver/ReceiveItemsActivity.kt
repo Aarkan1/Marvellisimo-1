@@ -1,8 +1,7 @@
-package com.example.marvellisimo.activity.Receiver
+package com.example.marvellisimo.activity.receiver
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
 import com.example.marvellisimo.models.ReceiveItem
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -55,7 +53,13 @@ class ReceiveItemsActivity : AppCompatActivity() {
                     val character = viewModel.fetchItem(item.itemId)
                     CoroutineScope(Dispatchers.Main).launch {
                         if (character != null) {
-                            adapter.add(ReceivedItem(character, item.senderName, item.date.toLong()))
+                            adapter.add(
+                                ReceivedItem(
+                                    character,
+                                    item.senderName,
+                                    item.date.toLong()
+                                )
+                            )
                         }
                     }
                 }

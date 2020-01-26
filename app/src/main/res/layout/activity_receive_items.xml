@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.Receiver.ReceiveItemsActivity">
+    tools:context=".activity.receiver.ReceiveItemsActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/received_item_List_recyclerView"

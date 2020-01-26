@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.Receiver.ReceiveItemsActivity"></activity>
+        <activity android:name=".activity.receiver.ReceiveItemsActivity"></activity>
         <activity android:name=".activity.character_details.CharacterDetailsActivity" />
         <activity android:name=".activity.favorites.FavoritesActivity">
             <meta-data

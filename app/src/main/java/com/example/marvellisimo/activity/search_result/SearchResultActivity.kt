@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import javax.inject.Inject
 
@@ -42,6 +44,8 @@ class SearchResultActivity : AppCompatActivity() {
 
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
+        seriesAdapter.setOnItemClickListener(this::onItemClick)
+        charactersAdapter.setOnItemClickListener(this::onItemClick)
 
         createProgressDialog()
 
@@ -53,7 +57,6 @@ class SearchResultActivity : AppCompatActivity() {
         if (searchType == "series") viewModel.searchType.value = SearchType.SERIES
         else viewModel.searchType.value = SearchType.CHARACTERS
 
-        resultListListener()
         observeViewModel()
     }
 
@@ -95,31 +98,16 @@ class SearchResultActivity : AppCompatActivity() {
         dialog = builder.create()
     }
 
-    private fun resultListListener() {
-        lateinit var intent: Intent
-        seriesAdapter.setOnItemClickListener { item, view ->
-            if (item is CharacterSearchResultItem) {
-                intent = Intent(this, CharacterDetailsActivity::class.java)
-                intent.putExtra("id", item.character.id)
-                intent.putExtra("searchString", searchString)
-            } else if (item is SeriesSearchResultItem) {
-                intent = Intent(this, SeriesDetailsActivity::class.java)
-                intent.putExtra("id", item.series.id)
-                intent.putExtra("searchString", searchString)
-            }
-            startActivity(intent)
+    private fun onItemClick(item: Item<GroupieViewHolder>, view: View) {
+        if (item is CharacterSearchResultItem) {
+            intent = Intent(this, CharacterDetailsActivity::class.java)
+            intent.putExtra("id", item.character.id)
+            intent.putExtra("searchString", searchString)
+        } else if (item is SeriesSearchResultItem) {
+            intent = Intent(this, SeriesDetailsActivity::class.java)
+            intent.putExtra("id", item.series.id)
+            intent.putExtra("searchString", searchString)
         }
-        charactersAdapter.setOnItemClickListener { item, view ->
-            if (item is CharacterSearchResultItem) {
-                intent = Intent(this, CharacterDetailsActivity::class.java)
-                intent.putExtra("id", item.character.id)
-                intent.putExtra("searchString", searchString)
-            } else if (item is SeriesSearchResultItem) {
-                intent = Intent(this, SeriesDetailsActivity::class.java)
-                intent.putExtra("id", item.series.id)
-                intent.putExtra("searchString", searchString)
-            }
-            startActivity(intent)
-        }
+        startActivity(intent)
     }
 }

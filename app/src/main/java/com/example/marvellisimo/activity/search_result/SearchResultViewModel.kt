@@ -28,7 +28,7 @@ class SearchResultViewModel @Inject constructor(
     fun getCharacters(phrase: String) = CS(IO).launch {
         Log.d(TAG, "getCharacters: $phrase")
 
-        CS(Main).launch { loading.value = true }
+        if (characters.value.isNullOrEmpty()) CS(Main).launch { loading.value = true }
 
         try {
             val chars = repository.fetchCharacters(phrase)
@@ -46,7 +46,7 @@ class SearchResultViewModel @Inject constructor(
     fun getSeries(phrase: String) = CS(IO).launch {
         Log.d(TAG, "getSeries: $phrase")
 
-        CS(Main).launch { loading.value = true }
+        if (series.value.isNullOrEmpty()) CS(Main).launch { loading.value = true }
 
         try {
             val sers = repository.fetchSeries(phrase)
