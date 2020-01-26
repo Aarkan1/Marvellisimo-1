@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.search
 
+import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
@@ -18,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.repository.models.realm.SearchType
-import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
+import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.search_options_fragment.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +82,6 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "globalSearch ${searchManager.searchablesInGlobalSearch.size}")
         Log.d(TAG, "searchable: ${searchableInfo ?: null}")
 
-//        Log.d(TAG, searchableInfo.toString())
         searchView?.setSearchableInfo(searchableInfo)
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -128,6 +128,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         return value
     }
 
+    @SuppressLint("InflateParams")
     private fun showSearchOptionsPopup() {
         Log.d(TAG, "about to clearFocus")
         searchView?.clearFocus()
@@ -186,7 +187,7 @@ class SearchActivity : AppCompatActivity(), HistoryListActionListener {
         Log.d(TAG, "switchToCharacterSerieList: starts")
         Log.d(TAG, "search is $search")
         startActivity(
-            Intent(this, CharacterSerieResultListActivity::class.java)
+            Intent(this, SearchResultActivity::class.java)
                 .putExtra("type", if (viewModel.searchType == SearchType.CHARACTERS) "characters" else "series")
                 .putExtra("search", search)
         )

@@ -32,4 +32,5 @@
     <string name="logout">Logout</string>
     <string name="toolbar_favorites">Favorites</string>
     <string name="favorite_item_character_image_description">Character Image</string>
+    <string name="loading_dialog_text">Loading...</string>
 </resources>

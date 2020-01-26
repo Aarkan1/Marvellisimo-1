@@ -19,6 +19,7 @@ class DB {
         val stitchClient = Stitch.getDefaultAppClient()
         val mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
         val collUsers = mongoClient.getDatabase("marvellisimo").getCollection("users")
+        val sendReceive = mongoClient.getDatabase("marvellisimo").getCollection("send")
 
         private fun initUser() {
             val uid = stitchClient.auth.user?.id
@@ -45,9 +46,7 @@ class DB {
 
             when (entity) {
                 is User -> {
-                    updateRealmUser(
-                        entity
-                    )
+                    updateRealmUser(entity)
                 }
             }
         }
@@ -58,38 +57,5 @@ class DB {
                 realm.insertOrUpdate(user)
             }
         }
-
-//        fun findAndUpdateLoggedInUser() {
-//            if (!stitchClient.auth.isLoggedIn) return
-//            initUser()
-//
-//
-//            val docs: ArrayList<Document> = ArrayList()
-//            users.find(Document("uid", stitchClient.auth.user!!.id))
-//                .limit(1)
-//                .into(docs)
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        val doc = docs[0].toJson()
-//                        Log.d("STITCH", "Found doc: $doc")
-//                        val gson = Gson()
-//                        var user = gson.fromJson(doc, User::class.java)
-//
-//                        updateRealmUser(user)
-//
-//                        if(DB.user == null) {
-//                            initUser()
-//                        }
-//
-////            test adding a favorite and save to mongoDB
-////                        user.favorites?.add("Ironman")
-////                        saveEntity("users", user, client.auth.user!!.id)
-//
-//                        return@addOnCompleteListener
-//                    }
-//                    Log.e("STITCH", "Error: " + task.exception.toString())
-//                    task.exception!!.printStackTrace()
-//                }
-//        }
     }
 }

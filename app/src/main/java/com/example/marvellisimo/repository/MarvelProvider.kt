@@ -19,20 +19,11 @@ object MarvelProvider {
     private const val PRIVATE_KEY = "4488d6d52c2bcb9e6b1aca391d92b7e246b31f03"
     private const val BASE_URL = "https://gateway.marvel.com:443/v1/public/"
 
-    val marvelService: MarvelService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .client(getOkHttpClient())
-        .build()
-        .create(MarvelService::class.java)
-
     @Singleton
     @Provides
     fun provideMarvelService(): MarvelService = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(getOkHttpClient())
         .build()
         .create(MarvelService::class.java)

@@ -13,10 +13,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
-import com.example.marvellisimo.ui.searchResult.CharacterSerieResultListActivity
 import android.view.MenuItem
+import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.notification.TestService
+import io.realm.Realm
 import com.example.marvellisimo.repository.DB
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -48,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
-            startActivity(Intent(this, CharacterSerieResultListActivity::class.java))
+            startActivity(Intent(this, ReceiveItemsActivity::class.java))
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -60,6 +62,19 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
+        test()
+    }
+
+    private fun test() {
+        Log.d(TAG, "test: starts")
+
+        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        val job = JobInfo.Builder(0, ComponentName(applicationContext, TestService::class.java))
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+            .build()
+
+        jobScheduler.schedule(job)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

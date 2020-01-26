@@ -3,21 +3,32 @@ package com.example.marvellisimo.repository
 import android.util.Log
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.DB
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.marvelEntities.*
+import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
 import com.example.marvellisimo.repository.models.realm.HistoryItem
+import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.StitchAppClient
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
 import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection
+import com.google.gson.Gson
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.bson.Document
 import org.bson.types.ObjectId
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 private const val TAG = "Repository"
 
@@ -45,8 +56,10 @@ class Repository @Inject constructor(
 
     suspend fun updateHistory(phrase: String) {
         Log.d(TAG, "updateHistory: $phrase")
-        Realm.getDefaultInstance()
-            .executeTransaction { it.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis())) }
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(HistoryItem(phrase, System.currentTimeMillis()))
+        realm.commitTransaction()
     }
 
     fun fetchCurrentUser() {
@@ -161,10 +174,10 @@ class Repository @Inject constructor(
         return
     }
 
-    suspend fun fetchFavoriteCharacters(): List<Character> {
+    suspend fun fetchFavoriteCharacters(): List<CharacterNonRealm> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
         if(user == null) throw Exception("No user")
-        val favoriteCharacters = user!!.favoriteCharacters
+        val favoriteCharacters = user!!.favoriteCharacters ?: return emptyList()
 
         return favoriteCharacters
             .map { CoroutineScope(IO).async { fetchCharacterById(it) } }
@@ -193,11 +206,11 @@ class Repository @Inject constructor(
         return
     }
 
-    suspend fun fetchFavoriteSeries(): List<Series> {
+    suspend fun fetchFavoriteSeries(): List<SeriesNonRealm> {
         Log.d(TAG, "fetchFavoriteSeries: starts")
         if(user == null) throw Exception("No user")
 
-        val favoriteSeries = user!!.favoriteSeries
+        val favoriteSeries = user!!.favoriteSeries ?: return emptyList()
 
         return favoriteSeries
             .map { CoroutineScope(IO).async { fetchSeriesById(it) } }
@@ -205,20 +218,211 @@ class Repository @Inject constructor(
             .mapNotNull { it }
     }
 
-    // TODO we should check caches here
-    suspend fun fetchSeriesById(id: String): Series? {
-        Log.d(TAG, "fetchSeriesById: $id")
-
-        val results = marvelService.getSeriesById(id).data.results
-        return if (results.isNotEmpty()) results[0] else null
+    private fun saveSeriesToRealm(series: Series) {
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(series)
+        realm.commitTransaction()
     }
 
-    // TODO we should check caches here
-    suspend fun fetchCharacterById(id: String): Character? {
+    private fun fetchSeriesFromRealm(id: Int): SeriesNonRealm? {
+        val result = Realm.getDefaultInstance().where(Series::class.java).equalTo("id", id)
+            .findFirst() ?: return null
+
+        return SeriesNonRealm(result)
+    }
+
+    suspend fun fetchSeriesById(id: String): SeriesNonRealm? {
+        Log.d(TAG, "fetchSeriesById: $id")
+
+        val realmResult = fetchSeriesFromRealm(id.toInt())
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getSeriesById(id).data.results
+        if (marvelResult.isEmpty()) return null
+
+        saveSeriesToRealm(marvelResult[0])
+
+        return SeriesNonRealm(marvelResult[0])
+    }
+
+    private suspend fun saveSeriesSearchResultToRealm(searchPhrase: String, results: MutableList<String>) {
+        Log.d(TAG, "saveSeriesSearchResultToRealm: starts")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(SeriesSearchResult().apply {
+            this.searchPhrase = searchPhrase
+            seriesIds.addAll(results)
+        })
+        realm.commitTransaction()
+    }
+
+    private suspend fun fetchSeriesFromRealm(phrase: String): ArrayList<SeriesNonRealm>? {
+        Log.d(TAG, "fetchSeriesFromRealm: $phrase")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val result = realm.where(SeriesSearchResult::class.java).equalTo("searchPhrase", phrase)
+            .findFirst()
+
+        if (result == null) {
+            realm.commitTransaction()
+            return null
+        }
+
+        val series = ArrayList<SeriesNonRealm>()
+        val seriesDeferred = ArrayList<Deferred<SeriesNonRealm?>>()
+
+        result.seriesIds.mapNotNull { it }
+            .forEach { seriesDeferred.add(CoroutineScope(IO).async { fetchSeriesById(it) }) }
+
+        realm.commitTransaction()
+
+        seriesDeferred.forEach { deffered -> deffered.await()?.let { series.add(it) } }
+        return series
+    }
+
+    suspend fun fetchSeries(phrase: String): MutableList<SeriesNonRealm> {
+        Log.d(TAG, "fetchSeries: $phrase")
+        val realmResult = fetchSeriesFromRealm(phrase)
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getAllSeries(phrase)
+        val series = marvelResult.data.results.map {
+            SeriesNonRealm(
+                it
+            )
+        }.toMutableList()
+
+        CoroutineScope(IO).launch {
+            marvelResult.data.results.forEach { saveSeriesToRealm(it) }
+            saveSeriesSearchResultToRealm(phrase, series.map { it.id.toString() }.toMutableList())
+        }
+
+        return series
+    }
+
+    private fun saveCharacterToRealm(character: Character) {
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(character)
+        realm.commitTransaction()
+    }
+
+    private fun fetchCharacterFromRealm(id: Int): CharacterNonRealm? {
+        Log.d(TAG, "fetchCharacterFromRealm: $id")
+        val result = Realm.getDefaultInstance().where(Character::class.java).equalTo("id", id)
+            .findFirst() ?: return null
+
+        return CharacterNonRealm(result)
+    }
+
+    suspend fun fetchCharacterById(id: String): CharacterNonRealm? {
         Log.d(TAG, "fetchCharacterById: $id")
 
-        val results = marvelService.getCharacterById(id).data.results
-        return if (results.isNotEmpty()) results[0] else null
+        val realmResult = fetchCharacterFromRealm(id.toInt())
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getCharacterById(id).data.results
+        if (marvelResult.isEmpty()) return null
+
+        CoroutineScope(IO).launch { saveCharacterToRealm(marvelResult[0]) }
+
+        return CharacterNonRealm(marvelResult[0])
+    }
+
+    private suspend fun saveCharacterSearchResultToRealm(searchPhrase: String, results: MutableList<String>) {
+        Log.d(TAG, "saveCharacterSearchResultToRealm: starts")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        realm.insertOrUpdate(CharacterSearchResult().apply {
+            this.searchPhrase = searchPhrase
+            characterIds.addAll(results)
+        })
+        realm.commitTransaction()
+    }
+
+    private suspend fun fetchCharactersFromRealm(phrase: String): ArrayList<CharacterNonRealm>? {
+        Log.d(TAG, "fetchCharacterFromRealm: $phrase")
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+
+        val result = realm.where(CharacterSearchResult::class.java).equalTo("searchPhrase", phrase)
+            .findFirst()
+
+        if (result == null) {
+            realm.commitTransaction()
+            return null
+        }
+
+        val characters = ArrayList<CharacterNonRealm>()
+        val charactersDeferred = ArrayList<Deferred<CharacterNonRealm?>>()
+
+        result.characterIds.mapNotNull { it }
+            .forEach { charactersDeferred.add(CoroutineScope(IO).async { fetchCharacterById(it) }) }
+
+        realm.commitTransaction()
+
+        charactersDeferred.forEach { deferred -> deferred.await()?.let { characters.add(it) } }
+        return characters
+    }
+
+    suspend fun fetchCharacters(phrase: String): MutableList<CharacterNonRealm> {
+        Log.d(TAG, "fetchCharacters: $phrase")
+        val realmResult = fetchCharactersFromRealm(phrase)
+        if (realmResult != null) return realmResult
+
+        val marvelResult = marvelService.getAllCharacters(phrase)
+        val characters = marvelResult.data.results.map {
+            CharacterNonRealm(
+                it
+            )
+        }.toMutableList()
+
+        CoroutineScope(IO).launch {
+            marvelResult.data.results.forEach { saveCharacterToRealm(it) }
+            saveCharacterSearchResultToRealm(phrase, characters.map { it.id.toString() }.toMutableList())
+        }
+
+        return characters
+    }
+
+    fun sendItemToFriend(itemId: String, type: String) {
+        val currentTimestamp = System.currentTimeMillis()
+
+        val sendDoc = Document()
+        sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
+        sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
+        sendDoc["itemId"] = itemId
+        sendDoc["type"] = type
+        sendDoc["senderName"] = "Joan"
+        sendDoc["date"] = "$currentTimestamp"
+
+        DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d(
+                    "___", String.format(
+                        "successfully inserted item with id %s",
+                        it.result.insertedId
+                    )
+                )
+            } else {
+                Log.e("___", "failed to insert document with: ", it.exception)
+            }
+        }
+    }
+
+    suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        val filter = Document()
+            .append("receiverId", Document().append("\$eq", "5e2aaf53d6503302ec2549c4"))
+
+        val result = DB.sendReceive.find().into(tempList)
+
+        while(!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
+
     }
 }
 
