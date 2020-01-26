@@ -3,10 +3,8 @@ package com.example.marvellisimo.repository
 import android.util.Log
 import com.example.marvellisimo.marvelEntities.Character
 import com.example.marvellisimo.marvelEntities.Series
-import com.example.marvellisimo.DB
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
-import com.example.marvellisimo.marvelEntities.*
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
@@ -14,18 +12,11 @@ import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
-import com.mongodb.stitch.android.core.Stitch
-import com.mongodb.stitch.android.core.StitchAppClient
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection
-import com.google.gson.Gson
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import org.bson.Document
 import org.bson.types.ObjectId
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.ArrayList
@@ -76,15 +67,22 @@ class Repository @Inject constructor(
                 doc.result["isOnline"] = true
                 realm.executeTransaction {
                     it.insertOrUpdate(documentToUser(doc.result))
+                    if(user == null) {
+                        setUserFromRealm(id)
+                        updateUserOnlineStatus(true)
+                    }
                 }
             }
         }
+        setUserFromRealm(id)
+    }
 
+    private fun setUserFromRealm(id: String) {
         val realmUser = realm.where(User::class.java)
             .equalTo("uid", id)
             .findAll()
 
-       if (realmUser.isNotEmpty()) {
+        if (realmUser.isNotEmpty()) {
             Log.d(TAG, "Loading RealmUser: ${realmUser[0]?.username}, uid: ${realmUser[0]?.uid}")
             user = realmUser[0]
         }
@@ -123,14 +121,17 @@ class Repository @Inject constructor(
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean) {
-        if(user == null) throw Exception("No user")
+        if(user == null) {
+            Log.e(TAG, "No user")
+            return
+        }
 
-            val tempUser = User().apply {
-                this.uid = user!!.uid
-                this.username = user!!.username
-                this.avatar = user!!.avatar
-                this.isOnline = isOnline
-            }
+        val tempUser = User().apply {
+            this.uid = user!!.uid
+            this.username = user!!.username
+            this.avatar = user!!.avatar
+            this.isOnline = isOnline
+        }
 
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(tempUser.uid)))
