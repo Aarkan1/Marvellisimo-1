@@ -1,19 +1,18 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.repository.Repository
+import com.example.marvellisimo.models.User
 import kotlinx.android.synthetic.main.activity_online.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 class OnlineActivity : AppCompatActivity(),
     OnlineActionListener {
@@ -31,18 +30,16 @@ class OnlineActivity : AppCompatActivity(),
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
-        addToRecycleView()
+        obcervRecycleView()
+        viewModel.fetchUsers()
     }
 
-    private fun addToRecycleView() {
-        CoroutineScope(IO).launch {
-            val usernames = viewModel.fetchUsers().map { it.username }
-            CoroutineScope(Main).launch {
-                onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
-                    .map { Online(it) }.toMutableList())
-                onlineAdapter.notifyDataSetChanged()
-            }
-        }
+    private fun obcervRecycleView() {
+        viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
+            onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
+                .map { Online(it.username) }.toMutableList())
+            onlineAdapter.notifyDataSetChanged()
+        })
     }
 
     lateinit var onlineAdapter: OnlineAdapter
