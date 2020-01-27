@@ -7,6 +7,7 @@ import android.content.Context
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
@@ -31,6 +32,7 @@ interface ApplicationComponent {
     fun inject(activity: MainActivity)
     fun inject(activity: LoginActivity)
     fun inject(activity: RegisterActivity)
+    fun inject(activity: OnlineActivity)
     fun inject(job: TestService)
 }
 

@@ -425,6 +425,15 @@ class Repository @Inject constructor(
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
 
     }
+
+    suspend fun fetchUsers(): ArrayList<User>{
+        val gson = Gson()
+        val tempList = ArrayList<Document>()
+        val filter = Document().append("isOnline", Document().append("\$eq", true))
+        var result = DB.collUsers.find(filter).into(tempList)
+        while (!result.isComplete) delay(5)
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
+    }
 }
 
 

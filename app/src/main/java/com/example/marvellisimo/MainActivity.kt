@@ -20,6 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.notification.TestService
 import com.example.marvellisimo.repository.DB
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //DB.client.auth.logout()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -104,7 +106,13 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, FavoritesActivity::class.java))
                 true
             }
+            R.id.action_OnlineList -> {
+                startActivity(Intent(this, OnlineActivity::class.java))
+                Log.d( "msg","OnlineActivity")
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+
         }
     }
 
