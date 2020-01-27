@@ -14,13 +14,13 @@
 
         <ImageView
                 android:id="@+id/selected_character_imageView"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/avatars" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                android:layout_marginStart="8dp" android:layout_marginTop="8dp"/>
 
         <TextView
                 android:id="@+id/selected_character_name_textView"
@@ -28,9 +28,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/selected_character_imageView" android:layout_marginTop="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="Hulk" android:layout_marginStart="8dp"/>
+                app:layout_constraintTop_toTopOf="@id/selected_character_imageView"
+
+                tools:text="Hulk" app:layout_constraintStart_toEndOf="@+id/selected_character_imageView"
+                android:layout_marginStart="8dp" android:layout_marginTop="8dp"/>
 
         <TextView
                 android:id="@+id/selected_character_description_textView"
@@ -39,11 +40,11 @@
                 app:layout_constraintTop_toBottomOf="@id/selected_character_name_textView"
                 android:textStyle="italic"
                 android:textSize="16sp" app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 tools:text="Testing description. This is some long description. This is some long description.
                 This is some long description. This is some long description-
                 This is some long description- This is some long description- This is some long description-"
-                android:layout_marginStart="8dp" android:layout_marginTop="8dp" android:layout_marginEnd="8dp"/>
+                android:layout_marginTop="8dp" android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toStartOf="@+id/selected_character_name_textView"/>
 
 
         <TextView
@@ -51,10 +52,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/selected_character_description_textView"
                 android:text="Features In Series:"
                 android:textSize="18sp"
-                android:textStyle="bold" android:layout_marginTop="16dp" android:layout_marginStart="8dp"/>
+                android:textStyle="bold" android:layout_marginStart="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/selected_character_imageView"
+                android:layout_marginTop="16dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/character_detail_serie_list_recyclerView"

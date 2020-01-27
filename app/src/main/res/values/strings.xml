@@ -37,5 +37,7 @@
     <string name="onlinelist">OnlineList</string>
     <string name="toolbar_favorites">Favorites</string>
     <string name="favorite_item_character_image_description">Character Image</string>
-    <string name="loading_dialog_text">Loading...</string>
+    <string name="loading_dialog_text">Loading…</string>
+    <string name="send_it_to_friend">Send to friend</string>
+    <string name="add_to_favorites">Add to favorites</string>
 </resources>
