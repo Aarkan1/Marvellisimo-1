@@ -7,6 +7,7 @@ import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.common.UserNonRealm
 import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
 import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
@@ -27,11 +28,12 @@ private const val TAG = "Repository"
 class Repository @Inject constructor(
     private val marvelService: MarvelService
 ) {
-    var user: User? = null
+    var user: UserNonRealm? = null
     var realm: Realm = Realm.getDefaultInstance()
     private val gson = Gson()
 
     private fun userToDocument(user: User) = gson.fromJson(gson.toJson(user), Document::class.java)
+    private fun userToDocument(user: UserNonRealm) = gson.fromJson(gson.toJson(user), Document::class.java)
     private fun documentToUser(document: Document) = gson.fromJson(gson.toJson(document), User::class.java)
 
     suspend fun fetchHistory(phrase: String = ""): List<String> {
@@ -55,24 +57,24 @@ class Repository @Inject constructor(
 
     fun fetchCurrentUser() {
         Log.d(TAG, "fetchCurrentUser: starts")
-        val id = if(DB.stitchClient.auth.isLoggedIn)
+        val id = if (DB.stitchClient.auth.isLoggedIn)
             DB.stitchClient.auth.user!!.id
         else return
 
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
             DB.collUsers.findOne(filter)
-            .addOnCompleteListener { doc ->
-            Log.d(TAG, "fetchUser, doc: ${doc.result}")
-                doc.result["isOnline"] = true
-                realm.executeTransaction {
-                    it.insertOrUpdate(documentToUser(doc.result))
-                    if(user == null) {
-                        setUserFromRealm(id)
-                        updateUserOnlineStatus(true)
+                .addOnCompleteListener { doc ->
+                    Log.d(TAG, "fetchUser, doc: ${doc.result}")
+                    doc.result["isOnline"] = true
+                    realm.executeTransaction {
+                        it.insertOrUpdate(documentToUser(doc.result))
+                        if (user == null) {
+                            setUserFromRealm(id)
+                            updateUserOnlineStatus(true)
+                        }
                     }
                 }
-            }
         }
         setUserFromRealm(id)
     }
@@ -80,48 +82,48 @@ class Repository @Inject constructor(
     private fun setUserFromRealm(id: String) {
         val realmUser = realm.where(User::class.java)
             .equalTo("uid", id)
-            .findAll()
+            .findFirst()
 
-        if (realmUser.isNotEmpty()) {
-            Log.d(TAG, "Loading RealmUser: ${realmUser[0]?.username}, uid: ${realmUser[0]?.uid}")
-            user = realmUser[0]
+        if (realmUser != null) {
+            Log.d(TAG, "Loading RealmUser: ${realmUser.username}, uid: ${realmUser.uid}")
+            user = UserNonRealm(realmUser)
         }
     }
 
-    fun updateUser() {
-        if(user == null) throw Exception("No user")
+    suspend fun updateUser() {
+        if (user == null) throw Exception("No user")
 
-        CoroutineScope(IO).launch {
-            val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-            val replacement = userToDocument(user!!)
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val replacement = userToDocument(user!!)
 
-            val task = DB.collUsers.findOneAndReplace(filter, replacement)
-            while (!task.isComplete) delay(5)
-            CoroutineScope(Dispatchers.Main).launch {
-                realm.executeTransaction {
-                    it.insertOrUpdate(documentToUser(task.result))
-                }
+        val task = DB.collUsers.findOneAndReplace(filter, replacement)
+        while (!task.isComplete) delay(5)
+        CoroutineScope(Dispatchers.Main).launch {
+            realm.executeTransaction {
+                it.insertOrUpdate(documentToUser(task.result))
             }
         }
+
     }
 
     fun createNewUser(userDoc: Document) {
         CoroutineScope(IO).launch {
             DB.collUsers.insertOne(userDoc)
-            .addOnSuccessListener {
-                user = documentToUser(userDoc)
-                realm.executeTransaction {
-                    realm.insertOrUpdate(user!!)
+                .addOnSuccessListener {
+                    val realmUser = documentToUser(userDoc)
+                    user = UserNonRealm(realmUser)
+                    realm.executeTransaction {
+                        realm.insertOrUpdate(realmUser)
+                    }
                 }
-            }
-            .addOnFailureListener {
-                Log.e(TAG, "Error in createNewUser: ${it.message}")
-            }
+                .addOnFailureListener {
+                    Log.e(TAG, "Error in createNewUser: ${it.message}")
+                }
         }
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean) {
-        if(user == null) {
+        if (user == null) {
             Log.e(TAG, "No user")
             return
         }
@@ -147,7 +149,7 @@ class Repository @Inject constructor(
             }
         }
 
-        if(!isOnline) {
+        if (!isOnline) {
             Log.d(TAG, "Logging out user")
             user = null
         }
@@ -155,7 +157,8 @@ class Repository @Inject constructor(
 
     suspend fun addCharacterToFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
-        if(user == null) throw Exception("No user")
+
+        if (user == null) throw Exception("No user")
 
         if (user!!.favoriteCharacters.contains(id)) return
 
@@ -167,7 +170,7 @@ class Repository @Inject constructor(
 
     suspend fun removeCharactersFromFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
-        if(user == null) throw Exception("No user")
+        if (user == null) throw Exception("No user")
 
         user!!.favoriteCharacters.remove(id)
 
@@ -177,7 +180,7 @@ class Repository @Inject constructor(
 
     suspend fun fetchFavoriteCharacters(): List<CharacterNonRealm> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
-        if(user == null) throw Exception("No user")
+        if (user == null) throw Exception("No user")
         val favoriteCharacters = user!!.favoriteCharacters ?: return emptyList()
 
         return favoriteCharacters
@@ -188,7 +191,7 @@ class Repository @Inject constructor(
 
     suspend fun addSeriesToFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
-        if(user == null) throw Exception("No user")
+        if (user == null) throw Exception("No user")
 
         if (user!!.favoriteSeries.contains(id)) return
         user!!.favoriteSeries.add(id)
@@ -199,7 +202,7 @@ class Repository @Inject constructor(
 
     suspend fun removeSeriesFromFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
-        if(user == null) throw Exception("No user")
+        if (user == null) throw Exception("No user")
 
         user!!.favoriteSeries.remove(id)
 
@@ -209,7 +212,7 @@ class Repository @Inject constructor(
 
     suspend fun fetchFavoriteSeries(): List<SeriesNonRealm> {
         Log.d(TAG, "fetchFavoriteSeries: starts")
-        if(user == null) throw Exception("No user")
+        if (user == null) throw Exception("No user")
 
         val favoriteSeries = user!!.favoriteSeries ?: return emptyList()
 
@@ -421,12 +424,12 @@ class Repository @Inject constructor(
 
         val result = DB.sendReceive.find().into(tempList)
 
-        while(!result.isComplete) delay(5)
+        while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
 
     }
 
-    suspend fun fetchUsers(): ArrayList<User>{
+    suspend fun fetchUsers(): ArrayList<User> {
         val gson = Gson()
         val tempList = ArrayList<Document>()
         val filter = Document().append("isOnline", Document().append("\$eq", true))

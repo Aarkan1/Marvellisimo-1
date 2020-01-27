@@ -35,6 +35,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val characters = repository.fetchFavoriteCharacters().toTypedArray()
             CS(Main).launch { favoriteCharacters.value = characters }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }
 
@@ -50,6 +51,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val series = repository.fetchFavoriteSeries().toTypedArray()
             CS(Main).launch { favoriteSeries.value = series }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }
 
@@ -64,6 +66,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val characters = repository.fetchFavoriteCharacters()
             CS(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             toastMessage.value = "Something went wrong..."
         }
 
@@ -79,6 +82,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val series = repository.fetchFavoriteSeries()
             CS(Main).launch { favoriteSeries.value = series.toTypedArray() }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             toastMessage.value = "Something went wrong..."
         }
 

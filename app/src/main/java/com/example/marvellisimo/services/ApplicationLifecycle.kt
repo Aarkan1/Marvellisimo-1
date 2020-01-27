@@ -12,7 +12,7 @@ import kotlinx.coroutines.*
 import org.bson.Document
 import org.bson.types.ObjectId
 
-class ApplicationLifecycle: Application.ActivityLifecycleCallbacks {
+class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
     private var mVisibleCount = 0
     private var mInBackground = false
 
@@ -50,10 +50,14 @@ class ApplicationLifecycle: Application.ActivityLifecycleCallbacks {
             } else {
                 val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
                 DB.collUsers.findOne(filter)
-                .addOnCompleteListener { doc ->
-                    val gson = Gson()
-                    updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
-                }
+                    .addOnCompleteListener { doc ->
+                        val gson = Gson()
+                        try {
+                            updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
+                        }
+                    }
             }
         }
     }

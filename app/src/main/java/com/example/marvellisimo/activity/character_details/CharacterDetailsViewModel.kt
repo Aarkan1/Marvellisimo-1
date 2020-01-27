@@ -47,6 +47,7 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
             }
         } catch (ex: Exception) {
             CS(Main).launch {
+                ex.printStackTrace()
                 toastMessage.value = "Something went wrong..."
                 toastMessage.value = ""
             }
