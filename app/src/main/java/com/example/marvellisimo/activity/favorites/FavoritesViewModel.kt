@@ -28,17 +28,31 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
 
     fun fetchFavoriteCharacters() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
+
         if (searchType.value == SearchType.CHARACTERS && favoriteCharacters.value.isNullOrEmpty())
             CS(Main).launch { loading.value = true }
+
+        try {
+            repository.updateUser()
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Failed to synchronize user with server..."
+                toastMessage.value = ""
+            }
+        }
 
         try {
             val characters = repository.fetchFavoriteCharacters().toTypedArray()
             CS(Main).launch { favoriteCharacters.value = characters }
         } catch (ex: Exception) {
-            CS(Main).launch { toastMessage.value = "Something went wrong..." }
+            ex.printStackTrace()
+            CS(Main).launch {
+                toastMessage.value = "Something went wrong..."
+                toastMessage.value = ""
+            }
         }
 
-        CS(Main).launch { toastMessage.value = ""; loading.value = false }
+        CS(Main).launch { loading.value = false }
     }
 
     fun fetchFavoriteSeries() = CS(IO).launch {
@@ -47,9 +61,19 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             CS(Main).launch { loading.value = true }
 
         try {
+            repository.updateUser()
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Failed to synchronize user with server..."
+                toastMessage.value = ""
+            }
+        }
+
+        try {
             val series = repository.fetchFavoriteSeries().toTypedArray()
             CS(Main).launch { favoriteSeries.value = series }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }
 
@@ -64,6 +88,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val characters = repository.fetchFavoriteCharacters()
             CS(Main).launch { favoriteCharacters.value = characters.toTypedArray() }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             toastMessage.value = "Something went wrong..."
         }
 
@@ -79,6 +104,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val series = repository.fetchFavoriteSeries()
             CS(Main).launch { favoriteSeries.value = series.toTypedArray() }
         } catch (ex: Exception) {
+            ex.printStackTrace()
             toastMessage.value = "Something went wrong..."
         }
 

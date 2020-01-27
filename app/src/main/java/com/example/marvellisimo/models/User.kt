@@ -1,5 +1,6 @@
 package com.example.marvellisimo.models
 
+import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
@@ -12,7 +13,7 @@ open class User : RealmObject() {
     var avatar: String = ""
     var isOnline: Boolean = false
     @Ignore
-    var favoriteCharacters: ArrayList<String> = ArrayList()
+    var favoriteCharacters: RealmList<String> = RealmList()
     @Ignore
-    var favoriteSeries: ArrayList<String> = ArrayList()
+    var favoriteSeries: RealmList<String> = RealmList()
 }
