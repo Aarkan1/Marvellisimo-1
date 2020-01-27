@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
@@ -39,6 +40,8 @@ class SearchResultActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: SearchResultViewModel
 
+    lateinit var stringsViewModel: StringsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
@@ -51,9 +54,12 @@ class SearchResultActivity : AppCompatActivity() {
         seriesAdapter.setOnItemClickListener(this::onItemClick)
         charactersAdapter.setOnItemClickListener(this::onItemClick)
 
+        stringsViewModel = ViewModelProviders.of(this).get(StringsViewModel::class.java)
+
         createProgressDialog()
 
-        searchString = intent.getStringExtra("search") ?: ""
+        searchString = intent.getStringExtra("search") ?: stringsViewModel.searchString
+        if (intent.getStringExtra("search") != null) stringsViewModel.searchString = searchString
         val searchType = intent.getStringExtra("type") ?: "characters"
 
         supportActionBar!!.title = searchString
