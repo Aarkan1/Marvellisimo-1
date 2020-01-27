@@ -62,6 +62,7 @@
                     android:value="com.example.marvellisimo.search.SearchActivity">
             </meta-data>
         </activity>
+        <activity android:name=".activity.receiver.ReceiveItemsActivity" />
 
         <service
                 android:name=".notification.TestService"

@@ -437,15 +437,17 @@ class Repository @Inject constructor(
         return characters
     }
 
-    fun sendItemToFriend(itemId: String, type: String) {
+    fun sendItemToFriend(itemId: String, type: String, uid: String) {
+        CoroutineScope(IO).launch { updateUser() }
         val currentTimestamp = System.currentTimeMillis()
 
         val sendDoc = Document()
-        sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
-        sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
+        //sendDoc["_id"] = ObjectId(uid)
+        sendDoc["senderId"] = this.user!!.uid
+        sendDoc["receiverId"] = uid
         sendDoc["itemId"] = itemId
         sendDoc["type"] = type
-        sendDoc["senderName"] = "Joan"
+        sendDoc["senderName"] = this.user!!.username
         sendDoc["date"] = "$currentTimestamp"
 
         DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
@@ -456,19 +458,18 @@ class Repository @Inject constructor(
                         it.result.insertedId
                     )
                 )
-            } else {
+            } else
                 Log.e("___", "failed to insert document with: ", it.exception)
-            }
         }
     }
 
-    suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
+    suspend fun fetchReceivedItem(type: String): ArrayList<ReceiveItem> {
         val gson = Gson()
         val tempList = ArrayList<Document>()
-        val filter = Document()
-            .append("receiverId", Document().append("\$eq", "5e2aaf53d6503302ec2549c4"))
+        val filter = Document().append("receiverId", Document().append("\$eq", user!!.uid))
+            .append("type", Document().append("\$eq", type))
 
-        val result = DB.sendReceive.find().into(tempList)
+        val result = DB.sendReceive.find(filter).into(tempList)
 
         while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })
@@ -479,7 +480,7 @@ class Repository @Inject constructor(
         val gson = Gson()
         val tempList = ArrayList<Document>()
         val filter = Document().append("isOnline", Document().append("\$eq", true))
-        var result = DB.collUsers.find(filter).into(tempList)
+        val result = DB.collUsers.find(filter).into(tempList)
         while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
     }

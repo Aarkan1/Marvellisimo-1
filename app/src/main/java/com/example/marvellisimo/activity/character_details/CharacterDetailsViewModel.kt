@@ -54,5 +54,7 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
         }
     }
 
-    fun sendToFriend(itemId: String, type: String) = repository.sendItemToFriend(itemId, type)
+    fun sendToFriend(itemId: String, type: String, uid: String) = CS(Main).launch {
+        repository.sendItemToFriend(itemId, type, uid)
+    }
 }
