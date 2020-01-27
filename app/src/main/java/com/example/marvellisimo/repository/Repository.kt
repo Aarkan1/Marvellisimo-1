@@ -71,7 +71,7 @@ class Repository @Inject constructor(
                         it.insertOrUpdate(documentToUser(doc.result))
                         if (user == null) {
                             setUserFromRealm(id)
-                            updateUserOnlineStatus(true)
+//                            updateUserOnlineStatus(true)
                         }
                     }
                 }
@@ -91,22 +91,38 @@ class Repository @Inject constructor(
     }
 
     suspend fun updateUser() {
-        if (user == null) throw Exception("No user")
+        Log.d(TAG, "updateUser")
 
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-        val replacement = userToDocument(user!!)
+        val mongoResult = DB.collUsers.findOne(filter)
+        while (!mongoResult.isComplete) delay(5)
+        if (mongoResult.result == null) return
 
-        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-        while (!task.isComplete) delay(5)
+        val user = documentToUser(mongoResult.result)
+        this.user = UserNonRealm(user)
         CoroutineScope(Dispatchers.Main).launch {
             realm.executeTransaction {
-                it.insertOrUpdate(documentToUser(task.result))
+                it.insertOrUpdate(user)
             }
         }
+
+//        if (user == null) throw Exception("No user")
+//
+//        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+//        val replacement = userToDocument(user!!)
+//
+//        val task = DB.collUsers.findOneAndReplace(filter, replacement)
+//        while (!task.isComplete) delay(5)
+//        CoroutineScope(Dispatchers.Main).launch {
+//            realm.executeTransaction {
+//                it.insertOrUpdate(documentToUser(task.result))
+//            }
+//        }
 
     }
 
     fun createNewUser(userDoc: Document) {
+        Log.d(TAG, "createNewUser: starts")
         CoroutineScope(IO).launch {
             DB.collUsers.insertOne(userDoc)
                 .addOnSuccessListener {
@@ -123,6 +139,7 @@ class Repository @Inject constructor(
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean) {
+        Log.d(TAG, "updateUserOnlineStatus: starts")
         if (user == null) {
             Log.e(TAG, "No user")
             return
@@ -158,11 +175,16 @@ class Repository @Inject constructor(
     suspend fun addCharacterToFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
 
+        updateUser()
         if (user == null) throw Exception("No user")
 
         if (user!!.favoriteCharacters.contains(id)) return
 
         user!!.favoriteCharacters.add(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val task = DB.collUsers.findOneAndReplace(filter, userToDocument(user!!))
+        while (!task.isComplete) delay(5)
 
         updateUser()
         return
@@ -170,9 +192,15 @@ class Repository @Inject constructor(
 
     suspend fun removeCharactersFromFavorites(id: String) {
         Log.d(TAG, "addCharacterToFavorites: starts")
+
+        updateUser()
         if (user == null) throw Exception("No user")
 
         user!!.favoriteCharacters.remove(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val task = DB.collUsers.findOneAndReplace(filter, userToDocument(user!!))
+        while (!task.isComplete) delay(5)
 
         updateUser()
         return
@@ -191,10 +219,16 @@ class Repository @Inject constructor(
 
     suspend fun addSeriesToFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
+
+        updateUser()
         if (user == null) throw Exception("No user")
 
         if (user!!.favoriteSeries.contains(id)) return
         user!!.favoriteSeries.add(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val task = DB.collUsers.findOneAndReplace(filter, userToDocument(user!!))
+        while (!task.isComplete) delay(5)
 
         updateUser()
         return
@@ -202,9 +236,15 @@ class Repository @Inject constructor(
 
     suspend fun removeSeriesFromFavorites(id: String) {
         Log.d(TAG, "addSeriesToFavorites: starts ")
+
+        updateUser()
         if (user == null) throw Exception("No user")
 
         user!!.favoriteSeries.remove(id)
+
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+        val task = DB.collUsers.findOneAndReplace(filter, userToDocument(user!!))
+        while (!task.isComplete) delay(5)
 
         updateUser()
         return
@@ -223,6 +263,7 @@ class Repository @Inject constructor(
     }
 
     private fun saveSeriesToRealm(series: Series) {
+        Log.d(TAG, "saveSeriesToRealm")
         val realm = Realm.getDefaultInstance()
         realm.beginTransaction()
         realm.insertOrUpdate(series)
@@ -230,6 +271,7 @@ class Repository @Inject constructor(
     }
 
     private fun fetchSeriesFromRealm(id: Int): SeriesNonRealm? {
+        Log.d(TAG, "fetchSeriesFromRealm")
         val result = Realm.getDefaultInstance().where(Series::class.java).equalTo("id", id)
             .findFirst() ?: return null
 

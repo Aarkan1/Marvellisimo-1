@@ -46,14 +46,14 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
                 .findAll()
 
             if (realmUser.isNotEmpty()) {
-                updateUser(realmUser[0]!!, isOnline)
+//                updateUser(realmUser[0]!!, isOnline)
             } else {
                 val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
                 DB.collUsers.findOne(filter)
                     .addOnCompleteListener { doc ->
                         val gson = Gson()
                         try {
-                            updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+//                            updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
                         } catch (ex: Exception) {
                             ex.printStackTrace()
                         }

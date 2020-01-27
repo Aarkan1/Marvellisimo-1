@@ -28,24 +28,46 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
 
     fun fetchFavoriteCharacters() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
+
         if (searchType.value == SearchType.CHARACTERS && favoriteCharacters.value.isNullOrEmpty())
             CS(Main).launch { loading.value = true }
+
+        try {
+            repository.updateUser()
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Failed to synchronize user with server..."
+                toastMessage.value = ""
+            }
+        }
 
         try {
             val characters = repository.fetchFavoriteCharacters().toTypedArray()
             CS(Main).launch { favoriteCharacters.value = characters }
         } catch (ex: Exception) {
             ex.printStackTrace()
-            CS(Main).launch { toastMessage.value = "Something went wrong..." }
+            CS(Main).launch {
+                toastMessage.value = "Something went wrong..."
+                toastMessage.value = ""
+            }
         }
 
-        CS(Main).launch { toastMessage.value = ""; loading.value = false }
+        CS(Main).launch { loading.value = false }
     }
 
     fun fetchFavoriteSeries() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
         if (searchType.value == SearchType.SERIES && favoriteSeries.value.isNullOrEmpty())
             CS(Main).launch { loading.value = true }
+
+        try {
+            repository.updateUser()
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Failed to synchronize user with server..."
+                toastMessage.value = ""
+            }
+        }
 
         try {
             val series = repository.fetchFavoriteSeries().toTypedArray()
