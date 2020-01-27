@@ -47,19 +47,19 @@ class SeriesDetailsActivity : AppCompatActivity() {
             val rating = if (it.rating.isEmpty()) "Rating not found."
             else it.rating
 
-            selected_item_end_year_textView.text = it.endYear.toString()
-            selected_item_start_year_textView.text = it.startYear.toString()
-            selected_item_rating_textView.text = rating
+            selected_series_end_year_textView.text = it.endYear.toString()
+            selected_series_start_year_textView.text = it.startYear.toString()
+            selected_series_rating_textView.text = rating
 
             var des = it.description
             if (des.isNullOrBlank()) des = "No description found."
 
-            selected_item_description_textView.text = des
-            selected_item_name_textView.text = it.title
+            selected_series_description_textView.text = des
+            selected_series_name_textView.text = it.title
             Log.d(TAG, "imageUrl: ${it.thumbnail.imageUrl}")
 
             if (it.thumbnail.imageUrl.isNotEmpty())
-                Picasso.get().load(it.thumbnail.imageUrl).into(selected_item_imageView)
+                Picasso.get().load(it.thumbnail.imageUrl).into(selected_series_imageView)
         })
 
         viewModel.loading.observe(this, Observer<Boolean> {
