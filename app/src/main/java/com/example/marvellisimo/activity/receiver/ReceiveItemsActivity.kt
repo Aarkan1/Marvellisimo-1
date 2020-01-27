@@ -50,16 +50,32 @@ class ReceiveItemsActivity : AppCompatActivity() {
             it.forEach {item ->
                 listSize--
                 CoroutineScope(Dispatchers.IO).launch {
-                    val character = viewModel.fetchItem(item.itemId)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        if (character != null) {
-                            adapter.add(
-                                ReceivedItem(
-                                    character,
-                                    item.senderName,
-                                    item.date.toLong()
+                    if (item.type == "character"){
+                        val character = viewModel.fetchItem(item.itemId)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (character != null) {
+                                adapter.add(
+                                    ReceivedItem(
+                                        character,
+                                        item.senderName,
+                                        item.date.toLong()
+                                    )
                                 )
-                            )
+                            }
+                        }
+                    }
+                    else{
+                        val series = viewModel.fetchSeries(item.itemId)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (series != null) {
+                                adapter.add(
+                                    ReceivedSeries(
+                                        series,
+                                        item.senderName,
+                                        item.date.toLong()
+                                    )
+                                )
+                            }
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.series_details
 
 import android.app.AlertDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -90,6 +92,11 @@ class SeriesDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.detail_menu_send -> {
+                val intent = Intent(this, OnlineActivity::class.java)
+                intent.putExtra("itemId", viewModel.series.value?.id.toString())
+                intent.putExtra("type", "serie")
+                startActivity(intent)
+
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
                     Toast.LENGTH_LONG

@@ -1,9 +1,11 @@
 package com.example.marvellisimo.activity.receiver
 
 import androidx.lifecycle.MutableLiveData
+import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.repository.Repository
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,6 +27,10 @@ class ReceivedItemViewModel @Inject constructor(
 
     suspend fun fetchItem(itemId: String): CharacterNonRealm? {
         return CoroutineScope(Dispatchers.IO).async { repository.fetchCharacterById(itemId)}.await()
+    }
+
+    suspend fun fetchSeries(itemId: String): SeriesNonRealm? {
+        return CoroutineScope(Dispatchers.IO).async { repository.fetchSeriesById(itemId)}.await()
     }
 
 }

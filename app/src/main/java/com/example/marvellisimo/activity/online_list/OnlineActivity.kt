@@ -75,7 +75,7 @@ class OnlineActivity : AppCompatActivity(),
         //Seend to yor online DB.client.auth.user?.profile?.email
         if (type != null && itemId != null){
 
-            characterDetailsViewModel.sendToFriend(itemId.toString(), "character", online.uid)
+            characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
 
             Toast.makeText(
                 applicationContext, "You sent this item to ${online.username}",
