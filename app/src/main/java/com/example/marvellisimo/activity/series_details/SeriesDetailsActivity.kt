@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.series_details
 
 import android.app.AlertDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -88,16 +90,20 @@ class SeriesDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.detail_menu_send -> {
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
                     Toast.LENGTH_LONG
-                ).show()
-
+                ).show(); true
             }
-            R.id.detail_menu_add_to_favorites -> viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
+            R.id.detail_menu_add_to_favorites -> {
+                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
+            }
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java)); true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 }
