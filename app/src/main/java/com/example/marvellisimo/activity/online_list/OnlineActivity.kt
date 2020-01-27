@@ -38,7 +38,10 @@ class OnlineActivity : AppCompatActivity(),
         viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
             onlineAdapter.onlines.clear()
             onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
-                .map {Online(it.username)}.toMutableList())
+                .map {Online().apply {
+                    username = it.username
+                    uid = it.uid
+                }}.toMutableList())
             onlineAdapter.notifyDataSetChanged()
         })
     }

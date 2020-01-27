@@ -13,6 +13,7 @@ import com.example.marvellisimo.repository.models.realm.HistoryItem
 import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
+import com.mongodb.client.model.Filters
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -476,12 +477,15 @@ class Repository @Inject constructor(
     }
 
     suspend fun fetchOnlineUsers(active : Boolean): ArrayList<User> {
+        CoroutineScope(IO).launch { updateUser() }
         val gson = Gson()
         val tempList = ArrayList<Document>()
-        val filter = Document().append("isOnline", Document().append("\$eq", active))
-        var result = DB.collUsers.find(filter).into(tempList)
+        val filter =
+            Filters.and(Filters.eq("isOnline", active))
+        val result = DB.collUsers.find(filter).into(tempList)
         while (!result.isComplete) delay(5)
-        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) })
+        return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) }
+            .filter { it.uid != this.user!!.uid })
     }
 
 }
