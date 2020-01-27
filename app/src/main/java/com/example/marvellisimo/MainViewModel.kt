@@ -8,7 +8,7 @@ class MainViewModel @Inject constructor(
     val repository: Repository
 ) {
     fun logoutUser() {
-//        repository.updateUserOnlineStatus(false)
+        repository.updateUserOnlineStatus(false)
         DB.stitchClient.auth.logout()
     }
 }

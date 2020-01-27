@@ -8,7 +8,7 @@ class LoginViewModel @Inject constructor(
 ) {
     fun updateLoggedInUser() {
         repository.fetchCurrentUser()
-//        repository.updateUserOnlineStatus(true)
+        repository.updateUserOnlineStatus(true)
     }
 }
 

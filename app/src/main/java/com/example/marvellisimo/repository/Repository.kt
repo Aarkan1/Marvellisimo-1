@@ -71,7 +71,7 @@ class Repository @Inject constructor(
                         it.insertOrUpdate(documentToUser(doc.result))
                         if (user == null) {
                             setUserFromRealm(id)
-//                            updateUserOnlineStatus(true)
+                            updateUserOnlineStatus(true)
                         }
                     }
                 }
@@ -145,18 +145,22 @@ class Repository @Inject constructor(
             return
         }
 
-        val tempUser = User().apply {
-            this.uid = user!!.uid
-            this.username = user!!.username
-            this.avatar = user!!.avatar
-            this.isOnline = isOnline
-        }
+//        val tempUser = User().apply {
+//            this.uid = user!!.uid
+//            this.username = user!!.username
+//            this.avatar = user!!.avatar
+//            this.isOnline = isOnline
+//        }
 
         CoroutineScope(IO).launch {
-            val filter = Document().append("_id", Document().append("\$eq", ObjectId(tempUser.uid)))
-            val replacement = userToDocument(tempUser)
+            val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
+//            val replacement = userToDocument(tempUser)
 
-            val task = DB.collUsers.findOneAndReplace(filter, replacement)
+            val mongoResult = DB.collUsers.findOne(filter)
+            while (!mongoResult.isComplete) delay(5)
+            mongoResult.result["isOnline"] = isOnline
+
+            val task = DB.collUsers.findOneAndReplace(filter, mongoResult.result)
             while (!task.isComplete) delay(5)
 
             CoroutineScope(Dispatchers.Main).launch {
