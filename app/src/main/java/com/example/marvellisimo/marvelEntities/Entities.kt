@@ -84,7 +84,7 @@ open class Series (
     var title: String = "", // (string, optional): The canonical title of the series.,
     var description: String? = "hej", // (string, optional): A description of the series.,
     //resourceURI (string, optional): The canonical URL identifier for this resource.,
-    //urls (Array[Url], optional): A set of public web site URLs for the resource.,
+    var urls: RealmList<Url> = RealmList(),
     var startYear: Int = 1, // (int, optional): The first year of publication for the series.,
     var endYear: Int = 1, // (int, optional): The last year of publication for the series (conventionally, 2099 for ongoing series) .,
     var rating: String = "", // (string, optional): The age-appropriateness rating for the series.,

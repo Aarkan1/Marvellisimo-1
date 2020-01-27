@@ -42,13 +42,15 @@ class SeriesDetailsActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.getSeries(serieId.toString())
+
+        web_details_button_series.setOnClickListener { webButtonClick() }
     }
 
     private fun webButtonClick() {
-//        val url: String = viewModel.series.value?.url ?: ""
+        val url: String = viewModel.series.value?.url ?: ""
         val name: String = viewModel.series.value?.title ?: ""
         val intent = Intent(this, WebViewActivity::class.java)
-//        intent.putExtra("url", url)
+        intent.putExtra("url", url)
         intent.putExtra("name", name)
         startActivity(intent)
     }

@@ -9,6 +9,7 @@ class SeriesNonRealm(series: Series? = null) {
     var startYear: Int = 1
     var endYear: Int = 1
     var rating: String = ""
+    var url: String = ""
     var thumbnail: ImageNonRealm =
         ImageNonRealm("", "")
 
@@ -23,6 +24,7 @@ class SeriesNonRealm(series: Series? = null) {
             startYear = series.startYear
             endYear = series.endYear
             rating = series.rating
+            url = series.urls.last()!!.url.replace("http:", "https:")
         }
     }
 }

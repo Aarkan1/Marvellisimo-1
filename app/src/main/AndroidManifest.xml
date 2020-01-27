@@ -32,7 +32,6 @@
                 android:value="com.example.marvellisimo.search.SearchActivity">
         </meta-data>
 
-        <activity android:name=".activity.character_details.CharacterDetailsActivity"/>
         <activity android:name=".activity.favorites.FavoritesActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -72,7 +71,6 @@
                     android:name="android.app.default_searchable"
                     android:value="com.example.marvellisimo.search.SearchActivity"/>
         </activity>
-        <activity android:name=".activity.receiver.ReceiveItemsActivity" />
 
         <service
                 android:name=".notification.TestService"
