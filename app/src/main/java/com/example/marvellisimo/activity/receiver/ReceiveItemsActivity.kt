@@ -2,6 +2,7 @@ package com.example.marvellisimo.activity.receiver
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -42,47 +43,43 @@ class ReceiveItemsActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem() }
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
-
             adapter.clear()
 
-            var listSize = it.size
-
             it.forEach {item ->
-                listSize--
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (item.type == "character"){
-                        val character = viewModel.fetchItem(item.itemId)
-                        CoroutineScope(Dispatchers.Main).launch {
-                            if (character != null) {
-                                adapter.add(
-                                    ReceivedItem(
-                                        character,
-                                        item.senderName,
-                                        item.date.toLong()
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    else{
-                        val series = viewModel.fetchSeries(item.itemId)
-                        CoroutineScope(Dispatchers.Main).launch {
-                            if (series != null) {
-                                adapter.add(
-                                    ReceivedSeries(
-                                        series,
-                                        item.senderName,
-                                        item.date.toLong()
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-                if (listSize  == 0) dialog.dismiss()
+                fetchItem(item)
             }
             received_item_List_recyclerView.adapter = adapter
         })
+
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) dialog.show() else dialog.dismiss()
+        })
+    }
+
+    private fun fetchItem(item: ReceiveItem) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (item.type == "character"){
+                val character = viewModel.fetchItem(item.itemId)
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (character != null) {
+                        adapter.add(
+                            ReceivedCharacter(character, item.senderName, item.date.toLong())
+                        )
+                    }
+                }
+            }
+            else{
+                val series = viewModel.fetchSeries(item.itemId)
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (series != null) {
+                        adapter.add(
+                            ReceivedSeries(series, item.senderName, item.date.toLong()
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
     }
 

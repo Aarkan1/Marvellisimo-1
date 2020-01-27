@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.received_item.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceivedItem(val receivedItem: CharacterNonRealm, val senderName: String, val date: Long): Item<GroupieViewHolder>() {
+class ReceivedCharacter(val receivedItem: CharacterNonRealm, val senderName: String, val date: Long): Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.received_item
     }

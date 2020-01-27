@@ -416,7 +416,7 @@ class Repository @Inject constructor(
     suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
         val gson = Gson()
         val tempList = ArrayList<Document>()
-        val filter = Document().append("receiverId", Document().append("\$eq", "5e2eaca8756ccc6ca15aa18b"))
+        val filter = Document().append("receiverId", Document().append("\$eq", "5e2eba3704c9a8419d3912d0"))
 
         val result = DB.sendReceive.find(filter).into(tempList)
 
