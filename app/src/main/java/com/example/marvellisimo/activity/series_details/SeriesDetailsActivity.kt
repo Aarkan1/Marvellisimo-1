@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
@@ -49,19 +50,19 @@ class SeriesDetailsActivity : AppCompatActivity() {
             val rating = if (it.rating.isEmpty()) "Rating not found."
             else it.rating
 
-            selected_item_end_year_textView.text = it.endYear.toString()
-            selected_item_start_year_textView.text = it.startYear.toString()
-            selected_item_rating_textView.text = rating
+            selected_series_end_year_textView.text = it.endYear.toString()
+            selected_series_start_year_textView.text = it.startYear.toString()
+            selected_series_rating_textView.text = rating
 
             var des = it.description
             if (des.isNullOrBlank()) des = "No description found."
 
-            selected_item_description_textView.text = des
-            selected_item_name_textView.text = it.title
+            selected_series_description_textView.text = des
+            selected_series_name_textView.text = it.title
             Log.d(TAG, "imageUrl: ${it.thumbnail.imageUrl}")
 
             if (it.thumbnail.imageUrl.isNotEmpty())
-                Picasso.get().load(it.thumbnail.imageUrl).into(selected_item_imageView)
+                Picasso.get().load(it.thumbnail.imageUrl).into(selected_series_imageView)
         })
 
         viewModel.loading.observe(this, Observer<Boolean> {
@@ -90,7 +91,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.detail_menu_send -> {
                 val intent = Intent(this, OnlineActivity::class.java)
                 intent.putExtra("itemId", viewModel.series.value?.id.toString())
@@ -100,11 +101,15 @@ class SeriesDetailsActivity : AppCompatActivity() {
                 Toast.makeText(
                     applicationContext, "You clicked Send to friend",
                     Toast.LENGTH_LONG
-                ).show()
-
+                ).show(); true
             }
-            R.id.detail_menu_add_to_favorites -> viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
+            R.id.detail_menu_add_to_favorites -> {
+                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
+            }
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java)); true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 }
