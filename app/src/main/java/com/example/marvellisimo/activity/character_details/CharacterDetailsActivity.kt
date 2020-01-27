@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.character_details
 
 import android.app.AlertDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
+import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -49,6 +51,17 @@ class CharacterDetailsActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.getCharacter(id.toString())
+
+        web_details_button_character.setOnClickListener { webButtonClick() }
+    }
+
+    private fun webButtonClick() {
+        val url: String = viewModel.character.value?.url ?: ""
+        val name: String = viewModel.character.value?.name ?: ""
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("url", url)
+        intent.putExtra("name", name)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {

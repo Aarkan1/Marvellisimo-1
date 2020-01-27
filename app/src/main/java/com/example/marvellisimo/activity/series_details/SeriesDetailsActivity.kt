@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.series_details
 
 import android.app.AlertDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -38,6 +40,15 @@ class SeriesDetailsActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.getSeries(serieId.toString())
+    }
+
+    private fun webButtonClick() {
+//        val url: String = viewModel.series.value?.url ?: ""
+        val name: String = viewModel.series.value?.title ?: ""
+        val intent = Intent(this, WebViewActivity::class.java)
+//        intent.putExtra("url", url)
+        intent.putExtra("name", name)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {
