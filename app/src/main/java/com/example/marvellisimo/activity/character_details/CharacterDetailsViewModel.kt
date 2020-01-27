@@ -47,11 +47,14 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
             }
         } catch (ex: Exception) {
             CS(Main).launch {
+                ex.printStackTrace()
                 toastMessage.value = "Something went wrong..."
                 toastMessage.value = ""
             }
         }
     }
 
-    fun sendToFriend(itemId: String, type: String) = repository.sendItemToFriend(itemId, type)
+    fun sendToFriend(itemId: String, type: String, uid: String) = CS(Main).launch {
+        repository.sendItemToFriend(itemId, type, uid)
+    }
 }

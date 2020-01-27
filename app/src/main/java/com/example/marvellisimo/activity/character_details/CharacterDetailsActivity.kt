@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.search.SearchActivity
+import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
 import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
@@ -110,17 +112,23 @@ class CharacterDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.detail_menu_send -> {
-                viewModel.sendToFriend(viewModel.character.value?.id.toString(), "character")
-                Toast.makeText(
-                    applicationContext, "You clicked Send to friend",
-                    Toast.LENGTH_LONG
-                ).show()
-
+                val intent = Intent(this, OnlineActivity::class.java)
+                intent.putExtra("itemId", viewModel.character.value?.id.toString())
+                intent.putExtra("type", "character")
+                startActivity(intent)
+                true
             }
-            R.id.detail_menu_add_to_favorites -> viewModel.addToFavorites(viewModel.character.value?.id.toString())
+            R.id.detail_menu_add_to_favorites -> {
+                viewModel.addToFavorites(viewModel.character.value?.id.toString())
+                true
+            }
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 }

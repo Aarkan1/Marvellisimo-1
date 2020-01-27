@@ -43,6 +43,7 @@ class SeriesDetailsViewModel @Inject constructor(
             }
         } catch (ex: Exception) {
             CS(Main).launch {
+                ex.printStackTrace()
                 toastMessage.value = "Something went wrong..."
                 toastMessage.value = ""
             }
