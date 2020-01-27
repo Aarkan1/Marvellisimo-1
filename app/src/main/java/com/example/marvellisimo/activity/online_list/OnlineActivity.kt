@@ -2,12 +2,13 @@ package com.example.marvellisimo.activity.online_list
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.repository.Repository
+import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
 import kotlinx.android.synthetic.main.activity_online.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -23,10 +24,20 @@ class OnlineActivity : AppCompatActivity(),
     @Inject
     lateinit var viewModel: OnlineViewModel
 
+    @Inject
+    lateinit var characterDetailsViewModel: CharacterDetailsViewModel
+
+    private var itemId: String? = null
+    private var type: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_online)
         MarvellisimoApplication.applicationComponent.inject(this)
+
+        itemId = intent.getStringExtra("itemId")
+        type = intent.getStringExtra("type")
+
 
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
@@ -36,10 +47,13 @@ class OnlineActivity : AppCompatActivity(),
 
     private fun addToRecycleView() {
         CoroutineScope(IO).launch {
-            val usernames = viewModel.fetchUsers().map { it.username }
+            val usernames = viewModel.fetchUsers().map { it }
             CoroutineScope(Main).launch {
                 onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
-                    .map { Online(it) }.toMutableList())
+                    .map { Online().apply {
+                        username = it.username
+                        uid = it.uid
+                    } }.toMutableList())
                 onlineAdapter.notifyDataSetChanged()
             }
         }
@@ -59,7 +73,15 @@ class OnlineActivity : AppCompatActivity(),
     override fun itemClicked(online: Online) {
         //TODO
         //Seend to yor online DB.client.auth.user?.profile?.email
-        Log.d("msg", online.username)
+        if (type != null && itemId != null){
+
+            characterDetailsViewModel.sendToFriend(itemId.toString(), "character", online.uid)
+
+            Toast.makeText(
+                applicationContext, "You sent this item to ${online.username}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
         //
 
     }
