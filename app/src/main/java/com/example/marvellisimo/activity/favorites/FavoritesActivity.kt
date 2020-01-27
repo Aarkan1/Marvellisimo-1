@@ -1,20 +1,23 @@
 package com.example.marvellisimo.activity.favorites
 
+import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.CharacterNonRealm
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -24,7 +27,7 @@ import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.favorite_item.view.*
 import javax.inject.Inject
 
-private const val TAG = "Favorites"
+private const val TAG = "FavoritesActivity"
 
 class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, SeriesItemActionListener {
 
@@ -33,6 +36,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
 
     private val charactersAdapter = GroupAdapter<GroupieViewHolder>()
     private val seriesAdapter = GroupAdapter<GroupieViewHolder>()
+    private lateinit var loadingDialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
@@ -42,30 +46,57 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         MarvellisimoApplication.applicationComponent.inject(this)
         supportActionBar?.title = "Favorites"
 
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
+        recycler_view_favorites.addItemDecoration(dividerItemDecoration)
+
+        createLoadingDialog()
+
         observeViewModel()
-        viewModel.fetchFavorites()
+    }
+
+    private fun createLoadingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = getString(R.string.loading_dialog_text)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        loadingDialog = builder.create()
     }
 
     private fun observeViewModel() {
-        viewModel.favoriteCharacters.observe(this, Observer<Array<CharacterNonRealm>> {
+        viewModel.favoriteCharacters.observe(this, Observer<Array<CharacterNonRealm>> { arr ->
             charactersAdapter.clear()
-            it.forEach { charactersAdapter.add(CharacterItem(it, this)) }
+            arr.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
-        viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> {
+        viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> { arr ->
             seriesAdapter.clear()
-            it.forEach { seriesAdapter.add(SeriesItem(it, this)) }
+            arr.forEach { seriesAdapter.add(SeriesItem(it, this)) }
         })
 
         viewModel.searchType.observe(this, Observer<SearchType> {
-            if (it == SearchType.CHARACTERS) recycler_view_favorites.adapter = charactersAdapter
-            else recycler_view_favorites.adapter = seriesAdapter
+            if (it == SearchType.CHARACTERS) {
+                recycler_view_favorites.adapter = charactersAdapter
+                viewModel.fetchFavoriteCharacters()
+            } else {
+                recycler_view_favorites.adapter = seriesAdapter
+                viewModel.fetchFavoriteSeries()
+            }
+        })
+
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) loadingDialog.show() else loadingDialog.dismiss()
+        })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(TAG, "onCreateOptionsMenu: starts")
-        menuInflater.inflate(R.menu.favorties, menu)
+        menuInflater.inflate(R.menu.favorites, menu)
 
         val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
 
@@ -100,7 +131,7 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     }
 
     override fun onSeriesClick(series: SeriesNonRealm) {
-        val intent = Intent(this, SerieDetailsActivity::class.java)
+        val intent = Intent(this, SeriesDetailsActivity::class.java)
         intent.putExtra("id", series.id)
         startActivity(intent)
     }
@@ -124,11 +155,6 @@ class CharacterItem(
     private val character: CharacterNonRealm, private val characterItemActionListener: CharacterItemActionListener
 ) : Item<GroupieViewHolder>() {
 
-    init {
-        character.thumbnail!!.path = character.thumbnail!!.path
-            .replace("http:", "https:") + "." + character.thumbnail!!.extension
-    }
-
     override fun getLayout(): Int {
         return R.layout.favorite_item
     }
@@ -142,19 +168,19 @@ class CharacterItem(
             characterItemActionListener.onRemoveCharacterClick(character)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = character.description
+        val description = if (character.description.isEmpty()) "No description found." else character.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = character.name
-        Picasso.get().load(character.thumbnail!!.path).into(viewHolder.itemView.favorite_item_imageView)
+
+        if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.favorite_item_imageView)
     }
 }
 
 class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActionListener: SeriesItemActionListener) :
     Item<GroupieViewHolder>() {
-
-    init {
-        series.thumbnail.path = series.thumbnail.path
-            .replace("http:", "https:") + "." + series.thumbnail.extension
-    }
 
     override fun getLayout(): Int {
         return R.layout.favorite_item
@@ -166,8 +192,13 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
             seriesItemActionListener.onRemoveSeriesClick(series)
         }
 
-        viewHolder.itemView.favorite_item_description_textView.text = series.description
+        val description = if (series.description?.isEmpty() != false) "No description found." else series.description
+
+        viewHolder.itemView.favorite_item_description_textView.text = description
         viewHolder.itemView.favorite_item_name_textView.text = series.title
-        Picasso.get().load(series.thumbnail.path).into(viewHolder.itemView.favorite_item_imageView)
+
+        if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.favorite_item_imageView)
     }
 }

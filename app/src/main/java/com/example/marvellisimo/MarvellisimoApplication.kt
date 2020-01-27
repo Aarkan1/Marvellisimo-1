@@ -5,13 +5,15 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
+import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
-import com.example.marvellisimo.activity.series_details.SerieDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.notification.TestService
 import com.example.marvellisimo.repository.MarvelProvider
+import com.example.marvellisimo.services.ApplicationLifecycle
 import com.mongodb.stitch.android.core.Stitch
 import dagger.Component
 import io.realm.Realm
@@ -24,8 +26,12 @@ interface ApplicationComponent {
     fun inject(activity: FavoritesActivity)
     fun inject(activity: SearchActivity)
     fun inject(activity: CharacterDetailsActivity)
-    fun inject(activity: SerieDetailsActivity)
+    fun inject(activityS: SeriesDetailsActivity)
     fun inject(activity: SearchResultActivity)
+    fun inject(activity: ReceiveItemsActivity)
+    fun inject(activity: MainActivity)
+    fun inject(activity: LoginActivity)
+    fun inject(activity: RegisterActivity)
     fun inject(activity: OnlineActivity)
     fun inject(job: TestService)
 }
@@ -39,7 +45,6 @@ class MarvellisimoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         applicationComponent = DaggerApplicationComponent.create()
 
         Realm.init(this)
@@ -48,11 +53,18 @@ class MarvellisimoApplication : Application() {
             .schemaVersion(0)
             .deleteRealmIfMigrationNeeded()
             .build()
+
         Realm.setDefaultConfiguration(config)
+
+        val realm = Realm.getDefaultInstance()
+        realm.executeTransaction{ it .deleteAll()}
 
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
 
         createNotificationChannel()
+
+        // manage when app starts/closes
+        registerActivityLifecycleCallbacks(ApplicationLifecycle())
     }
 
     private fun createNotificationChannel() {

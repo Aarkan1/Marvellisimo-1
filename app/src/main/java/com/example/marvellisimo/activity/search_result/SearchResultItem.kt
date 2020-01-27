@@ -1,97 +1,79 @@
 package com.example.marvellisimo.activity.search_result
 
 import com.example.marvellisimo.R
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.models.common.CharacterNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
+import com.example.marvellisimo.repository.models.common.SeriesSummaryNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import kotlinx.android.synthetic.main.character_detail_series_list.view.*
 import kotlinx.android.synthetic.main.search_result_item.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
 
+private val TAG = "CharacterSearchResultItem"
 
-class CharacterSearchResultItem (val character: Character): Item<GroupieViewHolder>() {
+class CharacterSearchResultItem(val character: CharacterNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        CoroutineScope(IO).launch {
-            val str1 = character.thumbnail!!.path
+//        var des = character.description
+//        if (des.length > 200) des = des.substring(0, 140) + "..."
+//        else if (des.isEmpty()) des = "No description found"
+//
+//        var name = character.name
+//        if (name.length > 25)
+//            name = character.name.substring(0, 25) + "..."
 
-            var des = character.description
-            if (des.length > 200) des = des.substring(0, 140) + "..."
-            else if (des.length <= 0)
-                des = "No description found"
+        val description = if (character.description.isEmpty()) "No description found." else character.description
 
-            var name = character.name
-            if (name.length > 25)
-            name = character.name.substring(0, 25) + "..."
+        viewHolder.itemView.search_result_item_description_textView.text = description
+        viewHolder.itemView.search_result_item_name_textView.text = character.name
 
-            CoroutineScope(Main).launch {
-                viewHolder.itemView.search_result_item_description_textView.text = des
-                viewHolder.itemView.search_result_item_name_textView.text = name
-
-                val path = str1
-                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
-
-            }
-        }
+        if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
 
-class SeriesSearchResultItem (val serie: Series): Item<GroupieViewHolder>() {
+class SeriesSearchResultItem(val series: SeriesNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.search_result_item
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        CoroutineScope(IO).launch {
-            val str1 = serie.thumbnail!!.path
+//        var des = series.description
+//        if (des != null) {
+//            if (des.length > 200) des = des.substring(0, 140) + "..."
+//        } else des = "No description found"
+//
+//        var title = series.title
+//        if (title.length > 25)
+//            title = series.title.substring(0, 25) + "..."
 
+        val description = if (series.description?.isEmpty() != false) "No description found." else series.description
 
-            var des = serie.description
-            if (des != null) {
-                if (des.length > 200) des = des.substring(0, 140) + "..."
-            }
-            else des = "No description found"
+        viewHolder.itemView.search_result_item_description_textView.text = description
+        viewHolder.itemView.search_result_item_name_textView.text = series.title
 
-            var title = serie.title
-            if (title.length > 25)
-                title = serie.title.substring(0, 25) + "..."
-
-            CoroutineScope(Main).launch {
-                val path = str1
-
-                viewHolder.itemView.search_result_item_description_textView.text = des
-                viewHolder.itemView.search_result_item_name_textView.text = title
-                Picasso.get().load(path).into(viewHolder.itemView.search_result_item_imageView)
-            }
-        }
+        if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)
+            .placeholder(R.drawable.ic_menu_camera)
+            .into(viewHolder.itemView.search_result_item_imageView)
     }
 }
 
-
-class CharacterDetailSeriesListItem (val serie: SeriesSummaryNonRealm): Item<GroupieViewHolder>() {
+class CharacterDetailSeriesListItem(val serie: SeriesSummaryNonRealm) : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
-        var layout: Int = 1
-            layout = R.layout.character_detail_series_list
-
-
-        return layout
+        return R.layout.character_detail_series_list
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-            val name = serie.name
+        val name = serie.name
 
-
-            val namee = name
-                viewHolder.itemView.serie_textView.text = namee
+        val namee = name
+        viewHolder.itemView.serie_textView.text = namee
 
     }
 }

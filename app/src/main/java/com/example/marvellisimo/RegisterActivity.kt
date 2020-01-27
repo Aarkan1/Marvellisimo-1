@@ -4,20 +4,28 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.DB
+import com.example.marvellisimo.repository.Repository
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
 import kotlinx.android.synthetic.main.activity_register.*
 import org.bson.Document
 import org.bson.types.ObjectId
+import javax.inject.Inject
 
 private const val TAG = "RegisterActivity"
 
 class RegisterActivity : AppCompatActivity() {
 
+    @Inject
+    lateinit var viewModel: RegisterViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        MarvellisimoApplication.applicationComponent.inject(this)
 
         btn_regrister.setOnClickListener {
             preformRegister()
@@ -43,7 +51,7 @@ class RegisterActivity : AppCompatActivity() {
                 val credential = UserPasswordCredential(email, password)
                 // auto login after sign up
                 // because mongoDB Stitch requires confirmation + sign in to get a _id
-                DB.client.auth.loginWithCredential(credential)
+                DB.stitchClient.auth.loginWithCredential(credential)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             //Log.d("stitch", "Successfully registered user: ${task.result!!.id}")
@@ -54,10 +62,10 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["email"] = email
                             userDoc["avatar"] = ""
                             userDoc["isOnline"] = true
-                            DB.users.insertOne(userDoc)
                             userDoc["favoriteSeries"] = ArrayList<String>()
                             userDoc["favoriteCharacters"] = ArrayList<String>()
-                            DB.users.insertOne(userDoc)
+
+                            viewModel.createNewUser(userDoc)
                             val intent = Intent(this, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)

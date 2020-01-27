@@ -1,26 +1,30 @@
 package com.example.marvellisimo.activity.series_details
 
+import android.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
+
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.activity.search_result.SeriesNonRealm
-import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SerieDetailsActivity : AppCompatActivity() {
+private const val TAG = "SeriesDetailsActivity"
+
+class SeriesDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
+
+    private lateinit var loadingDialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +34,17 @@ class SerieDetailsActivity : AppCompatActivity() {
 
         val serieId = intent.getIntExtra("id", 0)
 
-        CoroutineScope(IO).launch { viewModel.getSeries(serieId.toString()) }
+        createLoadingDialog()
+        observeViewModel()
 
+        viewModel.getSeries(serieId.toString())
+    }
+
+    private fun observeViewModel() {
         viewModel.series.observe(this, Observer<SeriesNonRealm> {
             supportActionBar!!.title = it.title
 
-            val rating = if (it.rating.isEmpty()) "Rating not found "
+            val rating = if (it.rating.isEmpty()) "Rating not found."
             else it.rating
 
             selected_item_end_year_textView.text = it.endYear.toString()
@@ -43,15 +52,33 @@ class SerieDetailsActivity : AppCompatActivity() {
             selected_item_rating_textView.text = rating
 
             var des = it.description
-            if (des == null) des = "No description found"
+            if (des.isNullOrBlank()) des = "No description found."
 
             selected_item_description_textView.text = des
             selected_item_name_textView.text = it.title
-            if (it.thumbnail.path.isNotEmpty()) {
-                Picasso.get().load(it.thumbnail.path).into(selected_item_imageView)
-            }
+            Log.d(TAG, "imageUrl: ${it.thumbnail.imageUrl}")
 
+            if (it.thumbnail.imageUrl.isNotEmpty())
+                Picasso.get().load(it.thumbnail.imageUrl).into(selected_item_imageView)
         })
+
+        viewModel.loading.observe(this, Observer<Boolean> {
+            if (it) loadingDialog.show() else loadingDialog.dismiss()
+        })
+
+        viewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun createLoadingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
+        message.text = getString(R.string.loading_dialog_text)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        loadingDialog = builder.create()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,13 +96,7 @@ class SerieDetailsActivity : AppCompatActivity() {
                 ).show()
 
             }
-            R.id.detail_menu_add_to_favorites -> {
-                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
-                Toast.makeText(
-                    applicationContext, "You clicked add to favorites",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            R.id.detail_menu_add_to_favorites -> viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString())
         }
         return super.onOptionsItemSelected(item)
     }
