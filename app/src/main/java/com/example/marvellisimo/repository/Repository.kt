@@ -392,6 +392,7 @@ class Repository @Inject constructor(
         val currentTimestamp = System.currentTimeMillis()
 
         val sendDoc = Document()
+        sendDoc["_id"] = ObjectId("5e2aabffd6503302ec21ff2e")
         sendDoc["senderId"] = "5e2aaf53d6503302ec2549c4"
         sendDoc["receiverId"] = "5e2aabffd6503302ec21ff2e"
         sendDoc["itemId"] = itemId
@@ -416,10 +417,9 @@ class Repository @Inject constructor(
     suspend fun fetchReceivedItem(): ArrayList<ReceiveItem> {
         val gson = Gson()
         val tempList = ArrayList<Document>()
-        val filter = Document()
-            .append("receiverId", Document().append("\$eq", "5e2aaf53d6503302ec2549c4"))
+        val filter = Document().append("_id", Document().append("\$eq", ObjectId("5e2aabffd6503302ec21ff2e")))
 
-        val result = DB.sendReceive.find().into(tempList)
+        val result = DB.sendReceive.find(filter).into(tempList)
 
         while(!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), ReceiveItem::class.java) })

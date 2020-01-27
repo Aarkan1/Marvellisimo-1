@@ -15,13 +15,13 @@ class ReceivedItem(val receivedItem: CharacterNonRealm, val senderName: String, 
     }
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm")
         val currentDate = sdf.format(Date(date))
 
         viewHolder.itemView.received_item_name_textView.text = receivedItem.name
         viewHolder.itemView.received_item_sender_name_textView.text = senderName
         viewHolder.itemView.received_item_time_textView.text = currentDate
 
-        Picasso.get().load(receivedItem.thumbnail!!.path).into(viewHolder.itemView.received_item_imageView)
+        Picasso.get().load(receivedItem.thumbnail.imageUrl).into(viewHolder.itemView.received_item_imageView)
     }
 }
