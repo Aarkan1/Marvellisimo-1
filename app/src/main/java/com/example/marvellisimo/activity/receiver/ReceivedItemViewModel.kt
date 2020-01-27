@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.receiver
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.repository.Repository
@@ -19,9 +20,9 @@ class ReceivedItemViewModel @Inject constructor(
     val loading = MutableLiveData<Boolean>().apply { value = false }
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
 
-    fun fetchReceivedItem() = CS(Dispatchers.IO).launch {
+    fun fetchReceivedItem(type: String) = CS(Dispatchers.IO).launch {
         if (receivedItems.value.isNullOrEmpty()) CS(Dispatchers.Main).launch { loading.value = true }
-        val receivedItemsFromDb = repository.fetchReceivedItem()
+        val receivedItemsFromDb = repository.fetchReceivedItem(type)
 
         CS(Dispatchers.Main).launch {
             if (receivedItemsFromDb.isEmpty()) loading.value = false

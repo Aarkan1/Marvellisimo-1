@@ -2,7 +2,6 @@ package com.example.marvellisimo.activity.receiver
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import android.widget.TextView
@@ -43,15 +42,37 @@ class ReceiveItemsActivity : AppCompatActivity() {
         supportActionBar!!.title = "Received Item"
 
         createProgressDialog()
-        CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem() }
 
         observeViewModel()
+    }
+
+    private fun fetchCharacter(item: ReceiveItem) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val character = viewModel.fetchItem(item.itemId)
+            CoroutineScope(Dispatchers.Main).launch {
+                if (character != null) {
+                    adapter.add(
+                        ReceivedCharacter(character, item.senderName, item.date.toLong())
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.searchType.observe(this, Observer<SearchType> {
+            if (it == SearchType.CHARACTERS) {
+                CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem("character") }
+            } else {
+                CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem("serie") }
+            }
+        })
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
             adapter.clear()
 
-            it.forEach { item ->
-                fetchItem(item)
+            it.forEach {
+                if (it.type == "character") fetchCharacter(it) else fetchSeries(it)
             }
             received_item_List_recyclerView.adapter = adapter
         })
@@ -61,42 +82,21 @@ class ReceiveItemsActivity : AppCompatActivity() {
         })
     }
 
-    private fun observeViewModel() {
-        viewModel.searchType.observe(this, Observer<SearchType> {
-            if (it == SearchType.CHARACTERS) {
-                // TODO do something
-            } else {
-                // TODO do something else
-            }
-        })
-    }
-
-    private fun fetchItem(item: ReceiveItem) {
+    private fun fetchSeries(item: ReceiveItem) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (item.type == "character") {
-                val character = viewModel.fetchItem(item.itemId)
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (character != null) {
-                        adapter.add(
-                            ReceivedCharacter(character, item.senderName, item.date.toLong())
+            val series = viewModel.fetchSeries(item.itemId)
+            CoroutineScope(Dispatchers.Main).launch {
+                if (series != null) {
+                    adapter.add(
+                        ReceivedSeries(
+                            series, item.senderName, item.date.toLong()
                         )
-                    }
-                }
-            } else {
-                val series = viewModel.fetchSeries(item.itemId)
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (series != null) {
-                        adapter.add(
-                            ReceivedSeries(
-                                series, item.senderName, item.date.toLong()
-                            )
-                        )
-                    }
+                    )
                 }
             }
         }
-
     }
+
 
     private fun createProgressDialog() {
         val builder = AlertDialog.Builder(this)
@@ -131,7 +131,6 @@ class ReceiveItemsActivity : AppCompatActivity() {
                 component.setText(R.string.switch_search_options_characters)
             }
         }
-
         return true
     }
 }
