@@ -13,4 +13,31 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="back_to_regrister">Back to regrister</string>
+    <string name="username">Username</string>
+    <string name="regrister">Regrister</string>
+    <string name="go_to_login">Go to login</string>
+    <string name="toolbar_search">Search</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="textview_search_options">Search Options</string>
+    <string name="switch_search_options_characters">Characters</string>
+    <string name="switch_search_options_series">Series</string>
+    <string name="textview_search_options_search_for">Search For</string>
+    <string name="imageview_close_button_description">exit</string>
+    <string name="logout">Logout</string>
+    <string name="friends">Friends</string>
+    <string name="friendlist">FriendList</string>
+    <string name="textview">TextView</string>
+    <string name="online">Online</string>
+    <string name="onlinelist">OnlineList</string>
+    <string name="toolbar_favorites">Favorites</string>
+    <string name="favorite_item_character_image_description">Character Image</string>
+    <string name="loading_dialog_text">Loading…</string>
+    <string name="send_it_to_friend">Send to friend</string>
+    <string name="add_to_favorites">Add to favorites</string>
 </resources>

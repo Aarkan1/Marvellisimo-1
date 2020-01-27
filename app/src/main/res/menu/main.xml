@@ -6,4 +6,27 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item android:id="@+id/action_favorites"
+        android:orderInCategory="100"
+        android:title="@string/toolbar_favorites"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/action_search"
+          android:title="@string/toolbar_search"
+          android:icon="@android:drawable/ic_menu_search"
+          app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_OnlineList"
+        android:orderInCategory="100"
+        android:title="@string/onlinelist"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:orderInCategory="100"
+        android:title="@string/logout"
+        app:showAsAction="never" />
+
 </menu>
