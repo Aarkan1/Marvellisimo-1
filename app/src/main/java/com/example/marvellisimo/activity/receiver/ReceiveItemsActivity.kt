@@ -3,6 +3,8 @@ package com.example.marvellisimo.activity.receiver
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.models.ReceiveItem
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_receive_items.*
@@ -42,10 +45,12 @@ class ReceiveItemsActivity : AppCompatActivity() {
         createProgressDialog()
         CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem() }
 
+        observeViewModel()
+
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
             adapter.clear()
 
-            it.forEach {item ->
+            it.forEach { item ->
                 fetchItem(item)
             }
             received_item_List_recyclerView.adapter = adapter
@@ -56,9 +61,19 @@ class ReceiveItemsActivity : AppCompatActivity() {
         })
     }
 
+    private fun observeViewModel() {
+        viewModel.searchType.observe(this, Observer<SearchType> {
+            if (it == SearchType.CHARACTERS) {
+                // TODO do something
+            } else {
+                // TODO do something else
+            }
+        })
+    }
+
     private fun fetchItem(item: ReceiveItem) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (item.type == "character"){
+            if (item.type == "character") {
                 val character = viewModel.fetchItem(item.itemId)
                 CoroutineScope(Dispatchers.Main).launch {
                     if (character != null) {
@@ -67,13 +82,13 @@ class ReceiveItemsActivity : AppCompatActivity() {
                         )
                     }
                 }
-            }
-            else{
+            } else {
                 val series = viewModel.fetchSeries(item.itemId)
                 CoroutineScope(Dispatchers.Main).launch {
                     if (series != null) {
                         adapter.add(
-                            ReceivedSeries(series, item.senderName, item.date.toLong()
+                            ReceivedSeries(
+                                series, item.senderName, item.date.toLong()
                             )
                         )
                     }
@@ -87,10 +102,36 @@ class ReceiveItemsActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
         val message = dialogView.findViewById<TextView>(R.id.progressDialog_message)
-        message.text = "Loading..."
+        message.text = getString(R.string.loading_dialog_text)
         builder.setView(dialogView)
         builder.setCancelable(false)
         dialog = builder.create()
         dialog.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.received_items, menu)
+
+        val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
+
+        if (viewModel.searchType.value == SearchType.CHARACTERS) {
+            switch.setText(R.string.switch_search_options_characters)
+            switch.isChecked = false
+        } else {
+            switch.setText(R.string.switch_search_options_series)
+            switch.isChecked = true
+        }
+
+        switch.setOnCheckedChangeListener { component, checked ->
+            if (checked) {
+                viewModel.searchType.value = SearchType.SERIES
+                component.setText(R.string.switch_search_options_series)
+            } else {
+                viewModel.searchType.value = SearchType.CHARACTERS
+                component.setText(R.string.switch_search_options_characters)
+            }
+        }
+
+        return true
     }
 }
