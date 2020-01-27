@@ -12,7 +12,7 @@ import kotlinx.coroutines.*
 import org.bson.Document
 import org.bson.types.ObjectId
 
-class ApplicationLifecycle: Application.ActivityLifecycleCallbacks {
+class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
     private var mVisibleCount = 0
     private var mInBackground = false
 
@@ -40,21 +40,25 @@ class ApplicationLifecycle: Application.ActivityLifecycleCallbacks {
         CoroutineScope(Dispatchers.IO).launch {
             val id = Stitch.getDefaultAppClient().auth.user?.id ?: return@launch
 
-            val realm = Realm.getDefaultInstance()
-            val realmUser = realm.where(User::class.java)
-                .equalTo("uid", id)
-                .findAll()
+//            val realm = Realm.getDefaultInstance()
+//            val realmUser = realm.where(User::class.java)
+//                .equalTo("uid", id)
+//                .findAll()
 
-            if (realmUser.isNotEmpty()) {
-                updateUser(realmUser[0]!!, isOnline)
-            } else {
-                val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
-                DB.collUsers.findOne(filter)
+            val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
+            DB.collUsers.findOne(filter)
                 .addOnCompleteListener { doc ->
                     val gson = Gson()
-                    updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+                    try {
+                        updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
                 }
-            }
+//            if (realmUser.isNotEmpty()) {
+//                updateUser(realmUser[0]!!, isOnline)
+//            } else {
+//            }
         }
     }
 
