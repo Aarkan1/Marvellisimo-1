@@ -31,7 +31,7 @@
                 app:layout_constraintTop_toTopOf="@id/selected_character_imageView"
 
                 tools:text="Hulk" app:layout_constraintStart_toEndOf="@+id/selected_character_imageView"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="8dp" android:layout_marginTop="8dp"/>
 
         <TextView
                 android:id="@+id/selected_character_description_textView"
