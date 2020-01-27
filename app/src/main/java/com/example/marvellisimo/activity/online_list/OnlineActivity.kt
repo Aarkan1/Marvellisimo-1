@@ -21,7 +21,7 @@ class OnlineActivity : AppCompatActivity(),
     private var onlines = arrayListOf<Online>()
 
     @Inject
-    lateinit var repository: Repository
+    lateinit var viewModel: OnlineViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +36,7 @@ class OnlineActivity : AppCompatActivity(),
 
     private fun addToRecycleView() {
         CoroutineScope(IO).launch {
-            val usernames = repository.fetchUsers().map { it.username }
+            val usernames = viewModel.fetchUsers().map { it.username }
             CoroutineScope(Main).launch {
                 onlineAdapter.onlines =  ArrayList( usernames.mapNotNull{it}
                     .map { Online(it) }.toMutableList())
