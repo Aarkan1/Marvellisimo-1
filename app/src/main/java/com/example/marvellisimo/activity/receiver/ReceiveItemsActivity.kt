@@ -39,7 +39,7 @@ class ReceiveItemsActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         received_item_List_recyclerView.addItemDecoration(dividerItemDecoration)
 
-        supportActionBar!!.title = "Received Item"
+        supportActionBar!!.title = "Received Items"
 
         createProgressDialog()
 
