@@ -1,6 +1,5 @@
 package com.example.marvellisimo.activity.online_list
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +17,7 @@ class OnlineActivity : AppCompatActivity(),
     OnlineActionListener {
     private val TAG = "OnlineActivity"
     private var onlines = arrayListOf<Online>()
+    private var active = true;
 
     @Inject
     lateinit var viewModel: OnlineViewModel
@@ -31,13 +31,14 @@ class OnlineActivity : AppCompatActivity(),
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
         obcervRecycleView()
-        viewModel.fetchUsers()
+        viewModel.fetchUsers(active)
     }
 
     private fun obcervRecycleView() {
         viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
+            onlineAdapter.onlines.clear()
             onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
-                .map { Online(it.username) }.toMutableList())
+                .map {Online(it.username)}.toMutableList())
             onlineAdapter.notifyDataSetChanged()
         })
     }
@@ -61,6 +62,3 @@ class OnlineActivity : AppCompatActivity(),
 
     }
 }
-
-
-
