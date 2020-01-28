@@ -40,25 +40,16 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         CoroutineScope(Dispatchers.IO).launch {
             val id = Stitch.getDefaultAppClient().auth.user?.id ?: return@launch
 
-//            val realm = Realm.getDefaultInstance()
-//            val realmUser = realm.where(User::class.java)
-//                .equalTo("uid", id)
-//                .findAll()
-
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
             DB.collUsers.findOne(filter)
-                .addOnCompleteListener { doc ->
-                    val gson = Gson()
-                    try {
-                        updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
+            .addOnCompleteListener { doc ->
+                val gson = Gson()
+                try {
+                    updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
-//            if (realmUser.isNotEmpty()) {
-//                updateUser(realmUser[0]!!, isOnline)
-//            } else {
-//            }
+            }
         }
     }
 
@@ -67,7 +58,6 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
         val userDoc = Document()
         userDoc["isOnline"] = isOnline
-        DB.collUsers.findOneAndUpdate(filter, userDoc)
         userDoc["_id"] = ObjectId(user.uid)
         userDoc["uid"] = user.uid
         userDoc["username"] = user.username

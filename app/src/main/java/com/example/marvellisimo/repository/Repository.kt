@@ -106,20 +106,6 @@ class Repository @Inject constructor(
                 it.insertOrUpdate(user)
             }
         }
-
-//        if (user == null) throw Exception("No user")
-//
-//        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-//        val replacement = userToDocument(user!!)
-//
-//        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-//        while (!task.isComplete) delay(5)
-//        CoroutineScope(Dispatchers.Main).launch {
-//            realm.executeTransaction {
-//                it.insertOrUpdate(documentToUser(task.result))
-//            }
-//        }
-
     }
 
     fun createNewUser(userDoc: Document) {
@@ -145,7 +131,6 @@ class Repository @Inject constructor(
             Log.e(TAG, "No user")
             return
         }
-
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
             val mongoResult = DB.collUsers.findOne(filter)
@@ -156,8 +141,8 @@ class Repository @Inject constructor(
             val task = DB.collUsers.findOneAndReplace(filter, mongoResult.result)
             while (!task.isComplete) delay(5)
 
-            if (logOut) {
-                Log.d(TAG, "Logging out user")
+            if (!isOnline && logOut) {
+                Log.d(TAG, "Logging out user: ${task.result}")
                 DB.stitchClient.auth.logout()
                 user = null
             }
