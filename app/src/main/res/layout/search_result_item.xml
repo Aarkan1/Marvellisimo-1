@@ -4,10 +4,14 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:orientation="vertical" android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
-                                                   android:layout_marginTop="16dp"
-                                                   android:layout_marginBottom="16dp">
+                                                   android:layout_marginTop="8dp"
+                                                   android:background="@drawable/search_result_item"
+                                                   android:layout_marginStart="16dp"
+                                                   android:layout_marginEnd="16dp"
+                                                   android:padding="16dp"
+                                                   android:paddingStart="0dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/search_result_item_imageView"
             android:contentDescription="@string/favorite_item_character_image_description"
             android:layout_width="107dp"
@@ -16,7 +20,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintVertical_bias="0.50"
             tools:srcCompat="@tools:sample/avatars"/>
 
     <TextView
