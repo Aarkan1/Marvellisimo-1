@@ -31,6 +31,7 @@
                 android:name="android.app.default_searchable"
                 android:value="com.example.marvellisimo.search.SearchActivity">
         </meta-data>
+        <meta-data android:name="preloaded_fonts" android:resource="@array/preloaded_fonts"/>
 
         <activity android:name=".activity.favorites.FavoritesActivity">
             <meta-data
