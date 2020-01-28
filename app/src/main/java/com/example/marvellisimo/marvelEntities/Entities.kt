@@ -1,12 +1,8 @@
 package com.example.marvellisimo.marvelEntities
 
-import android.os.Parcelable
 import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
-import kotlinx.android.parcel.Parcelize
-import org.jetbrains.annotations.NotNull
 
 data class CharacterDataWrapper(
     // val copyright: String, // optional): The copyright notice for the returned result.,
@@ -29,7 +25,7 @@ data class CharacterDataContainer(
 open class Character(
     //val modified: Date, //, optional): The date the resource was most recently modified.,
     //val resourceURI: string, //, optional): The canonical URL identifier for this resource.,
-    //val urls: Array, //[Url], optional): A set of public web site URLs for the resource.,
+    var urls: RealmList<Url> = RealmList(), //[Url], optional): A set of public web site URLs for the resource.,
     var thumbnail: Image? = Image("", ""), //, optional): The representative image for this character.,
     /*val comics: ComicList, //, optional): A resource list containing comics which feature this character.,
     val stories: StoryList, //, optional): A resource list of stories in which this character appears.,
@@ -40,6 +36,11 @@ open class Character(
     var id: Int = 1, //, optional): The unique ID of the character resource.,
     var name: String = "", //, optional): The name of the character.,
     var description: String = "" //, optional): A short bio or description of the character.,
+): RealmObject()
+
+open class Url (
+    //var type (string, optional): A text identifier for the URL.,
+    var url: String = "" // (string, optional): A full URL (including scheme, domain, and path).
 ): RealmObject()
 
 open class SeriesList (
@@ -83,7 +84,7 @@ open class Series (
     var title: String = "", // (string, optional): The canonical title of the series.,
     var description: String? = "hej", // (string, optional): A description of the series.,
     //resourceURI (string, optional): The canonical URL identifier for this resource.,
-    //urls (Array[Url], optional): A set of public web site URLs for the resource.,
+    var urls: RealmList<Url> = RealmList(),
     var startYear: Int = 1, // (int, optional): The first year of publication for the series.,
     var endYear: Int = 1, // (int, optional): The last year of publication for the series (conventionally, 2099 for ongoing series) .,
     var rating: String = "", // (string, optional): The age-appropriateness rating for the series.,

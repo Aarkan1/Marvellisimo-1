@@ -7,6 +7,7 @@ class CharacterNonRealm(character: Character? = null) {
         ImageNonRealm("", "")
     var series: SeriesListNonRealm? =
         SeriesListNonRealm()
+    var url: String = ""
     var id: Int = 1
     var name: String = ""
     var description: String = ""
@@ -24,6 +25,7 @@ class CharacterNonRealm(character: Character? = null) {
                     .apply { name = it.name }
             })
             id = character.id
+            url = character.urls.last()!!.url.replace("http:", "https:")
         }
     }
 }

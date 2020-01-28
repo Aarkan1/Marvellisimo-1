@@ -106,20 +106,6 @@ class Repository @Inject constructor(
                 it.insertOrUpdate(user)
             }
         }
-
-//        if (user == null) throw Exception("No user")
-//
-//        val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-//        val replacement = userToDocument(user!!)
-//
-//        val task = DB.collUsers.findOneAndReplace(filter, replacement)
-//        while (!task.isComplete) delay(5)
-//        CoroutineScope(Dispatchers.Main).launch {
-//            realm.executeTransaction {
-//                it.insertOrUpdate(documentToUser(task.result))
-//            }
-//        }
-
     }
 
     fun createNewUser(userDoc: Document) {
@@ -139,41 +125,33 @@ class Repository @Inject constructor(
         }
     }
 
-    fun updateUserOnlineStatus(isOnline: Boolean) {
+    fun updateUserOnlineStatus(isOnline: Boolean, logOut: Boolean = false) {
         Log.d(TAG, "updateUserOnlineStatus: starts")
         if (user == null) {
             Log.e(TAG, "No user")
             return
         }
-
-//        val tempUser = User().apply {
-//            this.uid = user!!.uid
-//            this.username = user!!.username
-//            this.avatar = user!!.avatar
-//            this.isOnline = isOnline
-//        }
-
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
-//            val replacement = userToDocument(tempUser)
-
             val mongoResult = DB.collUsers.findOne(filter)
+
             while (!mongoResult.isComplete) delay(5)
             mongoResult.result["isOnline"] = isOnline
 
             val task = DB.collUsers.findOneAndReplace(filter, mongoResult.result)
             while (!task.isComplete) delay(5)
 
+            if (!isOnline && logOut) {
+                Log.d(TAG, "Logging out user")
+                DB.stitchClient.auth.logout()
+                user = null
+            }
+
             CoroutineScope(Dispatchers.Main).launch {
                 realm.executeTransaction {
                     it.insertOrUpdate(documentToUser(task.result))
                 }
             }
-        }
-
-        if (!isOnline) {
-            Log.d(TAG, "Logging out user")
-            user = null
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.marvellisimo.services
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.DB
 import com.google.gson.Gson
@@ -32,33 +33,21 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         }
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        updateOnlineStatus(true)
-    }
 
     private fun updateOnlineStatus(isOnline: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             val id = Stitch.getDefaultAppClient().auth.user?.id ?: return@launch
 
-//            val realm = Realm.getDefaultInstance()
-//            val realmUser = realm.where(User::class.java)
-//                .equalTo("uid", id)
-//                .findAll()
-
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
             DB.collUsers.findOne(filter)
-                .addOnCompleteListener { doc ->
-                    val gson = Gson()
-                    try {
-                        updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
+            .addOnCompleteListener { doc ->
+                val gson = Gson()
+                try {
+                    updateUser(gson.fromJson(gson.toJson(doc.result), User::class.java), isOnline)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
                 }
-//            if (realmUser.isNotEmpty()) {
-//                updateUser(realmUser[0]!!, isOnline)
-//            } else {
-//            }
+            }
         }
     }
 
@@ -67,7 +56,6 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
         val userDoc = Document()
         userDoc["isOnline"] = isOnline
-        DB.collUsers.findOneAndUpdate(filter, userDoc)
         userDoc["_id"] = ObjectId(user.uid)
         userDoc["uid"] = user.uid
         userDoc["username"] = user.username
@@ -83,4 +71,5 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
     override fun onActivityDestroyed(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
     override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 }

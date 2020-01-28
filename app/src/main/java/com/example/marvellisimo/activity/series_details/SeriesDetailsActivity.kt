@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
@@ -41,6 +42,17 @@ class SeriesDetailsActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.getSeries(serieId.toString())
+
+        web_details_button_series.setOnClickListener { webButtonClick() }
+    }
+
+    private fun webButtonClick() {
+        val url: String = viewModel.series.value?.url ?: ""
+        val name: String = viewModel.series.value?.title ?: ""
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("url", url)
+        intent.putExtra("name", name)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {
@@ -111,5 +123,6 @@ class SeriesDetailsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+        return super.onOptionsItemSelected(item)
     }
 }
