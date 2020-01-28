@@ -142,7 +142,7 @@ class Repository @Inject constructor(
             while (!task.isComplete) delay(5)
 
             if (!isOnline && logOut) {
-                Log.d(TAG, "Logging out user: ${task.result}")
+                Log.d(TAG, "Logging out user")
                 DB.stitchClient.auth.logout()
                 user = null
             }

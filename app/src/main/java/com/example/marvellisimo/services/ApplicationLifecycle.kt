@@ -3,6 +3,7 @@ package com.example.marvellisimo.services
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.repository.DB
 import com.google.gson.Gson
@@ -32,9 +33,6 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         }
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        updateOnlineStatus(true)
-    }
 
     private fun updateOnlineStatus(isOnline: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -73,4 +71,5 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
     override fun onActivityDestroyed(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
     override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 }
