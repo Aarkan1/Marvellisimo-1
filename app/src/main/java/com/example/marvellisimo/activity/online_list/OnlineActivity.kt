@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -19,7 +20,7 @@ class OnlineActivity : AppCompatActivity(),
     OnlineActionListener {
     private val TAG = "OnlineActivity"
     private var onlines = arrayListOf<Online>()
-    private var active = true;
+    private var active = true
 
     @Inject
     lateinit var viewModel: OnlineViewModel
@@ -42,11 +43,18 @@ class OnlineActivity : AppCompatActivity(),
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
-        obcervRecycleView()
+        obcervRecycleView(active)
         viewModel.fetchUsers(active)
+        viewModel.runwatchlist(true)
+        viewModel.watchlist(active)
     }
 
-    private fun obcervRecycleView() {
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.runwatchlist(false)
+    }
+
+    private fun obcervRecycleView(active: Boolean) {
         viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
             onlineAdapter.onlines.clear()
             onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
@@ -54,6 +62,7 @@ class OnlineActivity : AppCompatActivity(),
                     username = it.username
                     uid = it.uid
                 }}.toMutableList())
+            chanchtext(active)
             onlineAdapter.notifyDataSetChanged()
         })
     }
@@ -70,16 +79,21 @@ class OnlineActivity : AppCompatActivity(),
     }
 
     override fun itemClicked(online: Online) {
-        //TODO
         if (type != null && itemId != null){
             characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
             Toast.makeText(
-
                 applicationContext, "You sent this item to ${online.username}",
                 Toast.LENGTH_LONG
             ).show()
         }
-        //
+    }
 
+
+    fun chanchtext(active : Boolean){
+        if(active){
+            textView_online.text = "Online"
+        }else{
+            textView_online.text = "Offline"
+        }
     }
 }
