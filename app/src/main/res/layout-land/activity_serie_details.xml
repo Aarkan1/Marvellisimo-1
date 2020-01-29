@@ -31,7 +31,8 @@
                 android:textStyle="bold"
                 tools:text="Hulk Series" app:layout_constraintTop_toTopOf="@+id/selected_series_imageView"
                 app:layout_constraintStart_toEndOf="@+id/selected_series_imageView" android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="8dp" app:layout_constraintEnd_toStartOf="@+id/web_details_button_series"
+                android:layout_marginEnd="8dp"/>
 
         <TextView
                 android:id="@+id/selected_series_description_textView"
@@ -106,6 +107,17 @@
                 app:layout_constraintTop_toTopOf="@id/textView9"
                 app:layout_constraintStart_toEndOf="@id/textView9"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"/>
+
+        <Button
+                android:id="@+id/web_details_button_series"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/rounded_btn"
+                android:text="Web"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
