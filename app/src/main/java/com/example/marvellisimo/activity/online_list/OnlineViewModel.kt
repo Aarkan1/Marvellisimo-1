@@ -1,7 +1,7 @@
 package com.example.marvellisimo.activity.online_list
 
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.User
 import com.example.marvellisimo.repository.Repository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO

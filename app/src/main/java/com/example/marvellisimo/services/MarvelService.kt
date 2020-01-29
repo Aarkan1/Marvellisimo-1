@@ -1,8 +1,7 @@
 package com.example.marvellisimo.services
 
-import com.example.marvellisimo.marvelEntities.CharacterDataWrapper
-import com.example.marvellisimo.marvelEntities.SeriesDataWrapper
-import io.reactivex.Single
+import com.example.marvellisimo.repository.models.retrofit.CharacterDataWrapper
+import com.example.marvellisimo.repository.models.retrofit.SeriesDataWrapper
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
