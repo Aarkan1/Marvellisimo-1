@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.Repository
+import com.mongodb.stitch.core.internal.common.Dispatcher
 
 import kotlinx.coroutines.CoroutineScope as CS
 import kotlinx.coroutines.Dispatchers.IO
@@ -19,12 +20,9 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
     var character = MutableLiveData<CharacterNonRealm>().apply { value = CharacterNonRealm() }
     var loading = MutableLiveData<Boolean>().apply { value = false }
     var toastMessage = MutableLiveData<String>().apply { value = "" }
-
+    var status = MutableLiveData<Boolean>()
     fun getCharacter(id: String) = CS(IO).launch {
-        Log.d(TAG, "getCharacter: starts")
-
         CS(Main).launch { loading.value = true }
-
         try {
             val char = repository.fetchCharacterById(id)
             CS(Main).launch { character.value = char }
@@ -55,6 +53,11 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
     }
 
     fun sendToFriend(itemId: String, type: String, uid: String) = CS(Main).launch {
-        repository.sendItemToFriend(itemId, type, uid)
+        try {
+            repository.sendItemToFriend(itemId, type, uid)
+            status.value = true
+        }catch (ex: Exception){
+            status.value = false
+        }
     }
 }
