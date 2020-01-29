@@ -13,14 +13,16 @@ private const val TAG = "OnlineViewModel"
 class OnlineViewModel @Inject constructor(private val repository: Repository) {
 
     val onlineUsersList = MutableLiveData<ArrayList<User>>().apply { value = ArrayList() }
+    val CurrentState = MutableLiveData<State>().apply { value = State.ONLINE }
 
+    var active = false
     var showList = false
 
     fun runwatchlist(run: Boolean){
         showList = run
     }
 
-    fun fetchUsers(active : Boolean){
+    fun fetchUsers(){
         CoroutineScope(IO).launch {
             var users =  repository.fetchOnlineUsers(active)
             CoroutineScope(Main).launch {
@@ -30,13 +32,13 @@ class OnlineViewModel @Inject constructor(private val repository: Repository) {
     }
 
 
-    fun watchlist(active:Boolean){
+    fun watchlist(){
         CoroutineScope(Dispatchers.Default).launch{
             while (showList){
                 runBlocking {
                     delay(2000)
                 }
-                fetchUsers(active)
+                fetchUsers()
             }
         }
     }

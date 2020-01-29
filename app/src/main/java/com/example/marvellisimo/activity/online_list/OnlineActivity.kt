@@ -3,6 +3,8 @@ package com.example.marvellisimo.activity.online_list
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -12,6 +14,7 @@ import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.models.User
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
+import com.example.marvellisimo.repository.models.realm.SearchType
 import kotlinx.android.synthetic.main.activity_online.*
 import javax.inject.Inject
 
@@ -38,15 +41,21 @@ class OnlineActivity : AppCompatActivity(),
 
         itemId = intent.getStringExtra("itemId")
         type = intent.getStringExtra("type")
-
-
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
-        obcervRecycleView(active)
-        viewModel.fetchUsers(active)
+
         viewModel.runwatchlist(true)
-        viewModel.watchlist(active)
+        rewright()
+        viewModel.active = active
+        viewModel.watchlist()
+    }
+
+    fun rewright(){
+        Log.d(TAG,active.toString())
+        chanchtext()
+        obcervRecycleView(active)
+        viewModel.fetchUsers()
     }
 
     override fun onDestroy() {
@@ -54,16 +63,17 @@ class OnlineActivity : AppCompatActivity(),
         viewModel.runwatchlist(false)
     }
 
-    private fun obcervRecycleView(active: Boolean) {
+    private fun obcervRecycleView(newActive: Boolean) {
         viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
+            if (active == newActive) {
             onlineAdapter.onlines.clear()
             onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
                 .map {Online().apply {
                     username = it.username
                     uid = it.uid
                 }}.toMutableList())
-            chanchtext(active)
-            onlineAdapter.notifyDataSetChanged()
+                onlineAdapter.notifyDataSetChanged()
+            }
         })
     }
 
@@ -89,11 +99,28 @@ class OnlineActivity : AppCompatActivity(),
     }
 
 
-    fun chanchtext(active : Boolean){
+    fun chanchtext(){
         if(active){
             textView_online.text = "Online"
         }else{
             textView_online.text = "Offline"
         }
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.onlinelist,menu)
+        val switch = menu?.findItem(R.id.action_switch_on_offline)?.actionView as Switch
+
+
+
+        switch.setOnCheckedChangeListener { component, checked ->
+
+            if (checked == active) return@setOnCheckedChangeListener
+            active = checked
+            viewModel.active = active
+            rewright()
+        }
+        return true
     }
 }
