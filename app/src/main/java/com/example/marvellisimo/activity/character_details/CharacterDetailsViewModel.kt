@@ -21,7 +21,7 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
     var loading = MutableLiveData<Boolean>().apply { value = false }
     var toastMessage = MutableLiveData<String>().apply { value = "" }
     var status = MutableLiveData<Boolean>()
-
+    val inFavorites = MutableLiveData<Boolean>().apply { value = true }
 
     fun getCharacter(id: String) = CS(IO).launch {
         CS(Main).launch { loading.value = true }
@@ -42,6 +42,7 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
         try {
             repository.addCharacterToFavorites(id)
             CS(Main).launch {
+                inFavorites.value = true
                 toastMessage.value = "Added to favorites."
                 toastMessage.value = ""
             }
@@ -54,11 +55,44 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
         }
     }
 
+    fun removeFromFavorites(id: String) = CS(IO).launch {
+        Log.d(TAG, "removeFromFavorites: starts")
+        try {
+            repository.removeCharactersFromFavorites(id)
+            CS(Main).launch {
+                inFavorites.value = false
+                toastMessage.value = "Removed from favorites."
+                toastMessage.value = ""
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            CS(Main).launch {
+                toastMessage.value = "Something went wrong..."
+                toastMessage.value = ""
+            }
+        }
+    }
+
+    fun checkIfInFavorites(id: String) = CS(IO).launch {
+        Log.d(TAG, "checkIfInFavorites: starts")
+
+        try {
+            repository.updateUser()
+        } catch (ex: Exception) {
+            CS(Main).launch {
+                toastMessage.value = "Failed to synchronize user with server..."
+                toastMessage.value = ""
+            }
+        }
+
+        CS(Main).launch { inFavorites.value = repository.user?.favoriteCharacters?.contains(id) ?: false }
+    }
+
     fun sendToFriend(itemId: String, type: String, uid: String) = CS(Main).launch {
         try {
             repository.sendItemToFriend(itemId, type, uid)
             status.value = true
-        }catch (ex: Exception){
+        } catch (ex: Exception) {
             status.value = false
         }
     }

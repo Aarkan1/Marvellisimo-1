@@ -92,7 +92,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun updateUser() {
-        Log.d(TAG, "updateUser")
+        //Log.d(TAG, "updateUser")
 
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
         val mongoResult = DB.collUsers.findOne(filter)
@@ -174,7 +174,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun removeCharactersFromFavorites(id: String) {
-        Log.d(TAG, "addCharacterToFavorites: starts")
+        Log.d(TAG, "removeCharacterToFavorites: starts")
 
         updateUser()
         if (user == null) throw Exception("No user")
@@ -218,7 +218,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun removeSeriesFromFavorites(id: String) {
-        Log.d(TAG, "addSeriesToFavorites: starts ")
+        Log.d(TAG, "removeSeriesToFavorites: starts ")
 
         updateUser()
         if (user == null) throw Exception("No user")

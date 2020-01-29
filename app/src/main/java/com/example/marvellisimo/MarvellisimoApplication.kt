@@ -58,9 +58,6 @@ class MarvellisimoApplication : Application() {
 
         Realm.setDefaultConfiguration(config)
 
-        val realm = Realm.getDefaultInstance()
-        realm.executeTransaction{ it .deleteAll()}
-
         Stitch.initializeDefaultAppClient("marvellisimo-xebqg")
 
         createNotificationChannel()

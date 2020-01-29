@@ -17,7 +17,7 @@
         <activity android:name=".activity.webview_details.WebViewActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.search_result.SearchResultActivity"/>
+                android:value=".MainActivity"/>
         </activity>
         <activity android:name=".activity.receiver.ReceiveItemsActivity" />
         <activity android:name=".activity.character_details.CharacterDetailsActivity">

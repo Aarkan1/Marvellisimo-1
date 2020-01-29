@@ -32,6 +32,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
     private lateinit var loadingDialog: AlertDialog
 
+    private lateinit var actionFavorites: MenuItem
+
     @Inject
     lateinit var viewModel: CharacterDetailsViewModel
 
@@ -51,6 +53,7 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         createLoadingDialog()
         observeViewModel()
+        viewModel.checkIfInFavorites(id.toString())
 
         viewModel.getCharacter(id.toString())
 
@@ -111,6 +114,14 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.selected_item_menu, menu)
+
+        actionFavorites = menu?.findItem(R.id.detail_menu_add_to_favorites)!!
+
+        viewModel.inFavorites.observe(this, Observer<Boolean> {
+            if (it) actionFavorites.title = "Remove From Favorites"
+            else actionFavorites.title = "Add To Favorites"
+        })
+
         return super.onCreateOptionsMenu(menu)
 
     }
@@ -125,7 +136,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
                 true
             }
             R.id.detail_menu_add_to_favorites -> {
-                viewModel.addToFavorites(viewModel.character.value?.id.toString())
+                if (viewModel.inFavorites.value!!) viewModel.removeFromFavorites(viewModel.character.value?.id.toString())
+                else viewModel.addToFavorites(viewModel.character.value?.id.toString())
                 true
             }
             R.id.action_search -> {
