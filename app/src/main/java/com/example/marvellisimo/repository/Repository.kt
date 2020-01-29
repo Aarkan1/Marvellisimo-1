@@ -92,7 +92,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun updateUser(maxTimeout: Long = -1L) {
-        Log.d(TAG, "updateUser")
+        //Log.d(TAG, "updateUser")
 
         var timeout = 0L
 
