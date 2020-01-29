@@ -34,7 +34,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             CS(Main).launch { loading.value = true }
 
         try {
-            repository.updateUser()
+            repository.updateUser(maxTimeout = 10000L)
         } catch (ex: Exception) {
             CS(Main).launch {
                 toastMessage.value = "Failed to synchronize user with server..."
@@ -65,7 +65,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             CS(Main).launch { loading.value = true }
 
         try {
-            repository.updateUser()
+            repository.updateUser(maxTimeout = 10000L)
         } catch (ex: Exception) {
             CS(Main).launch {
                 toastMessage.value = "Failed to synchronize user with server..."
@@ -77,7 +77,8 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val series = repository.fetchFavoriteSeries().toTypedArray()
             CS(Main).launch {
                 favoriteSeries.value = series
-                noFavoritesItems.value = series.isEmpty()}
+                noFavoritesItems.value = series.isEmpty()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
