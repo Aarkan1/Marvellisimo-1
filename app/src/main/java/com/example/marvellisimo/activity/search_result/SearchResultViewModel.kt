@@ -24,6 +24,7 @@ class SearchResultViewModel @Inject constructor(
     val toastMessage = MutableLiveData<String>().apply { value = "" }
     val loading = MutableLiveData<Boolean>().apply { value = false }
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
+    val noResult = MutableLiveData<Boolean>().apply { value = false }
 
     fun getCharacters(phrase: String) = CS(IO).launch {
         Log.d(TAG, "getCharacters: $phrase")
@@ -32,7 +33,15 @@ class SearchResultViewModel @Inject constructor(
 
         try {
             val chars = repository.fetchCharacters(phrase)
-            CS(Main).launch { characters.value = ArrayList(chars.toMutableList()) }
+
+            if (chars.isNotEmpty())
+                CS(Main).launch {
+                    characters.value = ArrayList(chars.toMutableList())
+                    noResult.value = false
+                }
+            else
+                CS(Main).launch {noResult.value = true}
+
         } catch (ex: Exception) {
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
         }

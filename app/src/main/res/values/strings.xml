@@ -16,10 +16,10 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
-    <string name="back_to_regrister">Back to regrister</string>
+    <string name="back_to_regrister">Do not have account.</string>
     <string name="username">Username</string>
-    <string name="regrister">Regrister</string>
-    <string name="go_to_login">Go to login</string>
+    <string name="regrister">Register</string>
+    <string name="go_to_login">Already have account.</string>
     <string name="toolbar_search">Search</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -40,4 +40,5 @@
     <string name="loading_dialog_text">Loading…</string>
     <string name="send_it_to_friend">Send to friend</string>
     <string name="add_to_favorites">Add to favorites</string>
+    <string name="todo">TODO</string>
 </resources>

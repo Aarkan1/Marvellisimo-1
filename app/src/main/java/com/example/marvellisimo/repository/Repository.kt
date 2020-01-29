@@ -174,7 +174,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun removeCharactersFromFavorites(id: String) {
-        Log.d(TAG, "addCharacterToFavorites: starts")
+        Log.d(TAG, "removeCharacterToFavorites: starts")
 
         updateUser()
         if (user == null) throw Exception("No user")
@@ -218,7 +218,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun removeSeriesFromFavorites(id: String) {
-        Log.d(TAG, "addSeriesToFavorites: starts ")
+        Log.d(TAG, "removeSeriesToFavorites: starts ")
 
         updateUser()
         if (user == null) throw Exception("No user")
@@ -416,30 +416,19 @@ class Repository @Inject constructor(
         return characters
     }
 
-    fun sendItemToFriend(itemId: String, type: String, uid: String) {
+    suspend fun sendItemToFriend(itemId: String, type: String, uid: String) {
         CoroutineScope(IO).launch { updateUser() }
         val currentTimestamp = System.currentTimeMillis()
-
         val sendDoc = Document()
-        //sendDoc["_id"] = ObjectId(uid)
+        //sendDoc["_id"] = ObjectId( "1")
         sendDoc["senderId"] = this.user!!.uid
         sendDoc["receiverId"] = uid
         sendDoc["itemId"] = itemId
         sendDoc["type"] = type
         sendDoc["senderName"] = this.user!!.username
         sendDoc["date"] = "$currentTimestamp"
-
-        DB.sendReceive.insertOne(sendDoc).addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.d(
-                    "___", String.format(
-                        "successfully inserted item with id %s",
-                        it.result.insertedId
-                    )
-                )
-            } else
-                Log.e("___", "failed to insert document with: ", it.exception)
-        }
+        val result = DB.sendReceive.insertOne(sendDoc)
+        while (!result.isComplete) delay(5)
     }
 
     suspend fun fetchReceivedItem(type: String): ArrayList<ReceiveItem> {

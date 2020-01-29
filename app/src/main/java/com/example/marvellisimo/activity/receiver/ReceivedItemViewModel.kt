@@ -19,13 +19,17 @@ class ReceivedItemViewModel @Inject constructor(
     var receivedItems = MutableLiveData<ArrayList<ReceiveItem>>().apply { value = ArrayList() }
     val loading = MutableLiveData<Boolean>().apply { value = false }
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
+    val noReceivedItems = MutableLiveData<Boolean>().apply { value = false }
 
     fun fetchReceivedItem(type: String) = CS(Dispatchers.IO).launch {
         if (receivedItems.value.isNullOrEmpty()) CS(Dispatchers.Main).launch { loading.value = true }
         val receivedItemsFromDb = repository.fetchReceivedItem(type)
 
         CS(Dispatchers.Main).launch {
-            if (receivedItemsFromDb.isEmpty()) loading.value = false
+            if (receivedItemsFromDb.isEmpty()) {
+                loading.value = false
+                noReceivedItems.value = true
+            }else noReceivedItems.value = false
             receivedItems.value = receivedItemsFromDb
         }
     }
