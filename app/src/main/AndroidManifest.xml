@@ -49,10 +49,10 @@
                     android:value=".MainActivity"/>
         </activity>
         <activity
-                android:name=".RegisterActivity"
+                android:name=".activity.register.RegisterActivity"
                 android:windowSoftInputMode="stateVisible|adjustResize"/>
         <activity
-                android:name=".LoginActivity"
+                android:name=".activity.login.LoginActivity"
                 android:windowSoftInputMode="stateVisible|adjustResize"/>
         <activity
                 android:name=".MainActivity"

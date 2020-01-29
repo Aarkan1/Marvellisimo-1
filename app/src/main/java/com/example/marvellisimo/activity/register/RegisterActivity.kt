@@ -1,12 +1,14 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.register
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.MainActivity
+import com.example.marvellisimo.MarvellisimoApplication
+import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.login.LoginActivity
 import com.example.marvellisimo.repository.DB
-import com.example.marvellisimo.repository.Repository
 import com.mongodb.stitch.android.core.Stitch
 import com.mongodb.stitch.android.core.auth.providers.userpassword.UserPasswordAuthProviderClient
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential
