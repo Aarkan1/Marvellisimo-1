@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.register
 
 import com.example.marvellisimo.repository.Repository
 import org.bson.Document

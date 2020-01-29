@@ -1,6 +1,7 @@
 package com.example.marvellisimo.activity.receiver
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.Switch
@@ -11,10 +12,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
+import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.activity_receive_items.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +26,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class ReceiveItemsActivity : AppCompatActivity() {
+class ReceiveItemsActivity : AppCompatActivity(), ReceivedItemActionListener {
     @Inject
     lateinit var viewModel: ReceivedItemViewModel
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
     private lateinit var dialog: AlertDialog
-
+    private val listener = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +55,7 @@ class ReceiveItemsActivity : AppCompatActivity() {
             val character = viewModel.fetchItem(item.itemId)
             CoroutineScope(Dispatchers.Main).launch {
                 if (character != null) {
-                    adapter.add(
-                        ReceivedCharacter(character, item.senderName, item.date.toLong())
-                    )
+                    adapter.add(ReceivedCharacter(character, item.senderName, item.date.toLong(), listener))
                 }
             }
         }
@@ -66,6 +68,10 @@ class ReceiveItemsActivity : AppCompatActivity() {
             } else {
                 CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem("serie") }
             }
+        })
+
+        viewModel.noReceivedItems.observe(this, Observer<Boolean> {
+            no_received_items_textView.text = if (it) "No Received Items" else ""
         })
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
@@ -88,9 +94,7 @@ class ReceiveItemsActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.Main).launch {
                 if (series != null) {
                     adapter.add(
-                        ReceivedSeries(
-                            series, item.senderName, item.date.toLong()
-                        )
+                        ReceivedSeries(series, item.senderName, item.date.toLong(), listener)
                     )
                 }
             }
@@ -132,5 +136,20 @@ class ReceiveItemsActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    override fun itemClicked(type: SearchType, id: Int) {
+        when (type) {
+            SearchType.CHARACTERS -> {
+                startActivity(Intent(this, CharacterDetailsActivity::class.java).apply {
+                    putExtra("id", id)
+                })
+            }
+            SearchType.SERIES -> {
+                startActivity(Intent(this, SeriesDetailsActivity::class.java).apply {
+                    putExtra("id", id)
+                })
+            }
+        }
     }
 }

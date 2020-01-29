@@ -17,6 +17,7 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search_result.CharacterDetailSeriesListItem
+import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
@@ -30,6 +31,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
     private lateinit var adapter: GroupAdapter<GroupieViewHolder>
 
     private lateinit var loadingDialog: AlertDialog
+
+    private lateinit var actionFavorites: MenuItem
 
     @Inject
     lateinit var viewModel: CharacterDetailsViewModel
@@ -50,8 +53,20 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
         createLoadingDialog()
         observeViewModel()
+        viewModel.checkIfInFavorites(id.toString())
 
         viewModel.getCharacter(id.toString())
+
+        web_details_button_character.setOnClickListener { webButtonClick() }
+    }
+
+    private fun webButtonClick() {
+        val url: String = viewModel.character.value?.url ?: ""
+        val name: String = viewModel.character.value?.name ?: ""
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("url", url)
+        intent.putExtra("name", name)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {
@@ -95,6 +110,14 @@ class CharacterDetailsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.selected_item_menu, menu)
+
+        actionFavorites = menu?.findItem(R.id.detail_menu_add_to_favorites)!!
+
+        viewModel.inFavorites.observe(this, Observer<Boolean> {
+            if (it) actionFavorites.title = "Remove From Favorites"
+            else actionFavorites.title = "Add To Favorites"
+        })
+
         return super.onCreateOptionsMenu(menu)
 
     }
@@ -109,7 +132,8 @@ class CharacterDetailsActivity : AppCompatActivity() {
                 true
             }
             R.id.detail_menu_add_to_favorites -> {
-                viewModel.addToFavorites(viewModel.character.value?.id.toString())
+                if (viewModel.inFavorites.value!!) viewModel.removeFromFavorites(viewModel.character.value?.id.toString())
+                else viewModel.addToFavorites(viewModel.character.value?.id.toString())
                 true
             }
             R.id.action_search -> {

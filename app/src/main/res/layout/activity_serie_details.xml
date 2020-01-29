@@ -4,7 +4,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:background="@color/colorPrimaryLight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="fill_parent"
@@ -22,15 +23,26 @@
                 tools:srcCompat="@tools:sample/avatars" app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+        <Button
+                android:id="@+id/web_details_button_series"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/rounded_btn"
+                android:text="Web"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/selected_series_imageView" android:layout_marginTop="8dp"/>
         <TextView
                 android:id="@+id/selected_series_name_textView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/selected_series_imageView"
-                tools:text="Hulk Series" android:layout_marginTop="16dp" android:layout_marginStart="8dp"/>
+                tools:text="Hulk Series" android:layout_marginTop="16dp" android:layout_marginStart="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/web_details_button_series" android:layout_marginEnd="8dp"/>
 
         <TextView
                 android:id="@+id/selected_series_description_textView"

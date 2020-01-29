@@ -25,6 +25,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
         .apply { value = emptyArray() }
     val loading = MutableLiveData<Boolean>().apply { value = false }
     val toastMessage = MutableLiveData<String>().apply { value = "" }
+    val noFavoritesItems = MutableLiveData<Boolean>().apply { value = false }
 
     fun fetchFavoriteCharacters() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
@@ -43,7 +44,10 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
 
         try {
             val characters = repository.fetchFavoriteCharacters().toTypedArray()
-            CS(Main).launch { favoriteCharacters.value = characters }
+            CS(Main).launch {
+                favoriteCharacters.value = characters
+                noFavoritesItems.value = characters.isEmpty()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
             CS(Main).launch {
@@ -71,7 +75,9 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
 
         try {
             val series = repository.fetchFavoriteSeries().toTypedArray()
-            CS(Main).launch { favoriteSeries.value = series }
+            CS(Main).launch {
+                favoriteSeries.value = series
+                noFavoritesItems.value = series.isEmpty()}
         } catch (ex: Exception) {
             ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }

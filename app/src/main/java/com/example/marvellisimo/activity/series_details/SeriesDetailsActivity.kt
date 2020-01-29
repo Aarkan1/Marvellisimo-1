@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
+import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
@@ -28,6 +29,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
     lateinit var viewModel: SeriesDetailsViewModel
 
     private lateinit var loadingDialog: AlertDialog
+    private lateinit var actionFavorites: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,18 @@ class SeriesDetailsActivity : AppCompatActivity() {
         observeViewModel()
 
         viewModel.getSeries(serieId.toString())
+        viewModel.checkIfInFavorites(serieId.toString())
+
+        web_details_button_series.setOnClickListener { webButtonClick() }
+    }
+
+    private fun webButtonClick() {
+        val url: String = viewModel.series.value?.url ?: ""
+        val name: String = viewModel.series.value?.title ?: ""
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("url", url)
+        intent.putExtra("name", name)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {
@@ -86,8 +100,15 @@ class SeriesDetailsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.selected_item_menu, menu)
-        return super.onCreateOptionsMenu(menu)
 
+        actionFavorites = menu!!.findItem(R.id.detail_menu_add_to_favorites)
+
+        viewModel.inFavorites.observe(this, Observer<Boolean> {
+            if (it) actionFavorites.title = "Remove From Favorites"
+            else actionFavorites.title = "Add To Favorites"
+        })
+
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,15 +117,11 @@ class SeriesDetailsActivity : AppCompatActivity() {
                 val intent = Intent(this, OnlineActivity::class.java)
                 intent.putExtra("itemId", viewModel.series.value?.id.toString())
                 intent.putExtra("type", "serie")
-                startActivity(intent)
-
-                Toast.makeText(
-                    applicationContext, "You clicked Send to friend",
-                    Toast.LENGTH_LONG
-                ).show(); true
+                startActivity(intent); true
             }
             R.id.detail_menu_add_to_favorites -> {
-                viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
+                if (viewModel.inFavorites.value!!) viewModel.removeFromFavorites(viewModel.series.value?.id.toString())
+                else viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
             }
             R.id.action_search -> {
                 startActivity(Intent(this, SearchActivity::class.java)); true
