@@ -13,7 +13,7 @@ private const val TAG = "OnlineViewModel"
 class OnlineViewModel @Inject constructor(private val repository: Repository) {
 
     val onlineUsersList = MutableLiveData<ArrayList<User>>().apply { value = ArrayList() }
-    val CurrentState = MutableLiveData<State>().apply { value = State.ONLINE }
+    
 
     var active = false
     var showList = false
