@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.MainActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
@@ -89,6 +91,8 @@ class OnlineActivity : AppCompatActivity(),
     override fun itemClicked(online: Online) {
         if (type != null && itemId != null){
             characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
+            val intent = Intent (this, MainActivity::class.java)
+            startActivity(intent)
             Toast.makeText(
                 applicationContext, "You sent this item to ${online.username}",
                 Toast.LENGTH_LONG
