@@ -91,12 +91,18 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun updateUser() {
+    suspend fun updateUser(maxTimeout: Long = -1L) {
         //Log.d(TAG, "updateUser")
+
+        var timeout = 0L
 
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
         val mongoResult = DB.collUsers.findOne(filter)
-        while (!mongoResult.isComplete) delay(5)
+        while (!mongoResult.isComplete) {
+            delay(5)
+            timeout += 5L
+            if (maxTimeout != -1L && timeout >= maxTimeout) throw Exception("Timeout")
+        }
         if (mongoResult.result == null) return
 
         val user = documentToUser(mongoResult.result)
@@ -444,7 +450,7 @@ class Repository @Inject constructor(
 
     }
 
-    suspend fun fetchOnlineUsers(active : Boolean): ArrayList<User> {
+    suspend fun fetchOnlineUsers(active: Boolean): ArrayList<User> {
         CoroutineScope(IO).launch { updateUser() }
         val gson = Gson()
         val tempList = ArrayList<Document>()
