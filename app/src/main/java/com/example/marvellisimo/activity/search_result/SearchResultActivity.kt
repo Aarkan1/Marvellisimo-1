@@ -158,6 +158,10 @@ class SearchResultActivity : AppCompatActivity() {
                 startActivity(Intent(this, SearchActivity::class.java))
                 true
             }
+            R.id.action_refresh -> {
+                viewModel.refresh()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -26,8 +26,21 @@ class SearchResultViewModel @Inject constructor(
     val searchType = MutableLiveData<SearchType>().apply { value = SearchType.CHARACTERS }
     val noResult = MutableLiveData<Boolean>().apply { value = false }
 
+    private var searchPhrase = ""
+
+    fun refresh() = CS(IO).launch {
+        if (searchType.value == SearchType.CHARACTERS) CS(Main).launch {
+            characters.value = ArrayList()
+            getCharacters(searchPhrase)
+        } else CS(Main).launch {
+            series.value = ArrayList()
+            getSeries(searchPhrase)
+        }
+    }
+
     fun getCharacters(phrase: String) = CS(IO).launch {
         Log.d(TAG, "getCharacters: $phrase")
+        searchPhrase = phrase
 
         if (characters.value.isNullOrEmpty()) CS(Main).launch { loading.value = true }
 
@@ -40,7 +53,7 @@ class SearchResultViewModel @Inject constructor(
                     noResult.value = false
                 }
             else
-                CS(Main).launch {noResult.value = true}
+                CS(Main).launch { noResult.value = true }
 
         } catch (ex: Exception) {
             CS(Main).launch { toastMessage.value = "Something went wrong..." }
@@ -54,6 +67,7 @@ class SearchResultViewModel @Inject constructor(
 
     fun getSeries(phrase: String) = CS(IO).launch {
         Log.d(TAG, "getSeries: $phrase")
+        searchPhrase = phrase
 
         if (series.value.isNullOrEmpty()) CS(Main).launch { loading.value = true }
 
