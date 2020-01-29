@@ -92,7 +92,7 @@ class Repository @Inject constructor(
     }
 
     suspend fun updateUser() {
-        Log.d(TAG, "updateUser")
+        //Log.d(TAG, "updateUser")
 
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
         val mongoResult = DB.collUsers.findOne(filter)
