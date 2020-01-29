@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <TextView
         android:id="@+id/textView_onlineListeName"
-        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="28sp"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="6dp"
+        android:text="@string/textview"
         android:textColor="@android:color/white"
-        android:text="@string/textview" />
+        android:textSize="28sp" />
 </LinearLayout>
