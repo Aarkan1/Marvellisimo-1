@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.marvellisimo.MainActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
@@ -50,7 +52,6 @@ class OnlineActivity : AppCompatActivity(),
     }
 
     private fun rewrite(){
-        Log.d(TAG,active.toString())
         chanchtext()
         obcervRecycleView(active)
         viewModel.fetchUsers()
@@ -89,10 +90,23 @@ class OnlineActivity : AppCompatActivity(),
     override fun itemClicked(online: Online) {
         if (type != null && itemId != null){
             characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
-            Toast.makeText(
-                applicationContext, "You sent this item to ${online.username}",
-                Toast.LENGTH_LONG
-            ).show()
+            val intent = Intent (this, MainActivity::class.java)
+            startActivity(intent)
+
+            characterDetailsViewModel.status.observe(this, Observer<Boolean> {
+                if (it){
+                    Toast.makeText(
+                        applicationContext, "You sent this item to ${online.username}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                else{
+                    Toast.makeText(
+                        applicationContext, "Something went wrong...",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
         }
     }
 
