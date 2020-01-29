@@ -82,7 +82,7 @@ class SearchResultActivity : AppCompatActivity() {
         })
 
         viewModel.noResult.observe(this, Observer<Boolean> {
-            no_result_textView.text = if (it) "No Result" else ""
+            no_result_textView.text = if (it) "No Results" else ""
         })
 
         viewModel.searchType.observe(this, Observer<SearchType> {
