@@ -70,6 +70,10 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
             arr.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
+        viewModel.noFavoritesItems.observe(this, Observer<Boolean> {
+            no_favorite_items_textView.text = if (it) "No Favorite Items" else ""
+        })
+
         viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> { arr ->
             seriesAdapter.clear()
             arr.forEach { seriesAdapter.add(SeriesItem(it, this)) }
@@ -168,9 +172,12 @@ class CharacterItem(
             characterItemActionListener.onRemoveCharacterClick(character)
         }
 
+        var des = character.description
+        des = if (!des.isNullOrBlank() && des.length > 200) des.substring(0, 200) + "..." else "No description found."
+
         val description = if (character.description.isEmpty()) "No description found." else character.description
 
-        viewHolder.itemView.favorite_item_description_textView.text = description
+        viewHolder.itemView.favorite_item_description_textView.text = des
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
         if (character.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(character.thumbnail.imageUrl)
@@ -192,9 +199,12 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
             seriesItemActionListener.onRemoveSeriesClick(series)
         }
 
+        var des = series.description
+        des = if (!des.isNullOrBlank() && des.length > 200) des.substring(0, 200) + "..." else "No description found."
+
         val description = if (series.description?.isEmpty() != false) "No description found." else series.description
 
-        viewHolder.itemView.favorite_item_description_textView.text = description
+        viewHolder.itemView.favorite_item_description_textView.text = des
         viewHolder.itemView.favorite_item_name_textView.text = series.title
 
         if (series.thumbnail.imageUrl.isNotEmpty()) Picasso.get().load(series.thumbnail.imageUrl)

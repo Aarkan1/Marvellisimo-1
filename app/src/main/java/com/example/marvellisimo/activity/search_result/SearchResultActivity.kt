@@ -81,6 +81,10 @@ class SearchResultActivity : AppCompatActivity() {
             arr.forEach { seriesAdapter.add(SeriesSearchResultItem(it)) }
         })
 
+        viewModel.noResult.observe(this, Observer<Boolean> {
+            no_result_textView.text = if (it) "No Result" else ""
+        })
+
         viewModel.searchType.observe(this, Observer<SearchType> {
             if (it == SearchType.CHARACTERS) {
                 recyclerView_search_result.adapter = charactersAdapter

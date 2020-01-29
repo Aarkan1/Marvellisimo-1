@@ -57,29 +57,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             startActivity(Intent(this, ReceiveItemsActivity::class.java))
         }
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navController = findNavController(R.id.nav_host_fragment)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_tools, R.id.nav_share, R.id.nav_send),
-            drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        nav_view.setupWithNavController(navController)
 
-        test()
-    }
-
-    private fun test() {
-        Log.d(TAG, "test: starts")
-
-        val jobScheduler = applicationContext.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val job = JobInfo.Builder(0, ComponentName(applicationContext, TestService::class.java))
-            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-            .build()
-
-        jobScheduler.schedule(job)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

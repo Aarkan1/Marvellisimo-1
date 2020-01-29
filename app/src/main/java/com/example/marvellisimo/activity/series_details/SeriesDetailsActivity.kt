@@ -108,12 +108,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
                 val intent = Intent(this, OnlineActivity::class.java)
                 intent.putExtra("itemId", viewModel.series.value?.id.toString())
                 intent.putExtra("type", "serie")
-                startActivity(intent)
-
-                Toast.makeText(
-                    applicationContext, "You clicked Send to friend",
-                    Toast.LENGTH_LONG
-                ).show(); true
+                startActivity(intent); true
             }
             R.id.detail_menu_add_to_favorites -> {
                 viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
