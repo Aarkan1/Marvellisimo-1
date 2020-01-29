@@ -6,7 +6,8 @@
                                                    android:layout_height="match_parent"
                                                    tools:context=".activity.receiver.ReceiveItemsActivity"
                                                    android:background="@color/colorPrimary"
-                                                   android:paddingTop="16dp">
+                                                   android:paddingTop="16dp"
+                                                   android:paddingBottom="16dp">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/received_item_List_recyclerView"
