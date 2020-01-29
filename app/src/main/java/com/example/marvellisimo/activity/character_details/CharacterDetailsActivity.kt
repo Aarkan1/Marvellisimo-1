@@ -70,8 +70,12 @@ class CharacterDetailsActivity : AppCompatActivity() {
         viewModel.character.observe(this, Observer<CharacterNonRealm> {
             supportActionBar!!.title = it.name
 
-            if (it.series!!.items!!.isNotEmpty()) for (serie in it.series!!.items!!)
-                adapter.add(CharacterDetailSeriesListItem(serie))
+            if (it.series!!.items!!.isNotEmpty()) {
+                for (serie in it.series!!.items!!)
+                    adapter.add(CharacterDetailSeriesListItem(serie))
+                no_series_textView.text = ""
+            }
+            else no_series_textView.text = "No Series"
 
             character_detail_serie_list_recyclerView.adapter = adapter
 

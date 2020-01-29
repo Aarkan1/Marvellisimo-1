@@ -21,6 +21,8 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
     var loading = MutableLiveData<Boolean>().apply { value = false }
     var toastMessage = MutableLiveData<String>().apply { value = "" }
     var status = MutableLiveData<Boolean>()
+
+
     fun getCharacter(id: String) = CS(IO).launch {
         CS(Main).launch { loading.value = true }
         try {
