@@ -15,6 +15,7 @@ import com.example.marvellisimo.models.ReceiveItem
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
+import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.activity_receive_items.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,10 @@ class ReceiveItemsActivity : AppCompatActivity() {
             } else {
                 CoroutineScope(Dispatchers.IO).launch { viewModel.fetchReceivedItem("serie") }
             }
+        })
+
+        viewModel.noReceivedItems.observe(this, Observer<Boolean> {
+            no_received_items_textView.text = if (it) "No Received Items" else ""
         })
 
         viewModel.receivedItems.observe(this, Observer<ArrayList<ReceiveItem>> {
