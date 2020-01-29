@@ -70,6 +70,10 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
             arr.forEach { charactersAdapter.add(CharacterItem(it, this)) }
         })
 
+        viewModel.noFavoritesItems.observe(this, Observer<Boolean> {
+            no_favorite_items_textView.text = if (it) "No Favorite Items" else ""
+        })
+
         viewModel.favoriteSeries.observe(this, Observer<Array<SeriesNonRealm>> { arr ->
             seriesAdapter.clear()
             arr.forEach { seriesAdapter.add(SeriesItem(it, this)) }
