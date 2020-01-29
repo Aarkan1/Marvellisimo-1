@@ -52,7 +52,6 @@ class OnlineActivity : AppCompatActivity(),
     }
 
     private fun rewrite(){
-        Log.d(TAG,active.toString())
         chanchtext()
         obcervRecycleView(active)
         viewModel.fetchUsers()
@@ -93,10 +92,21 @@ class OnlineActivity : AppCompatActivity(),
             characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
             val intent = Intent (this, MainActivity::class.java)
             startActivity(intent)
-            Toast.makeText(
-                applicationContext, "You sent this item to ${online.username}",
-                Toast.LENGTH_LONG
-            ).show()
+
+            characterDetailsViewModel.status.observe(this, Observer<Boolean> {
+                if (it){
+                    Toast.makeText(
+                        applicationContext, "You sent this item to ${online.username}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                else{
+                    Toast.makeText(
+                        applicationContext, "Something went wrong...",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
         }
     }
 
