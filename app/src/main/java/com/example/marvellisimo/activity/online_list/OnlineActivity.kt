@@ -2,7 +2,6 @@ package com.example.marvellisimo.activity.online_list
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.widget.Switch
 import android.widget.Toast
@@ -21,9 +20,8 @@ import javax.inject.Inject
 
 class OnlineActivity : AppCompatActivity(),
     OnlineActionListener {
-    private val TAG = "OnlineActivity"
     private var onlines = arrayListOf<Online>()
-    private var active = true
+    lateinit var onlineAdapter: OnlineAdapter
 
     @Inject
     lateinit var viewModel: OnlineViewModel
@@ -41,19 +39,17 @@ class OnlineActivity : AppCompatActivity(),
 
         itemId = intent.getStringExtra("itemId")
         type = intent.getStringExtra("type")
-        createRecycleView()
+        createRecyclerView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
 
         viewModel.runwatchlist(true)
         rewrite()
-        viewModel.active = active
         viewModel.watchlist()
     }
 
     private fun rewrite(){
-        chanchtext()
-        obcervRecycleView(active)
+        observeRecyclerView()
         viewModel.fetchUsers()
     }
 
@@ -62,9 +58,8 @@ class OnlineActivity : AppCompatActivity(),
         viewModel.runwatchlist(false)
     }
 
-    private fun obcervRecycleView(newActive: Boolean) {
+    private fun observeRecyclerView() {
         viewModel.onlineUsersList.observe(this, Observer<ArrayList<User>> {
-            if (active == newActive) {
             onlineAdapter.onlines.clear()
             onlineAdapter.onlines = ArrayList( it.mapNotNull{it}
                 .map {Online().apply {
@@ -72,13 +67,10 @@ class OnlineActivity : AppCompatActivity(),
                     uid = it.uid
                 }}.toMutableList())
                 onlineAdapter.notifyDataSetChanged()
-            }
         })
     }
 
-    lateinit var onlineAdapter: OnlineAdapter
-
-    fun createRecycleView(){
+    fun createRecyclerView(){
         val layoutManager = LinearLayoutManager(this)
         recyclerView_onlinelist.layoutManager = layoutManager
 
@@ -110,23 +102,21 @@ class OnlineActivity : AppCompatActivity(),
         }
     }
 
-    fun chanchtext(){
-        if(active){
-            textView_online.text = "Online"
-        }else{
-            textView_online.text = "Offline"
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.onlinelist,menu)
-        val switch = menu?.findItem(R.id.action_switch_on_offline)?.actionView as Switch
-        switch.toggle()
+        menuInflater.inflate(R.menu.received_items, menu)
+
+        val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
+
+        switch.isChecked = viewModel.active.value != false
+
         switch.setOnCheckedChangeListener { component, checked ->
-            if (checked == active) return@setOnCheckedChangeListener
-            active = checked
-            viewModel.active = active
-            rewrite()
+            if (checked) {
+                viewModel.active.value = true
+                textView_online.text = getString(R.string.online)
+            } else {
+                viewModel.active.value = false
+                textView_online.text = getString(R.string.offline)
+            }
         }
         return true
     }
