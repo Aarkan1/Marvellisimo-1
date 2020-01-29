@@ -1,7 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -38,7 +37,6 @@ class OnlineActivity : AppCompatActivity(),
         itemId = intent.getStringExtra("itemId")
         type = intent.getStringExtra("type")
 
-
         createRecycleView()
         onlineAdapter = OnlineAdapter(onlines, this)
         recyclerView_onlinelist.adapter = onlineAdapter
@@ -66,7 +64,6 @@ class OnlineActivity : AppCompatActivity(),
 
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_onlinelist.addItemDecoration(dividerItemDecoration)
-
     }
 
     override fun itemClicked(online: Online) {
@@ -74,12 +71,9 @@ class OnlineActivity : AppCompatActivity(),
         if (type != null && itemId != null){
             characterDetailsViewModel.sendToFriend(itemId.toString(), type.toString(), online.uid)
             Toast.makeText(
-
                 applicationContext, "You sent this item to ${online.username}",
                 Toast.LENGTH_LONG
             ).show()
         }
-        //
-
     }
 }
