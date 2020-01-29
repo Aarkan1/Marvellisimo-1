@@ -1,4 +1,4 @@
-package com.example.marvellisimo.models
+package com.example.marvellisimo.repository.models.common
 
 class ReceiveItem(
     var itemId: String = "",
