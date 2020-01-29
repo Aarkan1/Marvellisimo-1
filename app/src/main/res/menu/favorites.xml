@@ -5,4 +5,9 @@
             android:title="TODO"
             app:actionViewClass="android.widget.Switch"
             app:showAsAction="always"/>
+    <item
+            android:id="@+id/action_refresh"
+            android:title="Refresh"
+            app:showAsAction="ifRoom"
+            android:icon="@drawable/ic_cached_24px"/>
 </menu>

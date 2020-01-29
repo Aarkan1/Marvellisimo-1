@@ -27,6 +27,16 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
     val toastMessage = MutableLiveData<String>().apply { value = "" }
     val noFavoritesItems = MutableLiveData<Boolean>().apply { value = false }
 
+    fun refresh() = CS(IO).launch {
+        if (searchType.value == SearchType.CHARACTERS) CS(Main).launch {
+            favoriteCharacters.value = emptyArray()
+            fetchFavoriteCharacters()
+        } else CS(Main).launch {
+            favoriteSeries.value = emptyArray()
+            fetchFavoriteSeries()
+        }
+    }
+
     fun fetchFavoriteCharacters() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
 

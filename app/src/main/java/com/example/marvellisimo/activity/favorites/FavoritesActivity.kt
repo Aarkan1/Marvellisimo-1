@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -124,6 +125,16 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_refresh -> {
+                viewModel.refresh()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onCharacterClick(character: CharacterNonRealm) {
         val intent = Intent(this, CharacterDetailsActivity::class.java)
         intent.putExtra("id", character.id)
@@ -175,8 +186,6 @@ class CharacterItem(
         var des = character.description
         des = if (!des.isNullOrBlank() && des.length > 200) des.substring(0, 200) + "..." else "No description found."
 
-        val description = if (character.description.isEmpty()) "No description found." else character.description
-
         viewHolder.itemView.favorite_item_description_textView.text = des
         viewHolder.itemView.favorite_item_name_textView.text = character.name
 
@@ -201,8 +210,6 @@ class SeriesItem(private val series: SeriesNonRealm, private val seriesItemActio
 
         var des = series.description
         des = if (!des.isNullOrBlank() && des.length > 200) des.substring(0, 200) + "..." else "No description found."
-
-        val description = if (series.description?.isEmpty() != false) "No description found." else series.description
 
         viewHolder.itemView.favorite_item_description_textView.text = des
         viewHolder.itemView.favorite_item_name_textView.text = series.title
