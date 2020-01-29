@@ -13,7 +13,6 @@ private const val TAG = "OnlineViewModel"
 class OnlineViewModel @Inject constructor(private val repository: Repository) {
 
     val onlineUsersList = MutableLiveData<ArrayList<User>>().apply { value = ArrayList() }
-    
 
     var active = false
     var showList = false
@@ -30,7 +29,6 @@ class OnlineViewModel @Inject constructor(private val repository: Repository) {
             }
         }
     }
-
 
     fun watchlist(){
         CoroutineScope(Dispatchers.Default).launch{

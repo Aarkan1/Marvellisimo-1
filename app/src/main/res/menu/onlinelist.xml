@@ -6,7 +6,6 @@
         android:id="@+id/action_switch_on_offline"
         android:title="@string/todo"
 
-        android:checked="true"
         app:actionViewClass="android.widget.Switch"
         app:showAsAction="always" />
 </menu>

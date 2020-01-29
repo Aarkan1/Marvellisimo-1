@@ -1,6 +1,5 @@
 package com.example.marvellisimo.activity.online_list
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,9 +11,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
-import com.example.marvellisimo.models.User
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
-import com.example.marvellisimo.repository.models.realm.SearchType
+import com.example.marvellisimo.models.User
 import kotlinx.android.synthetic.main.activity_online.*
 import javax.inject.Inject
 
@@ -46,12 +44,12 @@ class OnlineActivity : AppCompatActivity(),
         recyclerView_onlinelist.adapter = onlineAdapter
 
         viewModel.runwatchlist(true)
-        rewright()
+        rewrite()
         viewModel.active = active
         viewModel.watchlist()
     }
 
-    fun rewright(){
+    private fun rewrite(){
         Log.d(TAG,active.toString())
         chanchtext()
         obcervRecycleView(active)
@@ -98,7 +96,6 @@ class OnlineActivity : AppCompatActivity(),
         }
     }
 
-
     fun chanchtext(){
         if(active){
             textView_online.text = "Online"
@@ -107,19 +104,15 @@ class OnlineActivity : AppCompatActivity(),
         }
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.onlinelist,menu)
         val switch = menu?.findItem(R.id.action_switch_on_offline)?.actionView as Switch
-
-
-
+        switch.toggle()
         switch.setOnCheckedChangeListener { component, checked ->
-
             if (checked == active) return@setOnCheckedChangeListener
             active = checked
             viewModel.active = active
-            rewright()
+            rewrite()
         }
         return true
     }
