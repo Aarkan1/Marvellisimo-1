@@ -145,6 +145,8 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
         viewModel.removeCharacterFromFavorites(character.id.toString())
     }
 
+    override fun onAddCharacterToFavorites(id: String) {}
+
     override fun onSeriesClick(series: SeriesNonRealm) {
         val intent = Intent(this, SeriesDetailsActivity::class.java)
         intent.putExtra("id", series.id)
@@ -154,16 +156,20 @@ class FavoritesActivity : AppCompatActivity(), CharacterItemActionListener, Seri
     override fun onRemoveSeriesClick(series: SeriesNonRealm) {
         viewModel.removeSeriesFromFavorites(series.id.toString())
     }
+
+    override fun onAddSeriesToFavorites(id: String) {}
 }
 
 interface CharacterItemActionListener {
     fun onCharacterClick(character: CharacterNonRealm)
     fun onRemoveCharacterClick(character: CharacterNonRealm)
+    fun onAddCharacterToFavorites(id: String)
 }
 
 interface SeriesItemActionListener {
     fun onSeriesClick(series: SeriesNonRealm)
     fun onRemoveSeriesClick(series: SeriesNonRealm)
+    fun onAddSeriesToFavorites(id: String)
 }
 
 class CharacterItem(
