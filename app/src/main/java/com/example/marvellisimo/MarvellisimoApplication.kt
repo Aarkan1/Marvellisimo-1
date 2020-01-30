@@ -8,6 +8,7 @@ import com.example.marvellisimo.activity.character_details.CharacterDetailsActiv
 import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.login.LoginActivity
+import com.example.marvellisimo.activity.main.MainActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.register.RegisterActivity
 import com.example.marvellisimo.activity.search.SearchActivity
