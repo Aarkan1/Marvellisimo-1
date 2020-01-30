@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.main
 
 import com.example.marvellisimo.repository.Repository
 import javax.inject.Inject

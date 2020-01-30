@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -9,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marvellisimo.MainActivity
+import com.example.marvellisimo.activity.main.MainActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
+import com.example.marvellisimo.activity.search_result.SearchResultActivity
+import com.example.marvellisimo.repository.models.realm.SearchType
 import com.example.marvellisimo.repository.models.realm.User
 import kotlinx.android.synthetic.main.activity_online.*
 import javax.inject.Inject
@@ -102,20 +105,22 @@ class OnlineActivity : AppCompatActivity(),
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.received_items, menu)
 
         val switch = menu?.findItem(R.id.action_switch)?.actionView as Switch
-
         switch.isChecked = viewModel.active.value != false
-
+        switch.setText("Showing Online")
         switch.setOnCheckedChangeListener { component, checked ->
             if (checked) {
                 viewModel.active.value = true
                 textView_online.text = getString(R.string.online)
+                component.setText("Showing Online")
             } else {
                 viewModel.active.value = false
                 textView_online.text = getString(R.string.offline)
+                component.setText("Showing Offline")
             }
         }
         return true
