@@ -1,5 +1,6 @@
 package com.example.marvellisimo.activity.online_list
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.repository.models.realm.User
 import com.example.marvellisimo.repository.Repository
@@ -34,7 +35,7 @@ class OnlineViewModel @Inject constructor(private val repository: Repository) {
         CoroutineScope(Dispatchers.Default).launch{
             while (showList){
                 runBlocking {
-                    delay(2000)
+                    delay(500)
                 }
                 fetchUsers()
             }

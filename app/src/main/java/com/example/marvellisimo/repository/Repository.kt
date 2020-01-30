@@ -454,7 +454,8 @@ class Repository @Inject constructor(
         val result = DB.collUsers.find(filter).into(tempList)
         while (!result.isComplete) delay(5)
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) }
-            .filter { it.uid != this.user!!.uid })
+            //.filter { it.uid != this.user!!.uid }
+        )
     }
 
 }
