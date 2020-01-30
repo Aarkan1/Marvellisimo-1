@@ -124,6 +124,14 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
         viewModel.toastMessage.observe(this, Observer<String> {
             if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         })
+
+        seriesDetailsViewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
+
+        characterDetailsViewModel.toastMessage.observe(this, Observer<String> {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        })
     }
 
     private fun createProgressDialog() {
