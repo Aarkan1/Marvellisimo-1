@@ -1,6 +1,5 @@
 package com.example.marvellisimo.repository.models.common
-
-import com.example.marvellisimo.marvelEntities.Character
+import com.example.marvellisimo.repository.models.realm.Character
 
 class CharacterNonRealm(character: Character? = null) {
     var thumbnail: ImageNonRealm =

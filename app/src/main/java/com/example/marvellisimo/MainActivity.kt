@@ -17,6 +17,8 @@ import com.example.marvellisimo.activity.login.LoginActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.repository.DB
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
@@ -28,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //DB.client.auth.logout()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -40,16 +41,20 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
-
         viewModel.repository.fetchCurrentUser()
 
-        Log.d(TAG, viewModel.repository.user.toString())
+        start_search_button.setOnClickListener { startSearchButtonClicked() }
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
             startActivity(Intent(this, ReceiveItemsActivity::class.java))
         }
 
+    }
+
+    private fun startSearchButtonClicked() {
+        val intent = Intent(this, SearchActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

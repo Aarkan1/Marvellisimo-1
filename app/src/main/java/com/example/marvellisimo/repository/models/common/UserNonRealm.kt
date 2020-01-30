@@ -1,6 +1,6 @@
 package com.example.marvellisimo.repository.models.common
 
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.User
 
 class UserNonRealm(user: User) {
     var uid: String = ""

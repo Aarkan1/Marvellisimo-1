@@ -27,6 +27,16 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
     val toastMessage = MutableLiveData<String>().apply { value = "" }
     val noFavoritesItems = MutableLiveData<Boolean>().apply { value = false }
 
+    fun refresh() = CS(IO).launch {
+        if (searchType.value == SearchType.CHARACTERS) CS(Main).launch {
+            favoriteCharacters.value = emptyArray()
+            fetchFavoriteCharacters()
+        } else CS(Main).launch {
+            favoriteSeries.value = emptyArray()
+            fetchFavoriteSeries()
+        }
+    }
+
     fun fetchFavoriteCharacters() = CS(IO).launch {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
 
@@ -34,7 +44,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             CS(Main).launch { loading.value = true }
 
         try {
-            repository.updateUser()
+            repository.updateUser(maxTimeout = 10000L)
         } catch (ex: Exception) {
             CS(Main).launch {
                 toastMessage.value = "Failed to synchronize user with server..."
@@ -65,7 +75,7 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             CS(Main).launch { loading.value = true }
 
         try {
-            repository.updateUser()
+            repository.updateUser(maxTimeout = 10000L)
         } catch (ex: Exception) {
             CS(Main).launch {
                 toastMessage.value = "Failed to synchronize user with server..."
@@ -77,7 +87,8 @@ class FavoritesViewModel @Inject constructor(private val repository: Repository)
             val series = repository.fetchFavoriteSeries().toTypedArray()
             CS(Main).launch {
                 favoriteSeries.value = series
-                noFavoritesItems.value = series.isEmpty()}
+                noFavoritesItems.value = series.isEmpty()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
             CS(Main).launch { toastMessage.value = "Something went wrong..." }

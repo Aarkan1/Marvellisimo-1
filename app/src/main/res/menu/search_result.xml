@@ -10,4 +10,9 @@
           android:title="@string/toolbar_search"
           android:icon="@android:drawable/ic_menu_search"
           app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_refresh"
+          android:title="Refresh"
+          android:icon="@drawable/ic_cached_24px"
+          app:showAsAction="ifRoom"/>
 </menu>

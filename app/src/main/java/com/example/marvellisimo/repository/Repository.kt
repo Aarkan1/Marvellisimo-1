@@ -1,16 +1,11 @@
 package com.example.marvellisimo.repository
 
 import android.util.Log
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
-import com.example.marvellisimo.models.ReceiveItem
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.common.ReceiveItem
 import com.example.marvellisimo.repository.models.common.UserNonRealm
-import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
-import com.example.marvellisimo.repository.models.realm.HistoryItem
-import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
+import com.example.marvellisimo.repository.models.realm.*
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
 import com.mongodb.client.model.Filters
@@ -91,12 +86,18 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun updateUser() {
+    suspend fun updateUser(maxTimeout: Long = -1L) {
         //Log.d(TAG, "updateUser")
+
+        var timeout = 0L
 
         val filter = Document().append("_id", Document().append("\$eq", ObjectId(user!!.uid)))
         val mongoResult = DB.collUsers.findOne(filter)
-        while (!mongoResult.isComplete) delay(5)
+        while (!mongoResult.isComplete) {
+            delay(5)
+            timeout += 5L
+            if (maxTimeout != -1L && timeout >= maxTimeout) throw Exception("Timeout")
+        }
         if (mongoResult.result == null) return
 
         val user = documentToUser(mongoResult.result)
@@ -444,7 +445,7 @@ class Repository @Inject constructor(
 
     }
 
-    suspend fun fetchOnlineUsers(active : Boolean): ArrayList<User> {
+    suspend fun fetchOnlineUsers(active: Boolean): ArrayList<User> {
         CoroutineScope(IO).launch { updateUser() }
         val gson = Gson()
         val tempList = ArrayList<Document>()

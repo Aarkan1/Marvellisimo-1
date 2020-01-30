@@ -75,7 +75,6 @@ class RegisterActivity : AppCompatActivity() {
 
         emailPassClient.registerWithEmail(email, password)
             .addOnSuccessListener {
-                CoroutineScope(Main).launch { loadingDialog.dismiss() }
                 val credential = UserPasswordCredential(email, password)
                 // auto login after sign up
                 // because mongoDB Stitch requires confirmation + sign in to get a _id
@@ -92,8 +91,9 @@ class RegisterActivity : AppCompatActivity() {
                             userDoc["isOnline"] = true
                             userDoc["favoriteSeries"] = ArrayList<String>()
                             userDoc["favoriteCharacters"] = ArrayList<String>()
-
                             viewModel.createNewUser(userDoc)
+
+                            CoroutineScope(Main).launch { loadingDialog.dismiss() }
                             val intent = Intent(this, MainActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(intent)

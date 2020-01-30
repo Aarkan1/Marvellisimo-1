@@ -3,12 +3,10 @@ package com.example.marvellisimo.services
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.User
 import com.example.marvellisimo.repository.DB
 import com.google.gson.Gson
 import com.mongodb.stitch.android.core.Stitch
-import io.realm.Realm
 import kotlinx.coroutines.*
 import org.bson.Document
 import org.bson.types.ObjectId
