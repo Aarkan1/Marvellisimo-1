@@ -1,5 +1,6 @@
 package com.example.marvellisimo
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -68,9 +69,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_logout -> {
                 Log.d(TAG, viewModel.repository.user.toString())
-                viewModel.logoutUser()
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                alertDialog()
                 true
             }
             R.id.action_search -> {
@@ -94,5 +93,27 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    private fun alertDialog(){
+        val builder1: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder1.setMessage("Are you sure you want to log out?")
+
+        //cancel dialog if clicked outside it.
+        //builder1.setCancelable(false)
+
+        builder1.setPositiveButton("Yes") { dialog, id ->
+            dialog.cancel()
+            viewModel.logoutUser()
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
+        builder1.setNegativeButton("No") { dialog, id ->
+            dialog.cancel()
+        }
+
+        val alert11: AlertDialog = builder1.create()
+        alert11.show()
     }
 }

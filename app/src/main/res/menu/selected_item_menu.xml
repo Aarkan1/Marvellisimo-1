@@ -6,9 +6,15 @@
           android:icon="@android:drawable/ic_menu_search"
           app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/detail_menu_send"
-          android:title="@string/send_it_to_friend"/>
+    <item
+        android:id="@+id/detail_menu_add_to_favorites"
+        android:icon="@drawable/ic_favorite_border_black_24dp"
+        android:title="@string/add_to_favorites"
+        app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/detail_menu_add_to_favorites"
-          android:title="@string/add_to_favorites"/>
+    <item
+        android:id="@+id/detail_menu_send"
+        android:icon="@android:drawable/ic_menu_send"
+        android:title="@string/send_it_to_friend"
+        app:showAsAction="ifRoom" />
 </menu>
