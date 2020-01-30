@@ -1,4 +1,4 @@
-package com.example.marvellisimo
+package com.example.marvellisimo.activity.main
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -12,13 +12,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.example.marvellisimo.MarvellisimoApplication
+import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
 import com.example.marvellisimo.activity.login.LoginActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.repository.DB
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import javax.inject.Inject
 
