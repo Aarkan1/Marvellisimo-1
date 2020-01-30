@@ -7,8 +7,8 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     val repository: Repository
 ) {
-    fun createNewUser(user: Document) {
-        repository.createNewUser(user)
+    suspend fun createNewUser(user: Document): Boolean {
+        return repository.createNewUser(user)
     }
 }
 
