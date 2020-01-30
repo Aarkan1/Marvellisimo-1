@@ -1,7 +1,9 @@
 package com.example.marvellisimo.activity.series_details
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +30,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
 
+    private var toast: Toast? = null
     private lateinit var loadingDialog: AlertDialog
     private lateinit var actionFavorites: MenuItem
 
@@ -116,12 +119,14 @@ class SeriesDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.detail_menu_send -> {
+                if(!isOnline()) return false
                 val intent = Intent(this, OnlineActivity::class.java)
                 intent.putExtra("itemId", viewModel.series.value?.id.toString())
                 intent.putExtra("type", "serie")
                 startActivity(intent); true
             }
             R.id.detail_menu_add_to_favorites -> {
+                if(!isOnline()) return false
                 if (viewModel.inFavorites.value!!) viewModel.removeFromFavorites(viewModel.series.value?.id.toString())
                 else viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
             }
@@ -130,5 +135,26 @@ class SeriesDetailsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    private fun isOnline(): Boolean {
+        val connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var isWifiConn = false
+        var isMobileConn = false
+        connMgr.allNetworks.forEach { network ->
+            connMgr.getNetworkInfo(network).apply {
+                if (type == ConnectivityManager.TYPE_WIFI) {
+                    isWifiConn = isWifiConn or isConnected
+                }
+                if (type == ConnectivityManager.TYPE_MOBILE) {
+                    isMobileConn = isMobileConn or isConnected
+                }
+            }
+        }
+        if(!isMobileConn && !isWifiConn) {
+            toast?.cancel()
+            toast = Toast.makeText(this, "Needs online connection", Toast.LENGTH_SHORT)
+            toast?.show()
+        }
+        return isWifiConn || isMobileConn
     }
 }

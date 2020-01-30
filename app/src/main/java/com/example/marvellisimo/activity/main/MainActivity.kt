@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         start_search_button.setOnClickListener { startActivity(Intent(this, SearchActivity::class.java)) }
         start_received_items.setOnClickListener { if(isOnline()) startActivity(Intent(this, ReceiveItemsActivity::class.java)) }
         start_users.setOnClickListener { if(isOnline()) startActivity(Intent(this, OnlineActivity::class.java)) }
-        start_favorites.setOnClickListener { startActivity(Intent(this, FavoritesActivity::class.java)) }
+        start_favorites.setOnClickListener { if(isOnline()) startActivity(Intent(this, FavoritesActivity::class.java)) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
             toast = Toast.makeText(this, "Needs online connection", Toast.LENGTH_SHORT)
             toast?.show()
         }
-
         return isWifiConn || isMobileConn
     }
 }
