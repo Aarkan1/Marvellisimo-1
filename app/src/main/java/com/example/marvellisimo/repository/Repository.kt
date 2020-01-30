@@ -109,21 +109,22 @@ class Repository @Inject constructor(
         }
     }
 
-    fun createNewUser(userDoc: Document) {
+    suspend fun createNewUser(userDoc: Document): Boolean {
         Log.d(TAG, "createNewUser: starts")
-        CoroutineScope(IO).launch {
-            DB.collUsers.insertOne(userDoc)
-                .addOnSuccessListener {
-                    val realmUser = documentToUser(userDoc)
-                    user = UserNonRealm(realmUser)
-                    realm.executeTransaction {
-                        realm.insertOrUpdate(realmUser)
-                    }
-                }
-                .addOnFailureListener {
-                    Log.e(TAG, "Error in createNewUser: ${it.message}")
-                }
+        val task = DB.collUsers.insertOne(userDoc)
+
+        try {
+            while(!task.isComplete) delay(5)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in createNewUser: ${e.message}")
+            return false
         }
+        val realmUser = documentToUser(userDoc)
+        user = UserNonRealm(realmUser)
+        realm.executeTransaction {
+            realm.insertOrUpdate(realmUser)
+        }
+        return true
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean, logOut: Boolean = false) {
@@ -146,12 +147,6 @@ class Repository @Inject constructor(
                 Log.d(TAG, "Logging out user")
                 DB.stitchClient.auth.logout()
                 user = null
-            }
-
-            CoroutineScope(Dispatchers.Main).launch {
-                realm.executeTransaction {
-                    it.insertOrUpdate(documentToUser(task.result))
-                }
             }
         }
     }
