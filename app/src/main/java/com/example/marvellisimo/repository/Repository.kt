@@ -1,16 +1,11 @@
 package com.example.marvellisimo.repository
 
 import android.util.Log
-import com.example.marvellisimo.marvelEntities.Character
-import com.example.marvellisimo.marvelEntities.Series
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
-import com.example.marvellisimo.models.ReceiveItem
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.common.ReceiveItem
 import com.example.marvellisimo.repository.models.common.UserNonRealm
-import com.example.marvellisimo.repository.models.realm.CharacterSearchResult
-import com.example.marvellisimo.repository.models.realm.HistoryItem
-import com.example.marvellisimo.repository.models.realm.SeriesSearchResult
+import com.example.marvellisimo.repository.models.realm.*
 import com.example.marvellisimo.services.MarvelService
 import com.google.gson.Gson
 import com.mongodb.client.model.Filters

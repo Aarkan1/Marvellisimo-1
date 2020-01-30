@@ -14,11 +14,10 @@ import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
-import com.example.marvellisimo.models.ReceiveItem
+import com.example.marvellisimo.repository.models.common.ReceiveItem
 import com.example.marvellisimo.repository.models.realm.SearchType
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import kotlinx.android.synthetic.main.activity_character_serie_result_list.*
 import kotlinx.android.synthetic.main.activity_receive_items.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
