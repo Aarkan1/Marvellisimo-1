@@ -100,12 +100,14 @@ class SeriesDetailsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.selected_item_menu, menu)
-
         actionFavorites = menu!!.findItem(R.id.detail_menu_add_to_favorites)
 
+        val fav = R.drawable.ic_favorite_black_24dp
+        val noFav = R.drawable.ic_favorite_border_black_24dp
+
         viewModel.inFavorites.observe(this, Observer<Boolean> {
-            if (it) actionFavorites.title = "Remove From Favorites"
-            else actionFavorites.title = "Add To Favorites"
+            if (it) actionFavorites.setIcon(fav)
+            else actionFavorites.setIcon(noFav)
         })
 
         return super.onCreateOptionsMenu(menu)
