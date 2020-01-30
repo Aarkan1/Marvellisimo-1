@@ -1,6 +1,7 @@
 package com.example.marvellisimo.repository.models.common
 
-import com.example.marvellisimo.marvelEntities.Series
+import com.example.marvellisimo.repository.models.realm.Series
+
 
 class SeriesNonRealm(series: Series? = null) {
     var id: Int = 1

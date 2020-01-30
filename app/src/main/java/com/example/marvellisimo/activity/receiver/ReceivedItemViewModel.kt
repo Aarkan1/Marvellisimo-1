@@ -1,8 +1,7 @@
 package com.example.marvellisimo.activity.receiver
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.marvellisimo.models.ReceiveItem
+import com.example.marvellisimo.repository.models.common.ReceiveItem
 import com.example.marvellisimo.repository.Repository
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm

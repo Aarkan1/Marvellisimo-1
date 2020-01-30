@@ -13,7 +13,7 @@ import com.example.marvellisimo.MainActivity
 import com.example.marvellisimo.MarvellisimoApplication
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.character_details.CharacterDetailsViewModel
-import com.example.marvellisimo.models.User
+import com.example.marvellisimo.repository.models.realm.User
 import kotlinx.android.synthetic.main.activity_online.*
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.example.marvellisimo.models
+package com.example.marvellisimo.repository.models.realm
 
 import io.realm.RealmList
 import io.realm.RealmObject
