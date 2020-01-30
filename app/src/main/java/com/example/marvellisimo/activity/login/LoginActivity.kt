@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import com.example.marvellisimo.*
+import com.example.marvellisimo.activity.main.MainActivity
 import com.example.marvellisimo.activity.register.RegisterActivity
 import com.example.marvellisimo.repository.DB
 import com.mongodb.stitch.core.auth.providers.userpassword.UserPasswordCredential

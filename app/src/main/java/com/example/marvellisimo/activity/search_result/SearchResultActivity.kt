@@ -61,9 +61,7 @@ class SearchResultActivity : AppCompatActivity() {
         searchString = intent.getStringExtra("search") ?: stringsViewModel.searchString
         if (intent.getStringExtra("search") != null) stringsViewModel.searchString = searchString
         val searchType = intent.getStringExtra("type") ?: "characters"
-
         supportActionBar!!.title = searchString
-
         if (searchType == "series") viewModel.searchType.value = SearchType.SERIES
         else viewModel.searchType.value = SearchType.CHARACTERS
 
