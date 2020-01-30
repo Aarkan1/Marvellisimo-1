@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -53,9 +51,7 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
 
     @Inject
     lateinit var characterDetailsViewModel: CharacterDetailsViewModel
-
     lateinit var stringsViewModel: StringsViewModel
-
     private val that = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,11 +60,8 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
         setContentView(R.layout.activity_character_serie_result_list)
 
         MarvellisimoApplication.applicationComponent.inject(this)
-
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
-        //seriesAdapter.setOnItemClickListener(this::onItemClick)
-        //charactersAdapter.setOnItemClickListener(this::onItemClick)
 
         stringsViewModel = ViewModelProviders.of(this).get(StringsViewModel::class.java)
 
@@ -84,7 +77,6 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
         else viewModel.searchType.value = SearchType.CHARACTERS
 
         observeViewModel()
-
     }
 
     private fun observeViewModel() {
@@ -92,7 +84,6 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
             charactersAdapter.clear()
             arr.forEach {
                 CoroutineScope(Dispatchers.IO).launch {
-
                     val isFavorite = characterDetailsViewModel
                         .checkIfInFavoritesInResultList(it.id.toString(), "character")
 
@@ -146,30 +137,6 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
         builder.setCancelable(false)
         dialog = builder.create()
     }
-
-/*    private fun onItemClick(item: Item<GroupieViewHolder>, view: View) {
-        if (item is CharacterSearchResultItem) {
-            if (!item.isFavorite) {
-                intent = Intent(this, CharacterDetailsActivity::class.java)
-                intent.putExtra("id", item.character.id)
-                intent.putExtra("searchString", searchString)
-            }else{
-
-                Log.d("___", "Hej from else ")
-
-                if (characterDetailsViewModel.inFavorites.value!!)
-                    characterDetailsViewModel.removeFromFavorites(characterDetailsViewModel.character.value?.id.toString())
-                else
-                    characterDetailsViewModel.addToFavorites(characterDetailsViewModel.character.value?.id.toString())
-
-            }
-        } else if (item is SeriesSearchResultItem) {
-            intent = Intent(this, SeriesDetailsActivity::class.java)
-            intent.putExtra("id", item.series.id)
-            intent.putExtra("searchString", searchString)
-        }
-        startActivity(intent)
-    }*/
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         Log.d(TAG, "onCreateOptionsMenu")
@@ -229,7 +196,6 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
     }
 
     override fun onSeriesClick(series: SeriesNonRealm) {
-        Log.d("___", "Hej from onSeriesClick ")
         intent = Intent(this, SeriesDetailsActivity::class.java)
         intent.putExtra("id", series.id)
         intent.putExtra("searchString", searchString)
@@ -237,7 +203,6 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
     }
 
     override fun onRemoveSeriesClick(series: SeriesNonRealm) {
-        Log.d("___", "Hej from onRemoveSeriesClick ")
         seriesDetailsViewModel.removeFromFavorites(series.id.toString())
     }
 
