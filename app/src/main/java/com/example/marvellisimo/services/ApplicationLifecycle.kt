@@ -31,7 +31,6 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         }
     }
 
-
     private fun updateOnlineStatus(isOnline: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
             val id = Stitch.getDefaultAppClient().auth.user?.id ?: return@launch

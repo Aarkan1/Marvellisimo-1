@@ -12,6 +12,7 @@ import com.mongodb.client.model.Filters
 import io.realm.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import org.bson.Document
 import org.bson.types.ObjectId
 import javax.inject.Inject
@@ -51,11 +52,29 @@ class Repository @Inject constructor(
         realm.commitTransaction()
     }
 
-    fun fetchCurrentUser() {
+    fun getOfflineId(): String {
+        val realmAuth = Realm.getDefaultInstance().where(RealmAuth::class.java)
+            .equalTo("primeKey", "realm-auth-id")
+            .findFirst()
+
+        if (realmAuth != null) {
+            Log.d("offline", "Loading offline auth ID: ${realmAuth.id}")
+            return realmAuth.id
+        }
+        return ""
+    }
+
+    fun fetchCurrentUser(isOnline: Boolean = true) {
         Log.d(TAG, "fetchCurrentUser: starts")
-        val id = if (DB.stitchClient.auth.isLoggedIn)
-            DB.stitchClient.auth.user!!.id
-        else return
+        val id: String
+            if (isOnline && DB.stitchClient.auth.isLoggedIn) {
+           id = DB.stitchClient.auth.user!!.id
+        } else {
+            id = getOfflineId()
+                if(id == "") return
+        }
+        setUserFromRealm(id)
+        if(!isOnline) return
 
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
@@ -65,14 +84,13 @@ class Repository @Inject constructor(
                     doc.result["isOnline"] = true
                     realm.executeTransaction {
                         it.insertOrUpdate(documentToUser(doc.result))
-                        if (user == null) {
-                            setUserFromRealm(id)
-                            updateUserOnlineStatus(true)
-                        }
+                    }
+                    if (user == null) {
+                        setUserFromRealm(id)
+                        updateUserOnlineStatus(true)
                     }
                 }
         }
-        setUserFromRealm(id)
     }
 
     private fun setUserFromRealm(id: String) {
@@ -83,6 +101,7 @@ class Repository @Inject constructor(
         if (realmUser != null) {
             Log.d(TAG, "Loading RealmUser: ${realmUser.username}, uid: ${realmUser.uid}")
             user = UserNonRealm(realmUser)
+            updateRealmAuthId()
         }
     }
 
@@ -124,6 +143,7 @@ class Repository @Inject constructor(
         realm.executeTransaction {
             realm.insertOrUpdate(realmUser)
         }
+        updateRealmAuthId()
         return true
     }
 
@@ -147,6 +167,15 @@ class Repository @Inject constructor(
                 Log.d(TAG, "Logging out user")
                 DB.stitchClient.auth.logout()
                 user = null
+                updateRealmAuthId("")
+            }
+        }
+    }
+
+    private fun updateRealmAuthId(id: String = user!!.uid) {
+        CoroutineScope(Main).launch {
+            realm.executeTransaction {
+                realm.insertOrUpdate(RealmAuth(id))
             }
         }
     }
@@ -188,7 +217,7 @@ class Repository @Inject constructor(
     suspend fun fetchFavoriteCharacters(): List<CharacterNonRealm> {
         Log.d(TAG, "fetchFavoriteCharacters: starts")
         if (user == null) throw Exception("No user")
-        val favoriteCharacters = user!!.favoriteCharacters ?: return emptyList()
+        val favoriteCharacters = user!!.favoriteCharacters
 
         return favoriteCharacters
             .map { CoroutineScope(IO).async { fetchCharacterById(it) } }
@@ -233,7 +262,7 @@ class Repository @Inject constructor(
         Log.d(TAG, "fetchFavoriteSeries: starts")
         if (user == null) throw Exception("No user")
 
-        val favoriteSeries = user!!.favoriteSeries ?: return emptyList()
+        val favoriteSeries = user!!.favoriteSeries
 
         return favoriteSeries
             .map { CoroutineScope(IO).async { fetchSeriesById(it) } }

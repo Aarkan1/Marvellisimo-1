@@ -4,6 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.net.ConnectivityManager
+import android.util.Log
 import com.example.marvellisimo.activity.character_details.CharacterDetailsActivity
 import com.example.marvellisimo.activity.receiver.ReceiveItemsActivity
 import com.example.marvellisimo.activity.favorites.FavoritesActivity
@@ -15,12 +17,14 @@ import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.search_result.SearchResultActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.notification.TestService
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.MarvelProvider
 import com.example.marvellisimo.services.ApplicationLifecycle
 import com.mongodb.stitch.android.core.Stitch
 import dagger.Component
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import java.lang.Exception
 import javax.inject.Singleton
 
 @Singleton
@@ -79,5 +83,4 @@ class MarvellisimoApplication : Application() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
-
 }
