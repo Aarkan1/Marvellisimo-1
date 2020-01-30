@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.Repository
-import com.mongodb.stitch.core.internal.common.Dispatcher
 
 import kotlinx.coroutines.CoroutineScope as CS
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Exception
@@ -86,6 +86,28 @@ class CharacterDetailsViewModel @Inject constructor(private val repository: Repo
         }
 
         CS(Main).launch { inFavorites.value = repository.user?.favoriteCharacters?.contains(id) ?: false }
+    }
+
+    suspend fun checkIfInFavoritesInResultList(id: String, type: String): Boolean {
+        CS(IO).launch {
+            Log.d(TAG, "checkIfInFavorites: starts")
+
+            try {
+                repository.updateUser()
+            } catch (ex: Exception) {
+                CS(Main).launch {
+                    toastMessage.value = "Failed to synchronize user with server..."
+                    toastMessage.value = ""
+                }
+            }
+        }
+        if (type == "character") {
+            return CS(IO).async { repository.user?.favoriteCharacters?.contains(id) ?: false }
+                .await()
+        }
+
+        return CS(IO).async { repository.user?.favoriteSeries?.contains(id) ?: false }
+            .await()
     }
 
     fun sendToFriend(itemId: String, type: String, uid: String) = CS(Main).launch {
