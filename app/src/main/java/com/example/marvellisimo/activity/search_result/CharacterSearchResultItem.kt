@@ -1,8 +1,12 @@
 package com.example.marvellisimo.activity.search_result
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.widget.ImageView
+import android.widget.Toast
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.favorites.CharacterItemActionListener
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
@@ -11,7 +15,8 @@ import kotlinx.android.synthetic.main.search_result_item.view.*
 
 class CharacterSearchResultItem(val character: CharacterNonRealm,
                                 val isFavorite: Boolean,
-                                private val characterItemActionListener: CharacterItemActionListener
+                                private val characterItemActionListener: CharacterItemActionListener,
+                                val connMgr: ConnectivityManager
 )
     : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
@@ -38,13 +43,15 @@ class CharacterSearchResultItem(val character: CharacterNonRealm,
         else viewHolder.itemView.fav_imageView.setImageResource(noFav)
 
         viewHolder.itemView.fav_imageView.setOnClickListener {
-            val s = it as ImageView
-            if (s.drawable.constantState == s.resources.getDrawable(fav).constantState) {
-                characterItemActionListener.onRemoveCharacterClick(character)
-                viewHolder.itemView.fav_imageView.setImageResource(noFav)
-            }else{
-                characterItemActionListener.onAddCharacterToFavorites(character.id.toString())
-                viewHolder.itemView.fav_imageView.setImageResource(fav)
+            if(DB.isOnline(characterItemActionListener as Context, connMgr)) {
+                val s = it as ImageView
+                if (s.drawable.constantState == s.resources.getDrawable(fav).constantState) {
+                    characterItemActionListener.onRemoveCharacterClick(character)
+                    viewHolder.itemView.fav_imageView.setImageResource(noFav)
+                } else {
+                    characterItemActionListener.onAddCharacterToFavorites(character.id.toString())
+                    viewHolder.itemView.fav_imageView.setImageResource(fav)
+                }
             }
         }
 

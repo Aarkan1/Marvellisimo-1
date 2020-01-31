@@ -1,8 +1,12 @@
 package com.example.marvellisimo.activity.search_result
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.widget.ImageView
+import android.widget.Toast
 import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.favorites.SeriesItemActionListener
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
@@ -11,7 +15,8 @@ import kotlinx.android.synthetic.main.search_result_item.view.*
 
 class SeriesSearchResultItem(val series: SeriesNonRealm,
                              val isFavorite: Boolean,
-                             private val seriesItemActionListener: SeriesItemActionListener
+                             private val seriesItemActionListener: SeriesItemActionListener,
+                             val connMgr: ConnectivityManager
 )
     : Item<GroupieViewHolder>() {
     override fun getLayout(): Int {
@@ -34,14 +39,15 @@ class SeriesSearchResultItem(val series: SeriesNonRealm,
         else viewHolder.itemView.fav_imageView.setImageResource(noFav)
 
         viewHolder.itemView.fav_imageView.setOnClickListener {
-            val s = it as ImageView
-            if (s.drawable.constantState == s.resources.getDrawable(fav).constantState) {
-                seriesItemActionListener.onRemoveSeriesClick(series)
-                viewHolder.itemView.fav_imageView.setImageResource(noFav)
-            }else{
-                seriesItemActionListener.onAddSeriesToFavorites(series.id.toString())
-                viewHolder.itemView.fav_imageView.setImageResource(fav)
-
+            if(DB.isOnline(seriesItemActionListener as Context, connMgr)) {
+                val s = it as ImageView
+                if (s.drawable.constantState == s.resources.getDrawable(fav).constantState) {
+                    seriesItemActionListener.onRemoveSeriesClick(series)
+                    viewHolder.itemView.fav_imageView.setImageResource(noFav)
+                }else{
+                    seriesItemActionListener.onAddSeriesToFavorites(series.id.toString())
+                    viewHolder.itemView.fav_imageView.setImageResource(fav)
+                }
             }
         }
 

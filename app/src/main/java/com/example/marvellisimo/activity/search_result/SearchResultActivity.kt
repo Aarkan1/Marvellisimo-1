@@ -1,7 +1,9 @@
 package com.example.marvellisimo.activity.search_result
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -53,13 +55,15 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
     lateinit var characterDetailsViewModel: CharacterDetailsViewModel
     lateinit var stringsViewModel: StringsViewModel
     private val that = this
+    private lateinit var connMgr: ConnectivityManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: starts")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_serie_result_list)
-
         MarvellisimoApplication.applicationComponent.inject(this)
+        connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         recyclerView_search_result.addItemDecoration(dividerItemDecoration)
 
@@ -84,9 +88,8 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
                 CoroutineScope(Dispatchers.IO).launch {
                     val isFavorite = characterDetailsViewModel
                         .checkIfInFavoritesInResultList(it.id.toString(), "character")
-
                     CoroutineScope(Dispatchers.Main).launch {
-                        charactersAdapter.add(CharacterSearchResultItem(it, isFavorite, that))
+                        charactersAdapter.add(CharacterSearchResultItem(it, isFavorite, that, connMgr))
                     }
                 }
             }
@@ -99,7 +102,7 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
                     val isFavorite = characterDetailsViewModel.
                         checkIfInFavoritesInResultList(it.id.toString(), "series")
                     CoroutineScope(Dispatchers.Main).launch {
-                        seriesAdapter.add(SeriesSearchResultItem(it, isFavorite, that))
+                        seriesAdapter.add(SeriesSearchResultItem(it, isFavorite, that, connMgr))
                     }
                 }
             }

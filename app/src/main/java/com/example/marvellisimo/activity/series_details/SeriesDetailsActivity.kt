@@ -18,6 +18,7 @@ import com.example.marvellisimo.R
 import com.example.marvellisimo.activity.webview_details.WebViewActivity
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.online_list.OnlineActivity
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_serie_details.*
@@ -29,16 +30,16 @@ class SeriesDetailsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: SeriesDetailsViewModel
+    private lateinit var connMgr: ConnectivityManager
 
-    private var toast: Toast? = null
     private lateinit var loadingDialog: AlertDialog
     private lateinit var actionFavorites: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serie_details)
-
         MarvellisimoApplication.applicationComponent.inject(this)
+        connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val serieId = intent.getIntExtra("id", 0)
 
@@ -48,7 +49,7 @@ class SeriesDetailsActivity : AppCompatActivity() {
         viewModel.getSeries(serieId.toString())
         viewModel.checkIfInFavorites(serieId.toString())
 
-        web_details_button_series.setOnClickListener { webButtonClick() }
+        web_details_button_series.setOnClickListener { if(DB.isOnline(this, connMgr)) webButtonClick() }
     }
 
     private fun webButtonClick() {
@@ -119,14 +120,14 @@ class SeriesDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.detail_menu_send -> {
-                if(!isOnline()) return false
+                if(!DB.isOnline(this, connMgr)) return false
                 val intent = Intent(this, OnlineActivity::class.java)
                 intent.putExtra("itemId", viewModel.series.value?.id.toString())
                 intent.putExtra("type", "serie")
                 startActivity(intent); true
             }
             R.id.detail_menu_add_to_favorites -> {
-                if(!isOnline()) return false
+                if(!DB.isOnline(this, connMgr)) return false
                 if (viewModel.inFavorites.value!!) viewModel.removeFromFavorites(viewModel.series.value?.id.toString())
                 else viewModel.addSeriesToFavorites(viewModel.series.value?.id.toString()); true
             }
@@ -135,26 +136,5 @@ class SeriesDetailsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-    private fun isOnline(): Boolean {
-        val connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var isWifiConn = false
-        var isMobileConn = false
-        connMgr.allNetworks.forEach { network ->
-            connMgr.getNetworkInfo(network).apply {
-                if (type == ConnectivityManager.TYPE_WIFI) {
-                    isWifiConn = isWifiConn or isConnected
-                }
-                if (type == ConnectivityManager.TYPE_MOBILE) {
-                    isMobileConn = isMobileConn or isConnected
-                }
-            }
-        }
-        if(!isMobileConn && !isWifiConn) {
-            toast?.cancel()
-            toast = Toast.makeText(this, "Needs online connection", Toast.LENGTH_SHORT)
-            toast?.show()
-        }
-        return isWifiConn || isMobileConn
     }
 }

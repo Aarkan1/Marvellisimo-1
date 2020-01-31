@@ -31,7 +31,7 @@ private const val TAG = "MainActivity"
 @Suppress("DEPRECATION", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private var toast: Toast? = null
+    private lateinit var connMgr: ConnectivityManager
 
     @Inject
     lateinit var viewModel: MainViewModel
@@ -42,22 +42,31 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         MarvellisimoApplication.applicationComponent.inject(this)
+        connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        if (isOnline() && !DB.stitchClient.auth.isLoggedIn) {
+        if (DB.isOnline(this, connMgr) && !DB.stitchClient.auth.isLoggedIn) {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
-        viewModel.repository.fetchCurrentUser(isOnline())
+        viewModel.repository.fetchCurrentUser(DB.isOnline(this, connMgr))
 
         listenForButtonClicks()
     }
 
     private fun listenForButtonClicks() {
-        start_search_button.setOnClickListener { startActivity(Intent(this, SearchActivity::class.java)) }
-        start_received_items.setOnClickListener { if(isOnline()) startActivity(Intent(this, ReceiveItemsActivity::class.java)) }
-        start_users.setOnClickListener { if(isOnline()) startActivity(Intent(this, OnlineActivity::class.java)) }
-        start_favorites.setOnClickListener { if(isOnline()) startActivity(Intent(this, FavoritesActivity::class.java)) }
+        start_search_button.setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
+        }
+        start_received_items.setOnClickListener {
+            if (DB.isOnline(this, connMgr)) startActivity(Intent(this, ReceiveItemsActivity::class.java))
+        }
+        start_users.setOnClickListener {
+            if (DB.isOnline(this, connMgr)) startActivity(Intent(this, OnlineActivity::class.java))
+        }
+        start_favorites.setOnClickListener {
+            if (DB.isOnline(this, connMgr)) startActivity(Intent(this, FavoritesActivity::class.java))
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -70,8 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_logout -> {
-                if(!isOnline()) return false
-
+                if (!DB.isOnline(this, connMgr)) return false
                 alertDialog()
                 true
             }
@@ -88,9 +96,6 @@ class MainActivity : AppCompatActivity() {
         val builder1: AlertDialog.Builder = AlertDialog.Builder(this)
         builder1.setMessage("Are you sure you want to log out?")
 
-        //cancel dialog if clicked outside it.
-        //builder1.setCancelable(false)
-
         builder1.setPositiveButton("Yes") { dialog, _ ->
             dialog.cancel()
             viewModel.logoutUser()
@@ -104,27 +109,5 @@ class MainActivity : AppCompatActivity() {
 
         val alert11: AlertDialog = builder1.create()
         alert11.show()
-    }
-
-    private fun isOnline(): Boolean {
-        val connMgr = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var isWifiConn = false
-        var isMobileConn = false
-        connMgr.allNetworks.forEach { network ->
-            connMgr.getNetworkInfo(network).apply {
-                if (type == ConnectivityManager.TYPE_WIFI) {
-                    isWifiConn = isWifiConn or isConnected
-                }
-                if (type == ConnectivityManager.TYPE_MOBILE) {
-                    isMobileConn = isMobileConn or isConnected
-                }
-            }
-        }
-        if(!isMobileConn && !isWifiConn) {
-            toast?.cancel()
-            toast = Toast.makeText(this, "Needs online connection", Toast.LENGTH_SHORT)
-            toast?.show()
-        }
-        return isWifiConn || isMobileConn
     }
 }

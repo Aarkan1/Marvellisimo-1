@@ -52,7 +52,7 @@ class Repository @Inject constructor(
         realm.commitTransaction()
     }
 
-    fun getOfflineId(): String {
+    private fun getOfflineId(): String {
         val realmAuth = Realm.getDefaultInstance().where(RealmAuth::class.java)
             .equalTo("primeKey", "realm-auth-id")
             .findFirst()
@@ -74,8 +74,9 @@ class Repository @Inject constructor(
                 if(id == "") return
         }
         setUserFromRealm(id)
-        if(!isOnline) return
 
+        // don't fetch user from DB if there's no internet connection
+        if(!isOnline) return
         CoroutineScope(IO).launch {
             val filter = Document().append("_id", Document().append("\$eq", ObjectId(id)))
             DB.collUsers.findOne(filter)
@@ -480,7 +481,6 @@ class Repository @Inject constructor(
         return ArrayList(tempList.map { gson.fromJson(it.toJson(), User::class.java) }
             .filter { it.uid != this.user!!.uid })
     }
-
 }
 
 
