@@ -162,17 +162,19 @@
                   app:layout_constraintBottom_toBottomOf="@id/favorites_icon"
                   android:layout_marginStart="28dp" android:layout_marginEnd="16dp"
                   app:layout_constraintHorizontal_bias="0.33"/>
-        <Button android:id="@+id/favorites_icon"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/round_btn"
-                android:foreground="@android:drawable/ic_menu_add"
-                android:shadowColor="#00464646"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="0"/>
+
+        <Button
+            android:id="@+id/favorites_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/round_btn"
+            android:foreground="@drawable/ic_favorite_border_light_24dp"
+            android:shadowColor="#00464646"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
