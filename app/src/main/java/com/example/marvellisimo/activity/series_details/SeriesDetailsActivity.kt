@@ -88,7 +88,11 @@ class SeriesDetailsActivity : AppCompatActivity() {
         })
 
         viewModel.toastMessage.observe(this, Observer<String> {
-            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            if (it.isNotEmpty()) {
+                DB.toast?.cancel()
+                DB.toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
+                DB.toast?.show()
+            }
         })
     }
 

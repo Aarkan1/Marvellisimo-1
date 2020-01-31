@@ -13,7 +13,7 @@ class DB {
         val mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas")
         val collUsers = mongoClient.getDatabase("marvellisimo").getCollection("users")
         val sendReceive = mongoClient.getDatabase("marvellisimo").getCollection("send")
-        private var toast: Toast? = null
+        var toast: Toast? = null
 
         fun isOnline(context: Context, connMgr: ConnectivityManager): Boolean {
             var connected = false

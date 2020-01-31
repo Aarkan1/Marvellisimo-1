@@ -25,6 +25,7 @@ import com.example.marvellisimo.activity.favorites.SeriesItemActionListener
 import com.example.marvellisimo.activity.search.SearchActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsActivity
 import com.example.marvellisimo.activity.series_details.SeriesDetailsViewModel
+import com.example.marvellisimo.repository.DB
 import com.example.marvellisimo.repository.models.common.CharacterNonRealm
 import com.example.marvellisimo.repository.models.common.SeriesNonRealm
 import com.example.marvellisimo.repository.models.realm.SearchType
@@ -129,11 +130,19 @@ class SearchResultActivity : AppCompatActivity(), CharacterItemActionListener, S
         })
 
         seriesDetailsViewModel.toastMessage.observe(this, Observer<String> {
-            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            if (it.isNotEmpty()) {
+                DB.toast?.cancel()
+                DB.toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
+                DB.toast?.show()
+            }
         })
 
         characterDetailsViewModel.toastMessage.observe(this, Observer<String> {
-            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            if (it.isNotEmpty()){
+                DB.toast?.cancel()
+                DB.toast = Toast.makeText(this, it, Toast.LENGTH_SHORT)
+                DB.toast?.show()
+            }
         })
     }
 
