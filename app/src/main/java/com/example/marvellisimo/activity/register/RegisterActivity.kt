@@ -102,7 +102,6 @@ class RegisterActivity : AppCompatActivity() {
         userDoc["uid"] = loginTask.result!!.id
         userDoc["username"] = username
         userDoc["email"] = email
-        userDoc["avatar"] = ""
         userDoc["isOnline"] = true
         userDoc["favoriteSeries"] = ArrayList<String>()
         userDoc["favoriteCharacters"] = ArrayList<String>()

@@ -57,7 +57,6 @@ class ApplicationLifecycle : Application.ActivityLifecycleCallbacks {
         userDoc["uid"] = user.uid
         userDoc["username"] = user.username
         userDoc["email"] = user.email
-        userDoc["avatar"] = user.avatar
         userDoc["favoriteSeries"] = user.favoriteSeries
         userDoc["favoriteCharacters"] = user.favoriteCharacters
 
