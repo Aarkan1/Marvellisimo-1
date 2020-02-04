@@ -15,7 +15,6 @@ class UserNonRealm(user: User) {
         uid = user.uid
         username = user.username
         email = user.email
-        avatar = user.avatar
         isOnline = user.isOnline
         favoriteCharacters = user.favoriteCharacters.map { it }.toMutableList()
         favoriteSeries = user.favoriteSeries.map { it }.toMutableList()
