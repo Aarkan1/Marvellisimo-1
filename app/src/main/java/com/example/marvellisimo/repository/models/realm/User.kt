@@ -10,7 +10,6 @@ open class User : RealmObject() {
     var uid: String = ""
     var username: String = ""
     var email: String = ""
-    var avatar: String = ""
     var isOnline: Boolean = false
     @Ignore
     var favoriteCharacters: RealmList<String> = RealmList()
